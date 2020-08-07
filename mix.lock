@@ -1,0 +1,3 @@
+%{
+  "protobuf": {:git, "https://github.com/xinz/protobuf-elixir.git", "06e5ac0530f778f2a757df8f3f2287c825c504e6", [branch: "proto2-enum"]},
+}
