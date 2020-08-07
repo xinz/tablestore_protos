@@ -1,6 +1,6 @@
 # TablestoreProtos
 
-**Alibaba Tablestore Service's proto files**
+**Alibaba Tablestore Service's proto files for Elixir.**
 
 ### How to use:
 
@@ -10,7 +10,7 @@
 
 Notice: this step can be ignored in the feture, since run `mix escript.install hex protobuf` will generated for 0.7.1 version, but we would like to use the master branch `src/elixirpb.proto` for module prefix defination.
 
-3, In the repo root directory, generate codes from `protos/*.proto`
+3, In the repo root directory, generate codes from `protos/*.proto`.
 
 ```
 protoc -I protos --elixir_out=./lib protos/*.proto
