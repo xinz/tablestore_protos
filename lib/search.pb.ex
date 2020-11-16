@@ -103,11 +103,12 @@ defmodule ExAliyunOts.TableStoreSearch.ColumnReturnType do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :RETURN_ALL | :RETURN_SPECIFIED | :RETURN_NONE
+  @type t :: integer | :RETURN_ALL | :RETURN_SPECIFIED | :RETURN_NONE | :RETURN_ALL_FROM_INDEX
 
   field :RETURN_ALL, 1
   field :RETURN_SPECIFIED, 2
   field :RETURN_NONE, 3
+  field :RETURN_ALL_FROM_INDEX, 4
 end
 
 defmodule ExAliyunOts.TableStoreSearch.IndexOptions do
@@ -1479,4 +1480,60 @@ defmodule ExAliyunOts.TableStoreSearch.GroupBysResult do
   defstruct [:group_by_results]
 
   field :group_by_results, 1, repeated: true, type: ExAliyunOts.TableStoreSearch.GroupByResult
+end
+
+defmodule ExAliyunOts.TableStoreSearch.ScanQuery do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          query: ExAliyunOts.TableStoreSearch.Query.t() | nil,
+          limit: integer,
+          alive_time: integer,
+          token: binary,
+          current_parallel_id: integer,
+          max_parallel: integer
+        }
+  defstruct [:query, :limit, :alive_time, :token, :current_parallel_id, :max_parallel]
+
+  field :query, 1, optional: true, type: ExAliyunOts.TableStoreSearch.Query
+  field :limit, 2, optional: true, type: :int32
+  field :alive_time, 3, optional: true, type: :int32
+  field :token, 4, optional: true, type: :bytes
+  field :current_parallel_id, 5, optional: true, type: :int32
+  field :max_parallel, 6, optional: true, type: :int32
+end
+
+defmodule ExAliyunOts.TableStoreSearch.ParallelScanRequest do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          table_name: String.t(),
+          index_name: String.t(),
+          columns_to_get: ExAliyunOts.TableStoreSearch.ColumnsToGet.t() | nil,
+          session_id: binary,
+          scan_query: binary
+        }
+  defstruct [:table_name, :index_name, :columns_to_get, :session_id, :scan_query]
+
+  field :table_name, 1, optional: true, type: :string
+  field :index_name, 2, optional: true, type: :string
+  field :columns_to_get, 3, optional: true, type: ExAliyunOts.TableStoreSearch.ColumnsToGet
+  field :session_id, 4, optional: true, type: :bytes
+  field :scan_query, 5, optional: true, type: :bytes
+end
+
+defmodule ExAliyunOts.TableStoreSearch.ParallelScanResponse do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          rows: [binary],
+          next_token: binary
+        }
+  defstruct [:rows, :next_token]
+
+  field :rows, 1, repeated: true, type: :bytes
+  field :next_token, 2, optional: true, type: :bytes
 end

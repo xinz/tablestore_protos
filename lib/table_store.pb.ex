@@ -1290,3 +1290,46 @@ defmodule ExAliyunOts.TableStore.ComputeSplitPointsBySizeResponse do
     repeated: true,
     type: ExAliyunOts.TableStore.ComputeSplitPointsBySizeResponse.SplitLocation
 end
+
+defmodule ExAliyunOts.TableStore.ComputeSplitsRequest do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          table_name: String.t(),
+          search_index_splits_options: ExAliyunOts.TableStore.SearchIndexSplitsOptions.t() | nil
+        }
+  defstruct [:table_name, :search_index_splits_options]
+
+  field :table_name, 1, optional: true, type: :string
+
+  field :search_index_splits_options, 2,
+    optional: true,
+    type: ExAliyunOts.TableStore.SearchIndexSplitsOptions
+end
+
+defmodule ExAliyunOts.TableStore.SearchIndexSplitsOptions do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          index_name: String.t()
+        }
+  defstruct [:index_name]
+
+  field :index_name, 1, optional: true, type: :string
+end
+
+defmodule ExAliyunOts.TableStore.ComputeSplitsResponse do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          session_id: binary,
+          splits_size: integer
+        }
+  defstruct [:session_id, :splits_size]
+
+  field :session_id, 1, optional: true, type: :bytes
+  field :splits_size, 2, optional: true, type: :int32
+end

@@ -1,5 +1,4 @@
 syntax = "proto2";
-
 package tablestore.core.protocol;
 
 import "elixirpb.proto";
@@ -490,3 +489,16 @@ message ComputeSplitPointsBySizeResponse {
 }
 /* -------------------------------------- */
 
+message ComputeSplitsRequest {
+    optional string table_name = 1;
+    optional SearchIndexSplitsOptions search_index_splits_options = 2;
+}
+
+message SearchIndexSplitsOptions{
+    optional string index_name = 1;
+}
+
+message ComputeSplitsResponse {
+    optional bytes session_id = 1;
+    optional int32 splits_size = 2;
+}
