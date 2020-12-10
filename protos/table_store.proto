@@ -1,9 +1,6 @@
 syntax = "proto2";
-package tablestore.core.protocol;
 
-import "elixirpb.proto";
-
-option (elixirpb.file).module_prefix = "ExAliyunOts.TableStore";
+package ExAliyunOts.TableStore;
 
 message Error {
     required string code = 1;

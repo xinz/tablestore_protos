@@ -5,9 +5,26 @@ defmodule TablestoreProtos.MixProject do
     [
       app: :tablestore_protos,
       version: "0.1.0",
-      elixir: "~> 1.10",
+      elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      description: description(),
+      package: package(),
+      deps: deps(),
+      docs: docs(),
+      source_url: "https://github.com/xinz/tablestore_protos"
+    ]
+  end
+
+  defp description do
+    "The generated protobuf modules to Alibaba TableStore Elixir SDK"
+  end
+
+  defp package do
+    [
+      files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
+      maintainers: ["Xin Zou"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/xinz/tablestore_protos"}
     ]
   end
 
@@ -21,7 +38,18 @@ defmodule TablestoreProtos.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:protobuf, github: "xinz/protobuf-elixir", branch: "proto2-enum"}
+      {:protox, "~> 1.2"},
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      formatter_opts: [gfm: true],
+      extras: [
+        "README.md"
+      ]
     ]
   end
 end
