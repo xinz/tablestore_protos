@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
           end
         end,
         defp(encode_center_point(acc, msg)) do
-          field_value = msg.center_point()
+          field_value = msg.center_point
 
           case(field_value) do
             nil ->
@@ -48,7 +48,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
           end
         end,
         defp(encode_distance(acc, msg)) do
-          field_value = msg.distance()
+          field_value = msg.distance
 
           case(field_value) do
             nil ->

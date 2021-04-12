@@ -39,7 +39,7 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
 
       [
         defp(encode_table_meta(acc, msg)) do
-          case(msg.table_meta()) do
+          case(msg.table_meta) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_meta]))
 
@@ -48,7 +48,7 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
           end
         end,
         defp(encode_reserved_throughput_details(acc, msg)) do
-          case(msg.reserved_throughput_details()) do
+          case(msg.reserved_throughput_details) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:reserved_throughput_details]))
 
@@ -57,7 +57,7 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
           end
         end,
         defp(encode_table_options(acc, msg)) do
-          case(msg.table_options()) do
+          case(msg.table_options) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_options]))
 
@@ -66,7 +66,7 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
           end
         end,
         defp(encode_stream_details(acc, msg)) do
-          field_value = msg.stream_details()
+          field_value = msg.stream_details
 
           case(field_value) do
             nil ->
@@ -77,7 +77,7 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
           end
         end,
         defp(encode_shard_splits(acc, msg)) do
-          case(msg.shard_splits()) do
+          case(msg.shard_splits) do
             [] ->
               acc
 
@@ -91,7 +91,7 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
           end
         end,
         defp(encode_index_metas(acc, msg)) do
-          case(msg.index_metas()) do
+          case(msg.index_metas) do
             [] ->
               acc
 
@@ -152,7 +152,7 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.TableMeta.decode!(delimited)
-                field = {:table_meta, Protox.Message.merge(msg.table_meta(), value)}
+                field = {:table_meta, Protox.Message.merge(msg.table_meta, value)}
                 {[:table_meta | set_fields], [field], rest}
 
               {2, _, bytes} ->
@@ -162,7 +162,7 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
 
                 field =
                   {:reserved_throughput_details,
-                   Protox.Message.merge(msg.reserved_throughput_details(), value)}
+                   Protox.Message.merge(msg.reserved_throughput_details, value)}
 
                 {[:reserved_throughput_details | set_fields], [field], rest}
 
@@ -170,28 +170,28 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.TableOptions.decode!(delimited)
-                field = {:table_options, Protox.Message.merge(msg.table_options(), value)}
+                field = {:table_options, Protox.Message.merge(msg.table_options, value)}
                 {[:table_options | set_fields], [field], rest}
 
               {5, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.StreamDetails.decode!(delimited)
-                field = {:stream_details, Protox.Message.merge(msg.stream_details(), value)}
+                field = {:stream_details, Protox.Message.merge(msg.stream_details, value)}
                 {[:stream_details | set_fields], [field], rest}
 
               {6, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
-                field = {:shard_splits, msg.shard_splits() ++ List.wrap(value)}
+                field = {:shard_splits, msg.shard_splits ++ List.wrap(value)}
                 {[:shard_splits | set_fields], [field], rest}
 
               {8, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.IndexMeta.decode!(delimited)
-                field = {:index_metas, msg.index_metas() ++ List.wrap(value)}
+                field = {:index_metas, msg.index_metas ++ List.wrap(value)}
                 {[:index_metas | set_fields], [field], rest}
 
               {tag, wire_type, rest} ->

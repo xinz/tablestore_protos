@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FunctionScoreQuery) do
 
       [
         defp(encode_query(acc, msg)) do
-          field_value = msg.query()
+          field_value = msg.query
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FunctionScoreQuery) do
           end
         end,
         defp(encode_field_value_factor(acc, msg)) do
-          field_value = msg.field_value_factor()
+          field_value = msg.field_value_factor
 
           case(field_value) do
             nil ->
@@ -86,17 +86,14 @@ defmodule(ExAliyunOts.TableStoreSearch.FunctionScoreQuery) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.Query.decode!(delimited)
-                field = {:query, Protox.Message.merge(msg.query(), value)}
+                field = {:query, Protox.Message.merge(msg.query, value)}
                 {[field], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.FieldValueFactor.decode!(delimited)
-
-                field =
-                  {:field_value_factor, Protox.Message.merge(msg.field_value_factor(), value)}
-
+                field = {:field_value_factor, Protox.Message.merge(msg.field_value_factor, value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

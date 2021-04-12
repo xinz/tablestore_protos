@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.Token) do
 
       [
         defp(encode_version(acc, msg)) do
-          case(msg.version()) do
+          case(msg.version) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:version]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.Token) do
           end
         end,
         defp(encode_content(acc, msg)) do
-          case(msg.content()) do
+          case(msg.content) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:content]))
 

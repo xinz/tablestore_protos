@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ColumnsToGet) do
 
       [
         defp(encode_return_type(acc, msg)) do
-          field_value = msg.return_type()
+          field_value = msg.return_type
 
           case(field_value) do
             nil ->
@@ -43,7 +43,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ColumnsToGet) do
           end
         end,
         defp(encode_column_names(acc, msg)) do
-          case(msg.column_names()) do
+          case(msg.column_names) do
             [] ->
               acc
 
@@ -102,7 +102,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ColumnsToGet) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
-                field = {:column_names, msg.column_names() ++ List.wrap(value)}
+                field = {:column_names, msg.column_names ++ List.wrap(value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.PrimaryKeySchema) do
 
       [
         defp(encode_name(acc, msg)) do
-          case(msg.name()) do
+          case(msg.name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:name]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStore.PrimaryKeySchema) do
           end
         end,
         defp(encode_type(acc, msg)) do
-          case(msg.type()) do
+          case(msg.type) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:type]))
 
@@ -50,7 +50,7 @@ defmodule(ExAliyunOts.TableStore.PrimaryKeySchema) do
           end
         end,
         defp(encode_option(acc, msg)) do
-          field_value = msg.option()
+          field_value = msg.option
 
           case(field_value) do
             nil ->

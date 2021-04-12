@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ListSearchIndexResponse) do
 
       [
         defp(encode_indices(acc, msg)) do
-          case(msg.indices()) do
+          case(msg.indices) do
             [] ->
               acc
 
@@ -78,7 +78,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ListSearchIndexResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.IndexInfo.decode!(delimited)
-                field = {:indices, msg.indices() ++ List.wrap(value)}
+                field = {:indices, msg.indices ++ List.wrap(value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

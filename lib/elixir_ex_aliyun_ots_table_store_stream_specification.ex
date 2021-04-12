@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.StreamSpecification) do
 
       [
         defp(encode_enable_stream(acc, msg)) do
-          case(msg.enable_stream()) do
+          case(msg.enable_stream) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:enable_stream]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStore.StreamSpecification) do
           end
         end,
         defp(encode_expiration_time(acc, msg)) do
-          field_value = msg.expiration_time()
+          field_value = msg.expiration_time
 
           case(field_value) do
             nil ->

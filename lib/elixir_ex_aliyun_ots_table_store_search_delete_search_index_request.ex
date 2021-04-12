@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.DeleteSearchIndexRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          field_value = msg.table_name()
+          field_value = msg.table_name
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.DeleteSearchIndexRequest) do
           end
         end,
         defp(encode_index_name(acc, msg)) do
-          field_value = msg.index_name()
+          field_value = msg.index_name
 
           case(field_value) do
             nil ->

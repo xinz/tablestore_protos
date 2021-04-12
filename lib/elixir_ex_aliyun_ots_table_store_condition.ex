@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.Condition) do
 
       [
         defp(encode_row_existence(acc, msg)) do
-          case(msg.row_existence()) do
+          case(msg.row_existence) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:row_existence]))
 
@@ -41,7 +41,7 @@ defmodule(ExAliyunOts.TableStore.Condition) do
           end
         end,
         defp(encode_column_condition(acc, msg)) do
-          field_value = msg.column_condition()
+          field_value = msg.column_condition
 
           case(field_value) do
             nil ->

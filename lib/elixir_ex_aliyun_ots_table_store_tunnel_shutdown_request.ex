@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ShutdownRequest) do
 
       [
         defp(encode_tunnel_id(acc, msg)) do
-          case(msg.tunnel_id()) do
+          case(msg.tunnel_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:tunnel_id]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ShutdownRequest) do
           end
         end,
         defp(encode_client_id(acc, msg)) do
-          case(msg.client_id()) do
+          case(msg.client_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:client_id]))
 

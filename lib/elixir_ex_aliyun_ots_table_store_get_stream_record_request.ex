@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.GetStreamRecordRequest) do
 
       [
         defp(encode_shard_iterator(acc, msg)) do
-          case(msg.shard_iterator()) do
+          case(msg.shard_iterator) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:shard_iterator]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStore.GetStreamRecordRequest) do
           end
         end,
         defp(encode_limit(acc, msg)) do
-          field_value = msg.limit()
+          field_value = msg.limit
 
           case(field_value) do
             nil ->

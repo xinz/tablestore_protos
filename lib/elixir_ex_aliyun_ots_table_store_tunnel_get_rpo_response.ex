@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.GetRpoResponse) do
 
       [
         defp(encode_rpo_infos(acc, msg)) do
-          field_value = msg.rpo_infos()
+          field_value = msg.rpo_infos
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.GetRpoResponse) do
           end
         end,
         defp(encode_tunnel_rpo_infos(acc, msg)) do
-          field_value = msg.tunnel_rpo_infos()
+          field_value = msg.tunnel_rpo_infos
 
           case(field_value) do
             nil ->

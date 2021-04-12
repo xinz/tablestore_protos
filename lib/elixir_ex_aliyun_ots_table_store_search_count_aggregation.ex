@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.CountAggregation) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->

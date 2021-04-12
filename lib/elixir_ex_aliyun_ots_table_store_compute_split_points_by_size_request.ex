@@ -29,7 +29,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name()) do
+          case(msg.table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_name]))
 
@@ -38,7 +38,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
           end
         end,
         defp(encode_split_size(acc, msg)) do
-          case(msg.split_size()) do
+          case(msg.split_size) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:split_size]))
 
@@ -47,7 +47,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
           end
         end,
         defp(encode_split_size_unit_in_byte(acc, msg)) do
-          field_value = msg.split_size_unit_in_byte()
+          field_value = msg.split_size_unit_in_byte
 
           case(field_value) do
             nil ->

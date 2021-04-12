@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitsRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          field_value = msg.table_name()
+          field_value = msg.table_name
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitsRequest) do
           end
         end,
         defp(encode_search_index_splits_options(acc, msg)) do
-          field_value = msg.search_index_splits_options()
+          field_value = msg.search_index_splits_options
 
           case(field_value) do
             nil ->
@@ -96,7 +96,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitsRequest) do
 
                 field =
                   {:search_index_splits_options,
-                   Protox.Message.merge(msg.search_index_splits_options(), value)}
+                   Protox.Message.merge(msg.search_index_splits_options, value)}
 
                 {[field], rest}
 

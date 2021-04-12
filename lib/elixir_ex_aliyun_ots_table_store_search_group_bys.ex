@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupBys) do
 
       [
         defp(encode_group_bys(acc, msg)) do
-          case(msg.group_bys()) do
+          case(msg.group_bys) do
             [] ->
               acc
 
@@ -78,7 +78,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupBys) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.GroupBy.decode!(delimited)
-                field = {:group_bys, msg.group_bys() ++ List.wrap(value)}
+                field = {:group_bys, msg.group_bys ++ List.wrap(value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

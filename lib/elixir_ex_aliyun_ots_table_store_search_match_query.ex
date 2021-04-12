@@ -30,7 +30,7 @@ defmodule(ExAliyunOts.TableStoreSearch.MatchQuery) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->
@@ -41,7 +41,7 @@ defmodule(ExAliyunOts.TableStoreSearch.MatchQuery) do
           end
         end,
         defp(encode_text(acc, msg)) do
-          field_value = msg.text()
+          field_value = msg.text
 
           case(field_value) do
             nil ->
@@ -52,7 +52,7 @@ defmodule(ExAliyunOts.TableStoreSearch.MatchQuery) do
           end
         end,
         defp(encode_minimum_should_match(acc, msg)) do
-          field_value = msg.minimum_should_match()
+          field_value = msg.minimum_should_match
 
           case(field_value) do
             nil ->
@@ -63,7 +63,7 @@ defmodule(ExAliyunOts.TableStoreSearch.MatchQuery) do
           end
         end,
         defp(encode_operator(acc, msg)) do
-          field_value = msg.operator()
+          field_value = msg.operator
 
           case(field_value) do
             nil ->

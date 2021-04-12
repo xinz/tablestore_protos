@@ -30,7 +30,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TokenContentV2) do
 
       [
         defp(encode_primary_key(acc, msg)) do
-          field_value = msg.primary_key()
+          field_value = msg.primary_key
 
           case(field_value) do
             nil ->
@@ -41,7 +41,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TokenContentV2) do
           end
         end,
         defp(encode_iterator(acc, msg)) do
-          field_value = msg.iterator()
+          field_value = msg.iterator
 
           case(field_value) do
             nil ->
@@ -52,7 +52,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TokenContentV2) do
           end
         end,
         defp(encode_timestamp(acc, msg)) do
-          field_value = msg.timestamp()
+          field_value = msg.timestamp
 
           case(field_value) do
             nil ->
@@ -63,7 +63,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TokenContentV2) do
           end
         end,
         defp(encode_total_count(acc, msg)) do
-          field_value = msg.total_count()
+          field_value = msg.total_count
 
           case(field_value) do
             nil ->

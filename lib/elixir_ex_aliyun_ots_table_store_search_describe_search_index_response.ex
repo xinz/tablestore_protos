@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.DescribeSearchIndexResponse) do
 
       [
         defp(encode_schema(acc, msg)) do
-          field_value = msg.schema()
+          field_value = msg.schema
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.DescribeSearchIndexResponse) do
           end
         end,
         defp(encode_sync_stat(acc, msg)) do
-          field_value = msg.sync_stat()
+          field_value = msg.sync_stat
 
           case(field_value) do
             nil ->
@@ -86,14 +86,14 @@ defmodule(ExAliyunOts.TableStoreSearch.DescribeSearchIndexResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.IndexSchema.decode!(delimited)
-                field = {:schema, Protox.Message.merge(msg.schema(), value)}
+                field = {:schema, Protox.Message.merge(msg.schema, value)}
                 {[field], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.SyncStat.decode!(delimited)
-                field = {:sync_stat, Protox.Message.merge(msg.sync_stat(), value)}
+                field = {:sync_stat, Protox.Message.merge(msg.sync_stat, value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

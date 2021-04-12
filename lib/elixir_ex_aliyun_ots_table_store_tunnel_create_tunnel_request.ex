@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.CreateTunnelRequest) do
 
       [
         defp(encode_tunnel(acc, msg)) do
-          case(msg.tunnel()) do
+          case(msg.tunnel) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:tunnel]))
 
@@ -82,7 +82,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.CreateTunnelRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreTunnel.Tunnel.decode!(delimited)
-                field = {:tunnel, Protox.Message.merge(msg.tunnel(), value)}
+                field = {:tunnel, Protox.Message.merge(msg.tunnel, value)}
                 {[:tunnel | set_fields], [field], rest}
 
               {tag, wire_type, rest} ->

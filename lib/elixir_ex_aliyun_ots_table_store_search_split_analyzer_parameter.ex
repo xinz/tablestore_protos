@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SplitAnalyzerParameter) do
 
       [
         defp(encode_delimiter(acc, msg)) do
-          field_value = msg.delimiter()
+          field_value = msg.delimiter
 
           case(field_value) do
             nil ->

@@ -30,7 +30,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeResponse) do
 
       [
         defp(encode_consumed(acc, msg)) do
-          case(msg.consumed()) do
+          case(msg.consumed) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:consumed]))
 
@@ -39,7 +39,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeResponse) do
           end
         end,
         defp(encode_schema(acc, msg)) do
-          case(msg.schema()) do
+          case(msg.schema) do
             [] ->
               acc
 
@@ -53,7 +53,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeResponse) do
           end
         end,
         defp(encode_split_points(acc, msg)) do
-          case(msg.split_points()) do
+          case(msg.split_points) do
             [] ->
               acc
 
@@ -67,7 +67,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeResponse) do
           end
         end,
         defp(encode_locations(acc, msg)) do
-          case(msg.locations()) do
+          case(msg.locations) do
             [] ->
               acc
 
@@ -132,21 +132,21 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.ConsumedCapacity.decode!(delimited)
-                field = {:consumed, Protox.Message.merge(msg.consumed(), value)}
+                field = {:consumed, Protox.Message.merge(msg.consumed, value)}
                 {[:consumed | set_fields], [field], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.PrimaryKeySchema.decode!(delimited)
-                field = {:schema, msg.schema() ++ List.wrap(value)}
+                field = {:schema, msg.schema ++ List.wrap(value)}
                 {[:schema | set_fields], [field], rest}
 
               {3, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
-                field = {:split_points, msg.split_points() ++ List.wrap(value)}
+                field = {:split_points, msg.split_points ++ List.wrap(value)}
                 {[:split_points | set_fields], [field], rest}
 
               {4, _, bytes} ->
@@ -158,7 +158,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeResponse) do
                     delimited
                   )
 
-                field = {:locations, msg.locations() ++ List.wrap(value)}
+                field = {:locations, msg.locations ++ List.wrap(value)}
                 {[:locations | set_fields], [field], rest}
 
               {tag, wire_type, rest} ->

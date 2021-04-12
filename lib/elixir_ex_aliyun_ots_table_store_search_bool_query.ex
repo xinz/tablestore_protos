@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.BoolQuery) do
 
       [
         defp(encode_must_queries(acc, msg)) do
-          case(msg.must_queries()) do
+          case(msg.must_queries) do
             [] ->
               acc
 
@@ -51,7 +51,7 @@ defmodule(ExAliyunOts.TableStoreSearch.BoolQuery) do
           end
         end,
         defp(encode_must_not_queries(acc, msg)) do
-          case(msg.must_not_queries()) do
+          case(msg.must_not_queries) do
             [] ->
               acc
 
@@ -65,7 +65,7 @@ defmodule(ExAliyunOts.TableStoreSearch.BoolQuery) do
           end
         end,
         defp(encode_filter_queries(acc, msg)) do
-          case(msg.filter_queries()) do
+          case(msg.filter_queries) do
             [] ->
               acc
 
@@ -79,7 +79,7 @@ defmodule(ExAliyunOts.TableStoreSearch.BoolQuery) do
           end
         end,
         defp(encode_should_queries(acc, msg)) do
-          case(msg.should_queries()) do
+          case(msg.should_queries) do
             [] ->
               acc
 
@@ -93,7 +93,7 @@ defmodule(ExAliyunOts.TableStoreSearch.BoolQuery) do
           end
         end,
         defp(encode_minimum_should_match(acc, msg)) do
-          field_value = msg.minimum_should_match()
+          field_value = msg.minimum_should_match
 
           case(field_value) do
             nil ->
@@ -142,28 +142,28 @@ defmodule(ExAliyunOts.TableStoreSearch.BoolQuery) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.Query.decode!(delimited)
-                field = {:must_queries, msg.must_queries() ++ List.wrap(value)}
+                field = {:must_queries, msg.must_queries ++ List.wrap(value)}
                 {[field], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.Query.decode!(delimited)
-                field = {:must_not_queries, msg.must_not_queries() ++ List.wrap(value)}
+                field = {:must_not_queries, msg.must_not_queries ++ List.wrap(value)}
                 {[field], rest}
 
               {3, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.Query.decode!(delimited)
-                field = {:filter_queries, msg.filter_queries() ++ List.wrap(value)}
+                field = {:filter_queries, msg.filter_queries ++ List.wrap(value)}
                 {[field], rest}
 
               {4, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.Query.decode!(delimited)
-                field = {:should_queries, msg.should_queries() ++ List.wrap(value)}
+                field = {:should_queries, msg.should_queries ++ List.wrap(value)}
                 {[field], rest}
 
               {5, _, bytes} ->

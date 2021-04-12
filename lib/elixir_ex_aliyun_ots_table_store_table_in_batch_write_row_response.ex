@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name()) do
+          case(msg.table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_name]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
           end
         end,
         defp(encode_rows(acc, msg)) do
-          case(msg.rows()) do
+          case(msg.rows) do
             [] ->
               acc
 
@@ -107,7 +107,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.RowInBatchWriteRowResponse.decode!(delimited)
-                field = {:rows, msg.rows() ++ List.wrap(value)}
+                field = {:rows, msg.rows ++ List.wrap(value)}
                 {[:rows | set_fields], [field], rest}
 
               {tag, wire_type, rest} ->

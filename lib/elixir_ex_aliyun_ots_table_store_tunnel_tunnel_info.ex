@@ -45,7 +45,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
 
       [
         defp(encode_tunnel_id(acc, msg)) do
-          case(msg.tunnel_id()) do
+          case(msg.tunnel_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:tunnel_id]))
 
@@ -54,7 +54,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
           end
         end,
         defp(encode_tunnel_type(acc, msg)) do
-          case(msg.tunnel_type()) do
+          case(msg.tunnel_type) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:tunnel_type]))
 
@@ -63,7 +63,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
           end
         end,
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name()) do
+          case(msg.table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_name]))
 
@@ -72,7 +72,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
           end
         end,
         defp(encode_instance_name(acc, msg)) do
-          case(msg.instance_name()) do
+          case(msg.instance_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:instance_name]))
 
@@ -81,7 +81,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
           end
         end,
         defp(encode_stream_id(acc, msg)) do
-          case(msg.stream_id()) do
+          case(msg.stream_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:stream_id]))
 
@@ -90,7 +90,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
           end
         end,
         defp(encode_stage(acc, msg)) do
-          case(msg.stage()) do
+          case(msg.stage) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:stage]))
 
@@ -99,7 +99,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
           end
         end,
         defp(encode_expired(acc, msg)) do
-          field_value = msg.expired()
+          field_value = msg.expired
 
           case(field_value) do
             nil ->
@@ -110,7 +110,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
           end
         end,
         defp(encode_tunnel_name(acc, msg)) do
-          field_value = msg.tunnel_name()
+          field_value = msg.tunnel_name
 
           case(field_value) do
             nil ->
@@ -121,7 +121,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
           end
         end,
         defp(encode_public(acc, msg)) do
-          field_value = msg.public()
+          field_value = msg.public
 
           case(field_value) do
             nil ->

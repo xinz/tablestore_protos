@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupBy) do
 
       [
         defp(encode_name(acc, msg)) do
-          field_value = msg.name()
+          field_value = msg.name
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupBy) do
           end
         end,
         defp(encode_type(acc, msg)) do
-          field_value = msg.type()
+          field_value = msg.type
 
           case(field_value) do
             nil ->
@@ -54,7 +54,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupBy) do
           end
         end,
         defp(encode_body(acc, msg)) do
-          field_value = msg.body()
+          field_value = msg.body
 
           case(field_value) do
             nil ->

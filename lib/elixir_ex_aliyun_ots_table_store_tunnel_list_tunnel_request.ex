@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ListTunnelRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          field_value = msg.table_name()
+          field_value = msg.table_name
 
           case(field_value) do
             nil ->

@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ClientConfig) do
 
       [
         defp(encode_timeout(acc, msg)) do
-          field_value = msg.timeout()
+          field_value = msg.timeout
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ClientConfig) do
           end
         end,
         defp(encode_client_tag(acc, msg)) do
-          field_value = msg.client_tag()
+          field_value = msg.client_tag
 
           case(field_value) do
             nil ->

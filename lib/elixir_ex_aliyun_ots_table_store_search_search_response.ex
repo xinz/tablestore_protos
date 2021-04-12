@@ -39,7 +39,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchResponse) do
 
       [
         defp(encode_total_hits(acc, msg)) do
-          field_value = msg.total_hits()
+          field_value = msg.total_hits
 
           case(field_value) do
             nil ->
@@ -50,7 +50,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchResponse) do
           end
         end,
         defp(encode_rows(acc, msg)) do
-          case(msg.rows()) do
+          case(msg.rows) do
             [] ->
               acc
 
@@ -64,7 +64,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchResponse) do
           end
         end,
         defp(encode_is_all_succeeded(acc, msg)) do
-          field_value = msg.is_all_succeeded()
+          field_value = msg.is_all_succeeded
 
           case(field_value) do
             nil ->
@@ -75,7 +75,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchResponse) do
           end
         end,
         defp(encode_next_token(acc, msg)) do
-          field_value = msg.next_token()
+          field_value = msg.next_token
 
           case(field_value) do
             nil ->
@@ -86,7 +86,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchResponse) do
           end
         end,
         defp(encode_aggs(acc, msg)) do
-          field_value = msg.aggs()
+          field_value = msg.aggs
 
           case(field_value) do
             nil ->
@@ -97,7 +97,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchResponse) do
           end
         end,
         defp(encode_group_bys(acc, msg)) do
-          field_value = msg.group_bys()
+          field_value = msg.group_bys
 
           case(field_value) do
             nil ->
@@ -151,7 +151,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
-                field = {:rows, msg.rows() ++ List.wrap(value)}
+                field = {:rows, msg.rows ++ List.wrap(value)}
                 {[field], rest}
 
               {3, _, bytes} ->

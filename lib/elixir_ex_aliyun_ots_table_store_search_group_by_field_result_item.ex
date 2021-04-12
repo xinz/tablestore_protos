@@ -30,7 +30,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByFieldResultItem) do
 
       [
         defp(encode_key(acc, msg)) do
-          field_value = msg.key()
+          field_value = msg.key
 
           case(field_value) do
             nil ->
@@ -41,7 +41,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByFieldResultItem) do
           end
         end,
         defp(encode_row_count(acc, msg)) do
-          field_value = msg.row_count()
+          field_value = msg.row_count
 
           case(field_value) do
             nil ->
@@ -52,7 +52,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByFieldResultItem) do
           end
         end,
         defp(encode_sub_aggs_result(acc, msg)) do
-          field_value = msg.sub_aggs_result()
+          field_value = msg.sub_aggs_result
 
           case(field_value) do
             nil ->
@@ -63,7 +63,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByFieldResultItem) do
           end
         end,
         defp(encode_sub_group_bys_result(acc, msg)) do
-          field_value = msg.sub_group_bys_result()
+          field_value = msg.sub_group_bys_result
 
           case(field_value) do
             nil ->
@@ -124,7 +124,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByFieldResultItem) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.AggregationsResult.decode!(delimited)
-                field = {:sub_aggs_result, Protox.Message.merge(msg.sub_aggs_result(), value)}
+                field = {:sub_aggs_result, Protox.Message.merge(msg.sub_aggs_result, value)}
                 {[field], rest}
 
               {4, _, bytes} ->
@@ -133,7 +133,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByFieldResultItem) do
                 value = ExAliyunOts.TableStoreSearch.GroupBysResult.decode!(delimited)
 
                 field =
-                  {:sub_group_bys_result, Protox.Message.merge(msg.sub_group_bys_result(), value)}
+                  {:sub_group_bys_result, Protox.Message.merge(msg.sub_group_bys_result, value)}
 
                 {[field], rest}
 

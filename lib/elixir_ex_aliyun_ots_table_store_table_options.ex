@@ -29,7 +29,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
 
       [
         defp(encode_time_to_live(acc, msg)) do
-          field_value = msg.time_to_live()
+          field_value = msg.time_to_live
 
           case(field_value) do
             nil ->
@@ -40,7 +40,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
           end
         end,
         defp(encode_max_versions(acc, msg)) do
-          field_value = msg.max_versions()
+          field_value = msg.max_versions
 
           case(field_value) do
             nil ->
@@ -51,7 +51,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
           end
         end,
         defp(encode_deviation_cell_version_in_sec(acc, msg)) do
-          field_value = msg.deviation_cell_version_in_sec()
+          field_value = msg.deviation_cell_version_in_sec
 
           case(field_value) do
             nil ->

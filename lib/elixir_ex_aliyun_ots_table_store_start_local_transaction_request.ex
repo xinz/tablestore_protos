@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.StartLocalTransactionRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name()) do
+          case(msg.table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_name]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStore.StartLocalTransactionRequest) do
           end
         end,
         defp(encode_key(acc, msg)) do
-          case(msg.key()) do
+          case(msg.key) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:key]))
 

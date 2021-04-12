@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SyncStat) do
 
       [
         defp(encode_sync_phase(acc, msg)) do
-          field_value = msg.sync_phase()
+          field_value = msg.sync_phase
 
           case(field_value) do
             nil ->
@@ -43,7 +43,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SyncStat) do
           end
         end,
         defp(encode_current_sync_timestamp(acc, msg)) do
-          field_value = msg.current_sync_timestamp()
+          field_value = msg.current_sync_timestamp
 
           case(field_value) do
             nil ->

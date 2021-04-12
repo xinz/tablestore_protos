@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.MinAggregation) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.MinAggregation) do
           end
         end,
         defp(encode_missing(acc, msg)) do
-          field_value = msg.missing()
+          field_value = msg.missing
 
           case(field_value) do
             nil ->

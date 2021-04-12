@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoBoundingBoxQuery) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoBoundingBoxQuery) do
           end
         end,
         defp(encode_top_left(acc, msg)) do
-          field_value = msg.top_left()
+          field_value = msg.top_left
 
           case(field_value) do
             nil ->
@@ -48,7 +48,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoBoundingBoxQuery) do
           end
         end,
         defp(encode_bottom_right(acc, msg)) do
-          field_value = msg.bottom_right()
+          field_value = msg.bottom_right
 
           case(field_value) do
             nil ->

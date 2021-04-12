@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ParallelScanResponse) do
 
       [
         defp(encode_rows(acc, msg)) do
-          case(msg.rows()) do
+          case(msg.rows) do
             [] ->
               acc
 
@@ -40,7 +40,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ParallelScanResponse) do
           end
         end,
         defp(encode_next_token(acc, msg)) do
-          field_value = msg.next_token()
+          field_value = msg.next_token
 
           case(field_value) do
             nil ->
@@ -89,7 +89,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ParallelScanResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
-                field = {:rows, msg.rows() ++ List.wrap(value)}
+                field = {:rows, msg.rows ++ List.wrap(value)}
                 {[field], rest}
 
               {2, _, bytes} ->

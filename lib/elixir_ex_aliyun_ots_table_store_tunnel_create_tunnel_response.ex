@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.CreateTunnelResponse) do
 
       [
         defp(encode_tunnel_id(acc, msg)) do
-          case(msg.tunnel_id()) do
+          case(msg.tunnel_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:tunnel_id]))
 

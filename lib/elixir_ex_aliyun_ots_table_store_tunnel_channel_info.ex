@@ -39,7 +39,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelInfo) do
 
       [
         defp(encode_channel_id(acc, msg)) do
-          case(msg.channel_id()) do
+          case(msg.channel_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:channel_id]))
 
@@ -48,7 +48,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelInfo) do
           end
         end,
         defp(encode_channel_type(acc, msg)) do
-          field_value = msg.channel_type()
+          field_value = msg.channel_type
 
           case(field_value) do
             nil ->
@@ -59,7 +59,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelInfo) do
           end
         end,
         defp(encode_channel_status(acc, msg)) do
-          field_value = msg.channel_status()
+          field_value = msg.channel_status
 
           case(field_value) do
             nil ->
@@ -70,7 +70,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelInfo) do
           end
         end,
         defp(encode_client_id(acc, msg)) do
-          field_value = msg.client_id()
+          field_value = msg.client_id
 
           case(field_value) do
             nil ->
@@ -81,7 +81,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelInfo) do
           end
         end,
         defp(encode_channel_rpo(acc, msg)) do
-          field_value = msg.channel_rpo()
+          field_value = msg.channel_rpo
 
           case(field_value) do
             nil ->
@@ -92,7 +92,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelInfo) do
           end
         end,
         defp(encode_channel_count(acc, msg)) do
-          field_value = msg.channel_count()
+          field_value = msg.channel_count
 
           case(field_value) do
             nil ->

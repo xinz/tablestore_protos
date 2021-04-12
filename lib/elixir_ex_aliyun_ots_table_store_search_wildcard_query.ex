@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.WildcardQuery) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.WildcardQuery) do
           end
         end,
         defp(encode_value(acc, msg)) do
-          field_value = msg.value()
+          field_value = msg.value
 
           case(field_value) do
             nil ->

@@ -30,7 +30,7 @@ defmodule(ExAliyunOts.TableStore.UpdateTableRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name()) do
+          case(msg.table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_name]))
 
@@ -39,7 +39,7 @@ defmodule(ExAliyunOts.TableStore.UpdateTableRequest) do
           end
         end,
         defp(encode_reserved_throughput(acc, msg)) do
-          field_value = msg.reserved_throughput()
+          field_value = msg.reserved_throughput
 
           case(field_value) do
             nil ->
@@ -50,7 +50,7 @@ defmodule(ExAliyunOts.TableStore.UpdateTableRequest) do
           end
         end,
         defp(encode_table_options(acc, msg)) do
-          field_value = msg.table_options()
+          field_value = msg.table_options
 
           case(field_value) do
             nil ->
@@ -61,7 +61,7 @@ defmodule(ExAliyunOts.TableStore.UpdateTableRequest) do
           end
         end,
         defp(encode_stream_spec(acc, msg)) do
-          field_value = msg.stream_spec()
+          field_value = msg.stream_spec
 
           case(field_value) do
             nil ->
@@ -128,7 +128,7 @@ defmodule(ExAliyunOts.TableStore.UpdateTableRequest) do
                 value = ExAliyunOts.TableStore.ReservedThroughput.decode!(delimited)
 
                 field =
-                  {:reserved_throughput, Protox.Message.merge(msg.reserved_throughput(), value)}
+                  {:reserved_throughput, Protox.Message.merge(msg.reserved_throughput, value)}
 
                 {[:reserved_throughput | set_fields], [field], rest}
 
@@ -136,14 +136,14 @@ defmodule(ExAliyunOts.TableStore.UpdateTableRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.TableOptions.decode!(delimited)
-                field = {:table_options, Protox.Message.merge(msg.table_options(), value)}
+                field = {:table_options, Protox.Message.merge(msg.table_options, value)}
                 {[:table_options | set_fields], [field], rest}
 
               {4, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.StreamSpecification.decode!(delimited)
-                field = {:stream_spec, Protox.Message.merge(msg.stream_spec(), value)}
+                field = {:stream_spec, Protox.Message.merge(msg.stream_spec, value)}
                 {[:stream_spec | set_fields], [field], rest}
 
               {tag, wire_type, rest} ->

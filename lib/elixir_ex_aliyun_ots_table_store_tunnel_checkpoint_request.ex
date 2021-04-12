@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.CheckpointRequest) do
 
       [
         defp(encode_tunnel_id(acc, msg)) do
-          case(msg.tunnel_id()) do
+          case(msg.tunnel_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:tunnel_id]))
 
@@ -46,7 +46,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.CheckpointRequest) do
           end
         end,
         defp(encode_client_id(acc, msg)) do
-          case(msg.client_id()) do
+          case(msg.client_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:client_id]))
 
@@ -55,7 +55,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.CheckpointRequest) do
           end
         end,
         defp(encode_channel_id(acc, msg)) do
-          case(msg.channel_id()) do
+          case(msg.channel_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:channel_id]))
 
@@ -64,7 +64,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.CheckpointRequest) do
           end
         end,
         defp(encode_checkpoint(acc, msg)) do
-          case(msg.checkpoint()) do
+          case(msg.checkpoint) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:checkpoint]))
 
@@ -73,7 +73,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.CheckpointRequest) do
           end
         end,
         defp(encode_sequence_number(acc, msg)) do
-          case(msg.sequence_number()) do
+          case(msg.sequence_number) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:sequence_number]))
 

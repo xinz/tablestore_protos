@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeResponse.SplitLocation)
 
       [
         defp(encode_location(acc, msg)) do
-          case(msg.location()) do
+          case(msg.location) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:location]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeResponse.SplitLocation)
           end
         end,
         defp(encode_repeat(acc, msg)) do
-          case(msg.repeat()) do
+          case(msg.repeat) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:repeat]))
 

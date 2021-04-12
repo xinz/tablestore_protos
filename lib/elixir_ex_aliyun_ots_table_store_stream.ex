@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.Stream) do
 
       [
         defp(encode_stream_id(acc, msg)) do
-          case(msg.stream_id()) do
+          case(msg.stream_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:stream_id]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStore.Stream) do
           end
         end,
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name()) do
+          case(msg.table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_name]))
 
@@ -44,7 +44,7 @@ defmodule(ExAliyunOts.TableStore.Stream) do
           end
         end,
         defp(encode_creation_time(acc, msg)) do
-          case(msg.creation_time()) do
+          case(msg.creation_time) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:creation_time]))
 

@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.NestedQuery) do
 
       [
         defp(encode_path(acc, msg)) do
-          field_value = msg.path()
+          field_value = msg.path
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.NestedQuery) do
           end
         end,
         defp(encode_query(acc, msg)) do
-          field_value = msg.query()
+          field_value = msg.query
 
           case(field_value) do
             nil ->
@@ -48,7 +48,7 @@ defmodule(ExAliyunOts.TableStoreSearch.NestedQuery) do
           end
         end,
         defp(encode_score_mode(acc, msg)) do
-          field_value = msg.score_mode()
+          field_value = msg.score_mode
 
           case(field_value) do
             nil ->
@@ -110,7 +110,7 @@ defmodule(ExAliyunOts.TableStoreSearch.NestedQuery) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.Query.decode!(delimited)
-                field = {:query, Protox.Message.merge(msg.query(), value)}
+                field = {:query, Protox.Message.merge(msg.query, value)}
                 {[field], rest}
 
               {3, _, bytes} ->

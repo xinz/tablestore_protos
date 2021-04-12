@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.GetCheckpointResponse) do
 
       [
         defp(encode_checkpoint(acc, msg)) do
-          case(msg.checkpoint()) do
+          case(msg.checkpoint) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:checkpoint]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.GetCheckpointResponse) do
           end
         end,
         defp(encode_sequence_number(acc, msg)) do
-          case(msg.sequence_number()) do
+          case(msg.sequence_number) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:sequence_number]))
 

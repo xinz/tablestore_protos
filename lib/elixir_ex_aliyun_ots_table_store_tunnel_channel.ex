@@ -30,7 +30,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.Channel) do
 
       [
         defp(encode_channel_id(acc, msg)) do
-          case(msg.channel_id()) do
+          case(msg.channel_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:channel_id]))
 
@@ -39,7 +39,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.Channel) do
           end
         end,
         defp(encode_version(acc, msg)) do
-          case(msg.version()) do
+          case(msg.version) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:version]))
 
@@ -48,7 +48,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.Channel) do
           end
         end,
         defp(encode_status(acc, msg)) do
-          case(msg.status()) do
+          case(msg.status) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:status]))
 
@@ -63,7 +63,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.Channel) do
           end
         end,
         defp(encode_detail(acc, msg)) do
-          field_value = msg.detail()
+          field_value = msg.detail
 
           case(field_value) do
             nil ->

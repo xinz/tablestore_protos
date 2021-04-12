@@ -47,7 +47,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->
@@ -58,7 +58,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
           end
         end,
         defp(encode_field_type(acc, msg)) do
-          field_value = msg.field_type()
+          field_value = msg.field_type
 
           case(field_value) do
             nil ->
@@ -75,7 +75,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
           end
         end,
         defp(encode_index_options(acc, msg)) do
-          field_value = msg.index_options()
+          field_value = msg.index_options
 
           case(field_value) do
             nil ->
@@ -92,7 +92,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
           end
         end,
         defp(encode_analyzer(acc, msg)) do
-          field_value = msg.analyzer()
+          field_value = msg.analyzer
 
           case(field_value) do
             nil ->
@@ -103,7 +103,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
           end
         end,
         defp(encode_index(acc, msg)) do
-          field_value = msg.index()
+          field_value = msg.index
 
           case(field_value) do
             nil ->
@@ -114,7 +114,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
           end
         end,
         defp(encode_sort_and_agg(acc, msg)) do
-          field_value = msg.sort_and_agg()
+          field_value = msg.sort_and_agg
 
           case(field_value) do
             nil ->
@@ -125,7 +125,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
           end
         end,
         defp(encode_store(acc, msg)) do
-          field_value = msg.store()
+          field_value = msg.store
 
           case(field_value) do
             nil ->
@@ -136,7 +136,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
           end
         end,
         defp(encode_field_schemas(acc, msg)) do
-          case(msg.field_schemas()) do
+          case(msg.field_schemas) do
             [] ->
               acc
 
@@ -150,7 +150,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
           end
         end,
         defp(encode_is_array(acc, msg)) do
-          field_value = msg.is_array()
+          field_value = msg.is_array
 
           case(field_value) do
             nil ->
@@ -161,7 +161,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
           end
         end,
         defp(encode_analyzer_parameter(acc, msg)) do
-          field_value = msg.analyzer_parameter()
+          field_value = msg.analyzer_parameter
 
           case(field_value) do
             nil ->
@@ -253,7 +253,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.FieldSchema.decode!(delimited)
-                field = {:field_schemas, msg.field_schemas() ++ List.wrap(value)}
+                field = {:field_schemas, msg.field_schemas ++ List.wrap(value)}
                 {[field], rest}
 
               {9, _, bytes} ->

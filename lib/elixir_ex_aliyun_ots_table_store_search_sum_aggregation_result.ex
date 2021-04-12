@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SumAggregationResult) do
 
       [
         defp(encode_value(acc, msg)) do
-          field_value = msg.value()
+          field_value = msg.value
 
           case(field_value) do
             nil ->

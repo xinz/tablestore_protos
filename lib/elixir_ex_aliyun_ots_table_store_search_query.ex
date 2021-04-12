@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.Query) do
 
       [
         defp(encode_type(acc, msg)) do
-          field_value = msg.type()
+          field_value = msg.type
 
           case(field_value) do
             nil ->
@@ -43,7 +43,7 @@ defmodule(ExAliyunOts.TableStoreSearch.Query) do
           end
         end,
         defp(encode_query(acc, msg)) do
-          field_value = msg.query()
+          field_value = msg.query
 
           case(field_value) do
             nil ->

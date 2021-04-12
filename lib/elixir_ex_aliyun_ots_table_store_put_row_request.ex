@@ -31,7 +31,7 @@ defmodule(ExAliyunOts.TableStore.PutRowRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name()) do
+          case(msg.table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_name]))
 
@@ -40,7 +40,7 @@ defmodule(ExAliyunOts.TableStore.PutRowRequest) do
           end
         end,
         defp(encode_row(acc, msg)) do
-          case(msg.row()) do
+          case(msg.row) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:row]))
 
@@ -49,7 +49,7 @@ defmodule(ExAliyunOts.TableStore.PutRowRequest) do
           end
         end,
         defp(encode_condition(acc, msg)) do
-          case(msg.condition()) do
+          case(msg.condition) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:condition]))
 
@@ -58,7 +58,7 @@ defmodule(ExAliyunOts.TableStore.PutRowRequest) do
           end
         end,
         defp(encode_return_content(acc, msg)) do
-          field_value = msg.return_content()
+          field_value = msg.return_content
 
           case(field_value) do
             nil ->
@@ -69,7 +69,7 @@ defmodule(ExAliyunOts.TableStore.PutRowRequest) do
           end
         end,
         defp(encode_transaction_id(acc, msg)) do
-          field_value = msg.transaction_id()
+          field_value = msg.transaction_id
 
           case(field_value) do
             nil ->
@@ -141,14 +141,14 @@ defmodule(ExAliyunOts.TableStore.PutRowRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.Condition.decode!(delimited)
-                field = {:condition, Protox.Message.merge(msg.condition(), value)}
+                field = {:condition, Protox.Message.merge(msg.condition, value)}
                 {[:condition | set_fields], [field], rest}
 
               {4, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.ReturnContent.decode!(delimited)
-                field = {:return_content, Protox.Message.merge(msg.return_content(), value)}
+                field = {:return_content, Protox.Message.merge(msg.return_content, value)}
                 {[:return_content | set_fields], [field], rest}
 
               {5, _, bytes} ->

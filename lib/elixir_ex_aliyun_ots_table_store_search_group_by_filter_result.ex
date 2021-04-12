@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByFilterResult) do
 
       [
         defp(encode_group_by_filter_result_items(acc, msg)) do
-          case(msg.group_by_filter_result_items()) do
+          case(msg.group_by_filter_result_items) do
             [] ->
               acc
 
@@ -81,7 +81,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByFilterResult) do
 
                 field =
                   {:group_by_filter_result_items,
-                   msg.group_by_filter_result_items() ++ List.wrap(value)}
+                   msg.group_by_filter_result_items ++ List.wrap(value)}
 
                 {[field], rest}
 

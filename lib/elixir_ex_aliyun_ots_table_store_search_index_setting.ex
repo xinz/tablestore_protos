@@ -29,7 +29,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSetting) do
 
       [
         defp(encode_number_of_shards(acc, msg)) do
-          field_value = msg.number_of_shards()
+          field_value = msg.number_of_shards
 
           case(field_value) do
             nil ->
@@ -40,7 +40,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSetting) do
           end
         end,
         defp(encode_routing_fields(acc, msg)) do
-          case(msg.routing_fields()) do
+          case(msg.routing_fields) do
             [] ->
               acc
 
@@ -54,7 +54,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSetting) do
           end
         end,
         defp(encode_routing_partition_size(acc, msg)) do
-          field_value = msg.routing_partition_size()
+          field_value = msg.routing_partition_size
 
           case(field_value) do
             nil ->
@@ -108,7 +108,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSetting) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
-                field = {:routing_fields, msg.routing_fields() ++ List.wrap(value)}
+                field = {:routing_fields, msg.routing_fields ++ List.wrap(value)}
                 {[field], rest}
 
               {3, _, bytes} ->

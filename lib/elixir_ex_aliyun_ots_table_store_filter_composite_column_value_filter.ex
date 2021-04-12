@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreFilter.CompositeColumnValueFilter) do
 
       [
         defp(encode_combinator(acc, msg)) do
-          case(msg.combinator()) do
+          case(msg.combinator) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:combinator]))
 
@@ -41,7 +41,7 @@ defmodule(ExAliyunOts.TableStoreFilter.CompositeColumnValueFilter) do
           end
         end,
         defp(encode_sub_filters(acc, msg)) do
-          case(msg.sub_filters()) do
+          case(msg.sub_filters) do
             [] ->
               acc
 
@@ -113,7 +113,7 @@ defmodule(ExAliyunOts.TableStoreFilter.CompositeColumnValueFilter) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreFilter.Filter.decode!(delimited)
-                field = {:sub_filters, msg.sub_filters() ++ List.wrap(value)}
+                field = {:sub_filters, msg.sub_filters ++ List.wrap(value)}
                 {[:sub_filters | set_fields], [field], rest}
 
               {tag, wire_type, rest} ->

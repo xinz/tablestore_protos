@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.HeartbeatRequest) do
 
       [
         defp(encode_tunnel_id(acc, msg)) do
-          case(msg.tunnel_id()) do
+          case(msg.tunnel_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:tunnel_id]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.HeartbeatRequest) do
           end
         end,
         defp(encode_client_id(acc, msg)) do
-          case(msg.client_id()) do
+          case(msg.client_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:client_id]))
 
@@ -44,7 +44,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.HeartbeatRequest) do
           end
         end,
         defp(encode_channels(acc, msg)) do
-          case(msg.channels()) do
+          case(msg.channels) do
             [] ->
               acc
 
@@ -119,7 +119,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.HeartbeatRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreTunnel.Channel.decode!(delimited)
-                field = {:channels, msg.channels() ++ List.wrap(value)}
+                field = {:channels, msg.channels ++ List.wrap(value)}
                 {[:channels | set_fields], [field], rest}
 
               {tag, wire_type, rest} ->

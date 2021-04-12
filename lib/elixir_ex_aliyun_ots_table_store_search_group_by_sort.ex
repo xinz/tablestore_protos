@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupBySort) do
 
       [
         defp(encode_sorters(acc, msg)) do
-          case(msg.sorters()) do
+          case(msg.sorters) do
             [] ->
               acc
 
@@ -78,7 +78,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupBySort) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.GroupBySorter.decode!(delimited)
-                field = {:sorters, msg.sorters() ++ List.wrap(value)}
+                field = {:sorters, msg.sorters ++ List.wrap(value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

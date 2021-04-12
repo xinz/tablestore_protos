@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreFilter.ColumnPaginationFilter) do
 
       [
         defp(encode_offset(acc, msg)) do
-          case(msg.offset()) do
+          case(msg.offset) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:offset]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStoreFilter.ColumnPaginationFilter) do
           end
         end,
         defp(encode_limit(acc, msg)) do
-          case(msg.limit()) do
+          case(msg.limit) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:limit]))
 

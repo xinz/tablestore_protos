@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
 
       [
         defp(encode_comparator(acc, msg)) do
-          case(msg.comparator()) do
+          case(msg.comparator) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:comparator]))
 
@@ -52,7 +52,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
           end
         end,
         defp(encode_column_name(acc, msg)) do
-          case(msg.column_name()) do
+          case(msg.column_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:column_name]))
 
@@ -61,7 +61,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
           end
         end,
         defp(encode_column_value(acc, msg)) do
-          case(msg.column_value()) do
+          case(msg.column_value) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:column_value]))
 
@@ -70,7 +70,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
           end
         end,
         defp(encode_filter_if_missing(acc, msg)) do
-          case(msg.filter_if_missing()) do
+          case(msg.filter_if_missing) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:filter_if_missing]))
 
@@ -79,7 +79,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
           end
         end,
         defp(encode_latest_version_only(acc, msg)) do
-          case(msg.latest_version_only()) do
+          case(msg.latest_version_only) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:latest_version_only]))
 

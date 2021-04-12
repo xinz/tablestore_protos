@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.TermsQuery) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.TermsQuery) do
           end
         end,
         defp(encode_terms(acc, msg)) do
-          case(msg.terms()) do
+          case(msg.terms) do
             [] ->
               acc
 
@@ -96,7 +96,7 @@ defmodule(ExAliyunOts.TableStoreSearch.TermsQuery) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
-                field = {:terms, msg.terms() ++ List.wrap(value)}
+                field = {:terms, msg.terms ++ List.wrap(value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

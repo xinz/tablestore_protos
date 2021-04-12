@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.DefinedColumnSchema) do
 
       [
         defp(encode_name(acc, msg)) do
-          case(msg.name()) do
+          case(msg.name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:name]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStore.DefinedColumnSchema) do
           end
         end,
         defp(encode_type(acc, msg)) do
-          case(msg.type()) do
+          case(msg.type) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:type]))
 

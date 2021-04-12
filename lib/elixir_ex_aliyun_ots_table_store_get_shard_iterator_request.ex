@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorRequest) do
 
       [
         defp(encode_stream_id(acc, msg)) do
-          case(msg.stream_id()) do
+          case(msg.stream_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:stream_id]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorRequest) do
           end
         end,
         defp(encode_shard_id(acc, msg)) do
-          case(msg.shard_id()) do
+          case(msg.shard_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:shard_id]))
 

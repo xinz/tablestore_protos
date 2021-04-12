@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.StartLocalTransactionResponse) do
 
       [
         defp(encode_transaction_id(acc, msg)) do
-          case(msg.transaction_id()) do
+          case(msg.transaction_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:transaction_id]))
 

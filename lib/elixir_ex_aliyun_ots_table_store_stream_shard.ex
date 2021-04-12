@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.StreamShard) do
 
       [
         defp(encode_shard_id(acc, msg)) do
-          case(msg.shard_id()) do
+          case(msg.shard_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:shard_id]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStore.StreamShard) do
           end
         end,
         defp(encode_parent_id(acc, msg)) do
-          field_value = msg.parent_id()
+          field_value = msg.parent_id
 
           case(field_value) do
             nil ->
@@ -46,7 +46,7 @@ defmodule(ExAliyunOts.TableStore.StreamShard) do
           end
         end,
         defp(encode_parent_sibling_id(acc, msg)) do
-          field_value = msg.parent_sibling_id()
+          field_value = msg.parent_sibling_id
 
           case(field_value) do
             nil ->

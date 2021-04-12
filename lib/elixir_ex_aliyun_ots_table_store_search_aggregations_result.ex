@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationsResult) do
 
       [
         defp(encode_agg_results(acc, msg)) do
-          case(msg.agg_results()) do
+          case(msg.agg_results) do
             [] ->
               acc
 
@@ -78,7 +78,7 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationsResult) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.AggregationResult.decode!(delimited)
-                field = {:agg_results, msg.agg_results() ++ List.wrap(value)}
+                field = {:agg_results, msg.agg_results ++ List.wrap(value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

@@ -31,7 +31,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByField) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->
@@ -42,7 +42,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByField) do
           end
         end,
         defp(encode_size(acc, msg)) do
-          field_value = msg.size()
+          field_value = msg.size
 
           case(field_value) do
             nil ->
@@ -53,7 +53,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByField) do
           end
         end,
         defp(encode_sort(acc, msg)) do
-          field_value = msg.sort()
+          field_value = msg.sort
 
           case(field_value) do
             nil ->
@@ -64,7 +64,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByField) do
           end
         end,
         defp(encode_sub_aggs(acc, msg)) do
-          field_value = msg.sub_aggs()
+          field_value = msg.sub_aggs
 
           case(field_value) do
             nil ->
@@ -75,7 +75,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByField) do
           end
         end,
         defp(encode_sub_group_bys(acc, msg)) do
-          field_value = msg.sub_group_bys()
+          field_value = msg.sub_group_bys
 
           case(field_value) do
             nil ->
@@ -136,21 +136,21 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByField) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.GroupBySort.decode!(delimited)
-                field = {:sort, Protox.Message.merge(msg.sort(), value)}
+                field = {:sort, Protox.Message.merge(msg.sort, value)}
                 {[field], rest}
 
               {4, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.Aggregations.decode!(delimited)
-                field = {:sub_aggs, Protox.Message.merge(msg.sub_aggs(), value)}
+                field = {:sub_aggs, Protox.Message.merge(msg.sub_aggs, value)}
                 {[field], rest}
 
               {5, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.GroupBys.decode!(delimited)
-                field = {:sub_group_bys, Protox.Message.merge(msg.sub_group_bys(), value)}
+                field = {:sub_group_bys, Protox.Message.merge(msg.sub_group_bys, value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

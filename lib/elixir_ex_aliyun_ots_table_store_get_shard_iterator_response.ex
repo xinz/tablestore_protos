@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
 
       [
         defp(encode_shard_iterator(acc, msg)) do
-          case(msg.shard_iterator()) do
+          case(msg.shard_iterator) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:shard_iterator]))
 

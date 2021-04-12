@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.LoadTableRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name()) do
+          case(msg.table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_name]))
 

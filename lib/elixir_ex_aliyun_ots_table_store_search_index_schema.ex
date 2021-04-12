@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
 
       [
         defp(encode_field_schemas(acc, msg)) do
-          case(msg.field_schemas()) do
+          case(msg.field_schemas) do
             [] ->
               acc
 
@@ -40,7 +40,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
           end
         end,
         defp(encode_index_setting(acc, msg)) do
-          field_value = msg.index_setting()
+          field_value = msg.index_setting
 
           case(field_value) do
             nil ->
@@ -51,7 +51,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
           end
         end,
         defp(encode_index_sort(acc, msg)) do
-          field_value = msg.index_sort()
+          field_value = msg.index_sort
 
           case(field_value) do
             nil ->
@@ -100,21 +100,21 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.FieldSchema.decode!(delimited)
-                field = {:field_schemas, msg.field_schemas() ++ List.wrap(value)}
+                field = {:field_schemas, msg.field_schemas ++ List.wrap(value)}
                 {[field], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.IndexSetting.decode!(delimited)
-                field = {:index_setting, Protox.Message.merge(msg.index_setting(), value)}
+                field = {:index_setting, Protox.Message.merge(msg.index_setting, value)}
                 {[field], rest}
 
               {3, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.Sort.decode!(delimited)
-                field = {:index_sort, Protox.Message.merge(msg.index_sort(), value)}
+                field = {:index_sort, Protox.Message.merge(msg.index_sort, value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

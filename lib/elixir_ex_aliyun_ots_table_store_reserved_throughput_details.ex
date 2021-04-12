@@ -29,7 +29,7 @@ defmodule(ExAliyunOts.TableStore.ReservedThroughputDetails) do
 
       [
         defp(encode_capacity_unit(acc, msg)) do
-          case(msg.capacity_unit()) do
+          case(msg.capacity_unit) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:capacity_unit]))
 
@@ -38,7 +38,7 @@ defmodule(ExAliyunOts.TableStore.ReservedThroughputDetails) do
           end
         end,
         defp(encode_last_increase_time(acc, msg)) do
-          case(msg.last_increase_time()) do
+          case(msg.last_increase_time) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:last_increase_time]))
 
@@ -47,7 +47,7 @@ defmodule(ExAliyunOts.TableStore.ReservedThroughputDetails) do
           end
         end,
         defp(encode_last_decrease_time(acc, msg)) do
-          field_value = msg.last_decrease_time()
+          field_value = msg.last_decrease_time
 
           case(field_value) do
             nil ->
@@ -105,7 +105,7 @@ defmodule(ExAliyunOts.TableStore.ReservedThroughputDetails) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.CapacityUnit.decode!(delimited)
-                field = {:capacity_unit, Protox.Message.merge(msg.capacity_unit(), value)}
+                field = {:capacity_unit, Protox.Message.merge(msg.capacity_unit, value)}
                 {[:capacity_unit | set_fields], [field], rest}
 
               {2, _, bytes} ->

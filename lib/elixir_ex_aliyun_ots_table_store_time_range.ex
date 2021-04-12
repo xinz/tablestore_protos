@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.TimeRange) do
 
       [
         defp(encode_start_time(acc, msg)) do
-          field_value = msg.start_time()
+          field_value = msg.start_time
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStore.TimeRange) do
           end
         end,
         defp(encode_end_time(acc, msg)) do
-          field_value = msg.end_time()
+          field_value = msg.end_time
 
           case(field_value) do
             nil ->
@@ -48,7 +48,7 @@ defmodule(ExAliyunOts.TableStore.TimeRange) do
           end
         end,
         defp(encode_specific_time(acc, msg)) do
-          field_value = msg.specific_time()
+          field_value = msg.specific_time
 
           case(field_value) do
             nil ->

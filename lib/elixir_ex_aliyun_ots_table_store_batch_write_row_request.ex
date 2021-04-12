@@ -2,7 +2,7 @@
 defmodule(ExAliyunOts.TableStore.BatchWriteRowRequest) do
   @moduledoc false
   (
-    defstruct(tables: [], transaction_id: nil)
+    defstruct(tables: [], transaction_id: nil, is_atomic: nil)
 
     (
       (
@@ -18,7 +18,7 @@ defmodule(ExAliyunOts.TableStore.BatchWriteRowRequest) do
 
         @spec encode!(struct) :: iodata | no_return
         def(encode!(msg)) do
-          [] |> encode_tables(msg) |> encode_transaction_id(msg)
+          [] |> encode_tables(msg) |> encode_transaction_id(msg) |> encode_is_atomic(msg)
         end
       )
 
@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.BatchWriteRowRequest) do
 
       [
         defp(encode_tables(acc, msg)) do
-          case(msg.tables()) do
+          case(msg.tables) do
             [] ->
               acc
 
@@ -40,7 +40,7 @@ defmodule(ExAliyunOts.TableStore.BatchWriteRowRequest) do
           end
         end,
         defp(encode_transaction_id(acc, msg)) do
-          field_value = msg.transaction_id()
+          field_value = msg.transaction_id
 
           case(field_value) do
             nil ->
@@ -48,6 +48,17 @@ defmodule(ExAliyunOts.TableStore.BatchWriteRowRequest) do
 
             _ ->
               [acc, <<18>>, Protox.Encode.encode_string(field_value)]
+          end
+        end,
+        defp(encode_is_atomic(acc, msg)) do
+          field_value = msg.is_atomic
+
+          case(field_value) do
+            nil ->
+              acc
+
+            _ ->
+              [acc, <<24>>, Protox.Encode.encode_bool(field_value)]
           end
         end
       ]
@@ -89,7 +100,7 @@ defmodule(ExAliyunOts.TableStore.BatchWriteRowRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.TableInBatchWriteRowRequest.decode!(delimited)
-                field = {:tables, msg.tables() ++ List.wrap(value)}
+                field = {:tables, msg.tables ++ List.wrap(value)}
                 {[field], rest}
 
               {2, _, bytes} ->
@@ -97,6 +108,11 @@ defmodule(ExAliyunOts.TableStore.BatchWriteRowRequest) do
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
                 field = {:transaction_id, value}
+                {[field], rest}
+
+              {3, _, bytes} ->
+                {value, rest} = Protox.Decode.parse_bool(bytes)
+                field = {:is_atomic, value}
                 {[field], rest}
 
               {tag, wire_type, rest} ->
@@ -118,7 +134,8 @@ defmodule(ExAliyunOts.TableStore.BatchWriteRowRequest) do
     def(defs()) do
       %{
         1 => {:tables, :unpacked, {:message, ExAliyunOts.TableStore.TableInBatchWriteRowRequest}},
-        2 => {:transaction_id, {:default, ""}, :string}
+        2 => {:transaction_id, {:default, ""}, :string},
+        3 => {:is_atomic, {:default, false}, :bool}
       }
     end
 
@@ -127,6 +144,7 @@ defmodule(ExAliyunOts.TableStore.BatchWriteRowRequest) do
           }
     def(defs_by_name()) do
       %{
+        is_atomic: {3, {:default, false}, :bool},
         tables: {1, :unpacked, {:message, ExAliyunOts.TableStore.TableInBatchWriteRowRequest}},
         transaction_id: {2, {:default, ""}, :string}
       }
@@ -150,6 +168,9 @@ defmodule(ExAliyunOts.TableStore.BatchWriteRowRequest) do
       end,
       def(default(:transaction_id)) do
         {:ok, ""}
+      end,
+      def(default(:is_atomic)) do
+        {:ok, false}
       end,
       def(default(_)) do
         {:error, :no_such_field}

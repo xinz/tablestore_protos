@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ConnectRequest) do
 
       [
         defp(encode_tunnel_id(acc, msg)) do
-          case(msg.tunnel_id()) do
+          case(msg.tunnel_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:tunnel_id]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ConnectRequest) do
           end
         end,
         defp(encode_client_config(acc, msg)) do
-          field_value = msg.client_config()
+          field_value = msg.client_config
 
           case(field_value) do
             nil ->
@@ -100,7 +100,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ConnectRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreTunnel.ClientConfig.decode!(delimited)
-                field = {:client_config, Protox.Message.merge(msg.client_config(), value)}
+                field = {:client_config, Protox.Message.merge(msg.client_config, value)}
                 {[:client_config | set_fields], [field], rest}
 
               {tag, wire_type, rest} ->

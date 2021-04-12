@@ -30,7 +30,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSort) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->
@@ -41,7 +41,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSort) do
           end
         end,
         defp(encode_order(acc, msg)) do
-          field_value = msg.order()
+          field_value = msg.order
 
           case(field_value) do
             nil ->
@@ -58,7 +58,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSort) do
           end
         end,
         defp(encode_mode(acc, msg)) do
-          field_value = msg.mode()
+          field_value = msg.mode
 
           case(field_value) do
             nil ->
@@ -75,7 +75,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSort) do
           end
         end,
         defp(encode_nested_filter(acc, msg)) do
-          field_value = msg.nested_filter()
+          field_value = msg.nested_filter
 
           case(field_value) do
             nil ->
@@ -145,7 +145,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSort) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.NestedFilter.decode!(delimited)
-                field = {:nested_filter, Protox.Message.merge(msg.nested_filter(), value)}
+                field = {:nested_filter, Protox.Message.merge(msg.nested_filter, value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

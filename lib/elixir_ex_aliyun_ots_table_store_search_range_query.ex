@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.RangeQuery) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->
@@ -48,7 +48,7 @@ defmodule(ExAliyunOts.TableStoreSearch.RangeQuery) do
           end
         end,
         defp(encode_range_from(acc, msg)) do
-          field_value = msg.range_from()
+          field_value = msg.range_from
 
           case(field_value) do
             nil ->
@@ -59,7 +59,7 @@ defmodule(ExAliyunOts.TableStoreSearch.RangeQuery) do
           end
         end,
         defp(encode_range_to(acc, msg)) do
-          field_value = msg.range_to()
+          field_value = msg.range_to
 
           case(field_value) do
             nil ->
@@ -70,7 +70,7 @@ defmodule(ExAliyunOts.TableStoreSearch.RangeQuery) do
           end
         end,
         defp(encode_include_lower(acc, msg)) do
-          field_value = msg.include_lower()
+          field_value = msg.include_lower
 
           case(field_value) do
             nil ->
@@ -81,7 +81,7 @@ defmodule(ExAliyunOts.TableStoreSearch.RangeQuery) do
           end
         end,
         defp(encode_include_upper(acc, msg)) do
-          field_value = msg.include_upper()
+          field_value = msg.include_upper
 
           case(field_value) do
             nil ->

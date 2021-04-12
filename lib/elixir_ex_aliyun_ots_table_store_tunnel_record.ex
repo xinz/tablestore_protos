@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.Record) do
 
       [
         defp(encode_action_type(acc, msg)) do
-          case(msg.action_type()) do
+          case(msg.action_type) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:action_type]))
 
@@ -41,7 +41,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.Record) do
           end
         end,
         defp(encode_record(acc, msg)) do
-          case(msg.record()) do
+          case(msg.record) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:record]))
 

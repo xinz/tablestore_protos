@@ -30,7 +30,7 @@ defmodule(ExAliyunOts.TableStoreSearch.Sorter) do
 
       [
         defp(encode_field_sort(acc, msg)) do
-          field_value = msg.field_sort()
+          field_value = msg.field_sort
 
           case(field_value) do
             nil ->
@@ -41,7 +41,7 @@ defmodule(ExAliyunOts.TableStoreSearch.Sorter) do
           end
         end,
         defp(encode_geo_distance_sort(acc, msg)) do
-          field_value = msg.geo_distance_sort()
+          field_value = msg.geo_distance_sort
 
           case(field_value) do
             nil ->
@@ -52,7 +52,7 @@ defmodule(ExAliyunOts.TableStoreSearch.Sorter) do
           end
         end,
         defp(encode_score_sort(acc, msg)) do
-          field_value = msg.score_sort()
+          field_value = msg.score_sort
 
           case(field_value) do
             nil ->
@@ -63,7 +63,7 @@ defmodule(ExAliyunOts.TableStoreSearch.Sorter) do
           end
         end,
         defp(encode_pk_sort(acc, msg)) do
-          field_value = msg.pk_sort()
+          field_value = msg.pk_sort
 
           case(field_value) do
             nil ->
@@ -112,28 +112,28 @@ defmodule(ExAliyunOts.TableStoreSearch.Sorter) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.FieldSort.decode!(delimited)
-                field = {:field_sort, Protox.Message.merge(msg.field_sort(), value)}
+                field = {:field_sort, Protox.Message.merge(msg.field_sort, value)}
                 {[field], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.GeoDistanceSort.decode!(delimited)
-                field = {:geo_distance_sort, Protox.Message.merge(msg.geo_distance_sort(), value)}
+                field = {:geo_distance_sort, Protox.Message.merge(msg.geo_distance_sort, value)}
                 {[field], rest}
 
               {3, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.ScoreSort.decode!(delimited)
-                field = {:score_sort, Protox.Message.merge(msg.score_sort(), value)}
+                field = {:score_sort, Protox.Message.merge(msg.score_sort, value)}
                 {[field], rest}
 
               {4, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.PrimaryKeySort.decode!(delimited)
-                field = {:pk_sort, Protox.Message.merge(msg.pk_sort(), value)}
+                field = {:pk_sort, Protox.Message.merge(msg.pk_sort, value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

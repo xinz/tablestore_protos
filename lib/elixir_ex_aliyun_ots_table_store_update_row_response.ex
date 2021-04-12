@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.UpdateRowResponse) do
 
       [
         defp(encode_consumed(acc, msg)) do
-          case(msg.consumed()) do
+          case(msg.consumed) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:consumed]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStore.UpdateRowResponse) do
           end
         end,
         defp(encode_row(acc, msg)) do
-          field_value = msg.row()
+          field_value = msg.row
 
           case(field_value) do
             nil ->
@@ -93,7 +93,7 @@ defmodule(ExAliyunOts.TableStore.UpdateRowResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.ConsumedCapacity.decode!(delimited)
-                field = {:consumed, Protox.Message.merge(msg.consumed(), value)}
+                field = {:consumed, Protox.Message.merge(msg.consumed, value)}
                 {[:consumed | set_fields], [field], rest}
 
               {2, _, bytes} ->

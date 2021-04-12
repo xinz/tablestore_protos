@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoPolygonQuery) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoPolygonQuery) do
           end
         end,
         defp(encode_points(acc, msg)) do
-          case(msg.points()) do
+          case(msg.points) do
             [] ->
               acc
 
@@ -96,7 +96,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoPolygonQuery) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
-                field = {:points, msg.points() ++ List.wrap(value)}
+                field = {:points, msg.points ++ List.wrap(value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

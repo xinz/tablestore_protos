@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.Error) do
 
       [
         defp(encode_code(acc, msg)) do
-          case(msg.code()) do
+          case(msg.code) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:code]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.Error) do
           end
         end,
         defp(encode_message(acc, msg)) do
-          field_value = msg.message()
+          field_value = msg.message
 
           case(field_value) do
             nil ->
@@ -46,7 +46,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.Error) do
           end
         end,
         defp(encode_tunnel_id(acc, msg)) do
-          field_value = msg.tunnel_id()
+          field_value = msg.tunnel_id
 
           case(field_value) do
             nil ->

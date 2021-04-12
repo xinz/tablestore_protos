@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.PrimaryKeySort) do
 
       [
         defp(encode_order(acc, msg)) do
-          field_value = msg.order()
+          field_value = msg.order
 
           case(field_value) do
             nil ->

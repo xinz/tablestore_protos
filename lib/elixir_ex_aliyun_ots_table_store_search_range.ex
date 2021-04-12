@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.Range) do
 
       [
         defp(encode_from(acc, msg)) do
-          field_value = msg.from()
+          field_value = msg.from
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.Range) do
           end
         end,
         defp(encode_to(acc, msg)) do
-          field_value = msg.to()
+          field_value = msg.to
 
           case(field_value) do
             nil ->

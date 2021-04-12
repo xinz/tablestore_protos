@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.DescribeTunnelRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name()) do
+          case(msg.table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_name]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.DescribeTunnelRequest) do
           end
         end,
         defp(encode_tunnel_name(acc, msg)) do
-          case(msg.tunnel_name()) do
+          case(msg.tunnel_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:tunnel_name]))
 
@@ -44,7 +44,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.DescribeTunnelRequest) do
           end
         end,
         defp(encode_tunnel_id(acc, msg)) do
-          field_value = msg.tunnel_id()
+          field_value = msg.tunnel_id
 
           case(field_value) do
             nil ->

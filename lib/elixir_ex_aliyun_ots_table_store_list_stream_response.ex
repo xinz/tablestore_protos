@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.ListStreamResponse) do
 
       [
         defp(encode_streams(acc, msg)) do
-          case(msg.streams()) do
+          case(msg.streams) do
             [] ->
               acc
 
@@ -78,7 +78,7 @@ defmodule(ExAliyunOts.TableStore.ListStreamResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.Stream.decode!(delimited)
-                field = {:streams, msg.streams() ++ List.wrap(value)}
+                field = {:streams, msg.streams ++ List.wrap(value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.PrefixQuery) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.PrefixQuery) do
           end
         end,
         defp(encode_prefix(acc, msg)) do
-          field_value = msg.prefix()
+          field_value = msg.prefix
 
           case(field_value) do
             nil ->

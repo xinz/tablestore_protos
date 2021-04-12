@@ -39,7 +39,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ScanQuery) do
 
       [
         defp(encode_query(acc, msg)) do
-          field_value = msg.query()
+          field_value = msg.query
 
           case(field_value) do
             nil ->
@@ -50,7 +50,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ScanQuery) do
           end
         end,
         defp(encode_limit(acc, msg)) do
-          field_value = msg.limit()
+          field_value = msg.limit
 
           case(field_value) do
             nil ->
@@ -61,7 +61,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ScanQuery) do
           end
         end,
         defp(encode_alive_time(acc, msg)) do
-          field_value = msg.alive_time()
+          field_value = msg.alive_time
 
           case(field_value) do
             nil ->
@@ -72,7 +72,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ScanQuery) do
           end
         end,
         defp(encode_token(acc, msg)) do
-          field_value = msg.token()
+          field_value = msg.token
 
           case(field_value) do
             nil ->
@@ -83,7 +83,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ScanQuery) do
           end
         end,
         defp(encode_current_parallel_id(acc, msg)) do
-          field_value = msg.current_parallel_id()
+          field_value = msg.current_parallel_id
 
           case(field_value) do
             nil ->
@@ -94,7 +94,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ScanQuery) do
           end
         end,
         defp(encode_max_parallel(acc, msg)) do
-          field_value = msg.max_parallel()
+          field_value = msg.max_parallel
 
           case(field_value) do
             nil ->
@@ -143,7 +143,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ScanQuery) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.Query.decode!(delimited)
-                field = {:query, Protox.Message.merge(msg.query(), value)}
+                field = {:query, Protox.Message.merge(msg.query, value)}
                 {[field], rest}
 
               {2, _, bytes} ->

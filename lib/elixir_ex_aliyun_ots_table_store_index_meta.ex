@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStore.IndexMeta) do
 
       [
         defp(encode_name(acc, msg)) do
-          case(msg.name()) do
+          case(msg.name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:name]))
 
@@ -46,7 +46,7 @@ defmodule(ExAliyunOts.TableStore.IndexMeta) do
           end
         end,
         defp(encode_primary_key(acc, msg)) do
-          case(msg.primary_key()) do
+          case(msg.primary_key) do
             [] ->
               acc
 
@@ -60,7 +60,7 @@ defmodule(ExAliyunOts.TableStore.IndexMeta) do
           end
         end,
         defp(encode_defined_column(acc, msg)) do
-          case(msg.defined_column()) do
+          case(msg.defined_column) do
             [] ->
               acc
 
@@ -74,7 +74,7 @@ defmodule(ExAliyunOts.TableStore.IndexMeta) do
           end
         end,
         defp(encode_index_update_mode(acc, msg)) do
-          case(msg.index_update_mode()) do
+          case(msg.index_update_mode) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:index_update_mode]))
 
@@ -89,7 +89,7 @@ defmodule(ExAliyunOts.TableStore.IndexMeta) do
           end
         end,
         defp(encode_index_type(acc, msg)) do
-          case(msg.index_type()) do
+          case(msg.index_type) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:index_type]))
 
@@ -157,14 +157,14 @@ defmodule(ExAliyunOts.TableStore.IndexMeta) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
-                field = {:primary_key, msg.primary_key() ++ List.wrap(value)}
+                field = {:primary_key, msg.primary_key ++ List.wrap(value)}
                 {[:primary_key | set_fields], [field], rest}
 
               {3, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
-                field = {:defined_column, msg.defined_column() ++ List.wrap(value)}
+                field = {:defined_column, msg.defined_column ++ List.wrap(value)}
                 {[:defined_column | set_fields], [field], rest}
 
               {4, _, bytes} ->

@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.CreateSearchIndexRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name()) do
+          case(msg.table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_name]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStoreSearch.CreateSearchIndexRequest) do
           end
         end,
         defp(encode_index_name(acc, msg)) do
-          case(msg.index_name()) do
+          case(msg.index_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:index_name]))
 
@@ -44,7 +44,7 @@ defmodule(ExAliyunOts.TableStoreSearch.CreateSearchIndexRequest) do
           end
         end,
         defp(encode_schema(acc, msg)) do
-          field_value = msg.schema()
+          field_value = msg.schema
 
           case(field_value) do
             nil ->
@@ -120,7 +120,7 @@ defmodule(ExAliyunOts.TableStoreSearch.CreateSearchIndexRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.IndexSchema.decode!(delimited)
-                field = {:schema, Protox.Message.merge(msg.schema(), value)}
+                field = {:schema, Protox.Message.merge(msg.schema, value)}
                 {[:schema | set_fields], [field], rest}
 
               {tag, wire_type, rest} ->

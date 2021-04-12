@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SingleWordAnalyzerParameter) do
 
       [
         defp(encode_case_sensitive(acc, msg)) do
-          field_value = msg.case_sensitive()
+          field_value = msg.case_sensitive
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SingleWordAnalyzerParameter) do
           end
         end,
         defp(encode_delimit_word(acc, msg)) do
-          field_value = msg.delimit_word()
+          field_value = msg.delimit_word
 
           case(field_value) do
             nil ->

@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.ReservedThroughput) do
 
       [
         defp(encode_capacity_unit(acc, msg)) do
-          case(msg.capacity_unit()) do
+          case(msg.capacity_unit) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:capacity_unit]))
 
@@ -82,7 +82,7 @@ defmodule(ExAliyunOts.TableStore.ReservedThroughput) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.CapacityUnit.decode!(delimited)
-                field = {:capacity_unit, Protox.Message.merge(msg.capacity_unit(), value)}
+                field = {:capacity_unit, Protox.Message.merge(msg.capacity_unit, value)}
                 {[:capacity_unit | set_fields], [field], rest}
 
               {tag, wire_type, rest} ->

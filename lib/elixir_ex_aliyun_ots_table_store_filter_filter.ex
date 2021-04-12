@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreFilter.Filter) do
 
       [
         defp(encode_type(acc, msg)) do
-          case(msg.type()) do
+          case(msg.type) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:type]))
 
@@ -41,7 +41,7 @@ defmodule(ExAliyunOts.TableStoreFilter.Filter) do
           end
         end,
         defp(encode_filter(acc, msg)) do
-          case(msg.filter()) do
+          case(msg.filter) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:filter]))
 

@@ -53,7 +53,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name()) do
+          case(msg.table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_name]))
 
@@ -62,7 +62,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           end
         end,
         defp(encode_direction(acc, msg)) do
-          case(msg.direction()) do
+          case(msg.direction) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:direction]))
 
@@ -77,7 +77,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           end
         end,
         defp(encode_columns_to_get(acc, msg)) do
-          case(msg.columns_to_get()) do
+          case(msg.columns_to_get) do
             [] ->
               acc
 
@@ -91,7 +91,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           end
         end,
         defp(encode_time_range(acc, msg)) do
-          field_value = msg.time_range()
+          field_value = msg.time_range
 
           case(field_value) do
             nil ->
@@ -102,7 +102,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           end
         end,
         defp(encode_max_versions(acc, msg)) do
-          field_value = msg.max_versions()
+          field_value = msg.max_versions
 
           case(field_value) do
             nil ->
@@ -113,7 +113,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           end
         end,
         defp(encode_limit(acc, msg)) do
-          field_value = msg.limit()
+          field_value = msg.limit
 
           case(field_value) do
             nil ->
@@ -124,7 +124,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           end
         end,
         defp(encode_inclusive_start_primary_key(acc, msg)) do
-          case(msg.inclusive_start_primary_key()) do
+          case(msg.inclusive_start_primary_key) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:inclusive_start_primary_key]))
 
@@ -133,7 +133,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           end
         end,
         defp(encode_exclusive_end_primary_key(acc, msg)) do
-          case(msg.exclusive_end_primary_key()) do
+          case(msg.exclusive_end_primary_key) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:exclusive_end_primary_key]))
 
@@ -142,7 +142,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           end
         end,
         defp(encode_filter(acc, msg)) do
-          field_value = msg.filter()
+          field_value = msg.filter
 
           case(field_value) do
             nil ->
@@ -153,7 +153,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           end
         end,
         defp(encode_start_column(acc, msg)) do
-          field_value = msg.start_column()
+          field_value = msg.start_column
 
           case(field_value) do
             nil ->
@@ -164,7 +164,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           end
         end,
         defp(encode_end_column(acc, msg)) do
-          field_value = msg.end_column()
+          field_value = msg.end_column
 
           case(field_value) do
             nil ->
@@ -175,7 +175,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           end
         end,
         defp(encode_token(acc, msg)) do
-          field_value = msg.token()
+          field_value = msg.token
 
           case(field_value) do
             nil ->
@@ -186,7 +186,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           end
         end,
         defp(encode_transaction_id(acc, msg)) do
-          field_value = msg.transaction_id()
+          field_value = msg.transaction_id
 
           case(field_value) do
             nil ->
@@ -259,14 +259,14 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
-                field = {:columns_to_get, msg.columns_to_get() ++ List.wrap(value)}
+                field = {:columns_to_get, msg.columns_to_get ++ List.wrap(value)}
                 {[:columns_to_get | set_fields], [field], rest}
 
               {4, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.TimeRange.decode!(delimited)
-                field = {:time_range, Protox.Message.merge(msg.time_range(), value)}
+                field = {:time_range, Protox.Message.merge(msg.time_range, value)}
                 {[:time_range | set_fields], [field], rest}
 
               {5, _, bytes} ->

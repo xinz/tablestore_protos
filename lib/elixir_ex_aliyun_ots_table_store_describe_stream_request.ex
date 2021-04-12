@@ -29,7 +29,7 @@ defmodule(ExAliyunOts.TableStore.DescribeStreamRequest) do
 
       [
         defp(encode_stream_id(acc, msg)) do
-          case(msg.stream_id()) do
+          case(msg.stream_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:stream_id]))
 
@@ -38,7 +38,7 @@ defmodule(ExAliyunOts.TableStore.DescribeStreamRequest) do
           end
         end,
         defp(encode_inclusive_start_shard_id(acc, msg)) do
-          field_value = msg.inclusive_start_shard_id()
+          field_value = msg.inclusive_start_shard_id
 
           case(field_value) do
             nil ->
@@ -49,7 +49,7 @@ defmodule(ExAliyunOts.TableStore.DescribeStreamRequest) do
           end
         end,
         defp(encode_shard_limit(acc, msg)) do
-          field_value = msg.shard_limit()
+          field_value = msg.shard_limit
 
           case(field_value) do
             nil ->

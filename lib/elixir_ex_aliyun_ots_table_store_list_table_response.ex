@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.ListTableResponse) do
 
       [
         defp(encode_table_names(acc, msg)) do
-          case(msg.table_names()) do
+          case(msg.table_names) do
             [] ->
               acc
 
@@ -78,7 +78,7 @@ defmodule(ExAliyunOts.TableStore.ListTableResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
-                field = {:table_names, msg.table_names() ++ List.wrap(value)}
+                field = {:table_names, msg.table_names ++ List.wrap(value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

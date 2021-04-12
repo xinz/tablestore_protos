@@ -41,7 +41,7 @@ defmodule(ExAliyunOts.TableStore.DescribeStreamResponse) do
 
       [
         defp(encode_stream_id(acc, msg)) do
-          case(msg.stream_id()) do
+          case(msg.stream_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:stream_id]))
 
@@ -50,7 +50,7 @@ defmodule(ExAliyunOts.TableStore.DescribeStreamResponse) do
           end
         end,
         defp(encode_expiration_time(acc, msg)) do
-          case(msg.expiration_time()) do
+          case(msg.expiration_time) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:expiration_time]))
 
@@ -59,7 +59,7 @@ defmodule(ExAliyunOts.TableStore.DescribeStreamResponse) do
           end
         end,
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name()) do
+          case(msg.table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_name]))
 
@@ -68,7 +68,7 @@ defmodule(ExAliyunOts.TableStore.DescribeStreamResponse) do
           end
         end,
         defp(encode_creation_time(acc, msg)) do
-          case(msg.creation_time()) do
+          case(msg.creation_time) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:creation_time]))
 
@@ -77,7 +77,7 @@ defmodule(ExAliyunOts.TableStore.DescribeStreamResponse) do
           end
         end,
         defp(encode_stream_status(acc, msg)) do
-          case(msg.stream_status()) do
+          case(msg.stream_status) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:stream_status]))
 
@@ -92,7 +92,7 @@ defmodule(ExAliyunOts.TableStore.DescribeStreamResponse) do
           end
         end,
         defp(encode_shards(acc, msg)) do
-          case(msg.shards()) do
+          case(msg.shards) do
             [] ->
               acc
 
@@ -106,7 +106,7 @@ defmodule(ExAliyunOts.TableStore.DescribeStreamResponse) do
           end
         end,
         defp(encode_next_shard_id(acc, msg)) do
-          field_value = msg.next_shard_id()
+          field_value = msg.next_shard_id
 
           case(field_value) do
             nil ->
@@ -198,7 +198,7 @@ defmodule(ExAliyunOts.TableStore.DescribeStreamResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.StreamShard.decode!(delimited)
-                field = {:shards, msg.shards() ++ List.wrap(value)}
+                field = {:shards, msg.shards ++ List.wrap(value)}
                 {[:shards | set_fields], [field], rest}
 
               {7, _, bytes} ->

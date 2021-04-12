@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByGeoDistanceResult) do
 
       [
         defp(encode_group_by_geo_distance_result_items(acc, msg)) do
-          case(msg.group_by_geo_distance_result_items()) do
+          case(msg.group_by_geo_distance_result_items) do
             [] ->
               acc
 
@@ -83,7 +83,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByGeoDistanceResult) do
 
                 field =
                   {:group_by_geo_distance_result_items,
-                   msg.group_by_geo_distance_result_items() ++ List.wrap(value)}
+                   msg.group_by_geo_distance_result_items ++ List.wrap(value)}
 
                 {[field], rest}
 

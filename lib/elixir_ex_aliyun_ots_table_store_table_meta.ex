@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name()) do
+          case(msg.table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_name]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
           end
         end,
         defp(encode_primary_key(acc, msg)) do
-          case(msg.primary_key()) do
+          case(msg.primary_key) do
             [] ->
               acc
 
@@ -49,7 +49,7 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
           end
         end,
         defp(encode_defined_column(acc, msg)) do
-          case(msg.defined_column()) do
+          case(msg.defined_column) do
             [] ->
               acc
 
@@ -116,14 +116,14 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.PrimaryKeySchema.decode!(delimited)
-                field = {:primary_key, msg.primary_key() ++ List.wrap(value)}
+                field = {:primary_key, msg.primary_key ++ List.wrap(value)}
                 {[:primary_key | set_fields], [field], rest}
 
               {3, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.DefinedColumnSchema.decode!(delimited)
-                field = {:defined_column, msg.defined_column() ++ List.wrap(value)}
+                field = {:defined_column, msg.defined_column ++ List.wrap(value)}
                 {[:defined_column | set_fields], [field], rest}
 
               {tag, wire_type, rest} ->

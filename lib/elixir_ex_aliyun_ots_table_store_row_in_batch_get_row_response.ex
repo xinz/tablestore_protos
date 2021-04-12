@@ -31,7 +31,7 @@ defmodule(ExAliyunOts.TableStore.RowInBatchGetRowResponse) do
 
       [
         defp(encode_is_ok(acc, msg)) do
-          case(msg.is_ok()) do
+          case(msg.is_ok) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:is_ok]))
 
@@ -40,7 +40,7 @@ defmodule(ExAliyunOts.TableStore.RowInBatchGetRowResponse) do
           end
         end,
         defp(encode_error(acc, msg)) do
-          field_value = msg.error()
+          field_value = msg.error
 
           case(field_value) do
             nil ->
@@ -51,7 +51,7 @@ defmodule(ExAliyunOts.TableStore.RowInBatchGetRowResponse) do
           end
         end,
         defp(encode_consumed(acc, msg)) do
-          field_value = msg.consumed()
+          field_value = msg.consumed
 
           case(field_value) do
             nil ->
@@ -62,7 +62,7 @@ defmodule(ExAliyunOts.TableStore.RowInBatchGetRowResponse) do
           end
         end,
         defp(encode_row(acc, msg)) do
-          field_value = msg.row()
+          field_value = msg.row
 
           case(field_value) do
             nil ->
@@ -73,7 +73,7 @@ defmodule(ExAliyunOts.TableStore.RowInBatchGetRowResponse) do
           end
         end,
         defp(encode_next_token(acc, msg)) do
-          field_value = msg.next_token()
+          field_value = msg.next_token
 
           case(field_value) do
             nil ->
@@ -136,14 +136,14 @@ defmodule(ExAliyunOts.TableStore.RowInBatchGetRowResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.Error.decode!(delimited)
-                field = {:error, Protox.Message.merge(msg.error(), value)}
+                field = {:error, Protox.Message.merge(msg.error, value)}
                 {[:error | set_fields], [field], rest}
 
               {3, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.ConsumedCapacity.decode!(delimited)
-                field = {:consumed, Protox.Message.merge(msg.consumed(), value)}
+                field = {:consumed, Protox.Message.merge(msg.consumed, value)}
                 {[:consumed | set_fields], [field], rest}
 
               {4, _, bytes} ->

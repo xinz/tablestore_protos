@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          field_value = msg.table_name()
+          field_value = msg.table_name
 
           case(field_value) do
             nil ->
@@ -48,7 +48,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
           end
         end,
         defp(encode_index_name(acc, msg)) do
-          field_value = msg.index_name()
+          field_value = msg.index_name
 
           case(field_value) do
             nil ->
@@ -59,7 +59,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
           end
         end,
         defp(encode_columns_to_get(acc, msg)) do
-          field_value = msg.columns_to_get()
+          field_value = msg.columns_to_get
 
           case(field_value) do
             nil ->
@@ -70,7 +70,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
           end
         end,
         defp(encode_search_query(acc, msg)) do
-          field_value = msg.search_query()
+          field_value = msg.search_query
 
           case(field_value) do
             nil ->
@@ -81,7 +81,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
           end
         end,
         defp(encode_routing_values(acc, msg)) do
-          case(msg.routing_values()) do
+          case(msg.routing_values) do
             [] ->
               acc
 
@@ -147,7 +147,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.ColumnsToGet.decode!(delimited)
-                field = {:columns_to_get, Protox.Message.merge(msg.columns_to_get(), value)}
+                field = {:columns_to_get, Protox.Message.merge(msg.columns_to_get, value)}
                 {[field], rest}
 
               {4, _, bytes} ->
@@ -161,7 +161,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = delimited
-                field = {:routing_values, msg.routing_values() ++ List.wrap(value)}
+                field = {:routing_values, msg.routing_values ++ List.wrap(value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

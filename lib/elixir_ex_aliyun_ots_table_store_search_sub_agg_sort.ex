@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SubAggSort) do
 
       [
         defp(encode_sub_agg_name(acc, msg)) do
-          field_value = msg.sub_agg_name()
+          field_value = msg.sub_agg_name
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SubAggSort) do
           end
         end,
         defp(encode_order(acc, msg)) do
-          field_value = msg.order()
+          field_value = msg.order
 
           case(field_value) do
             nil ->

@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.MatchPhraseQuery) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name()
+          field_value = msg.field_name
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.MatchPhraseQuery) do
           end
         end,
         defp(encode_text(acc, msg)) do
-          field_value = msg.text()
+          field_value = msg.text
 
           case(field_value) do
             nil ->

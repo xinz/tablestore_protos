@@ -30,7 +30,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
 
       [
         defp(encode_consumed(acc, msg)) do
-          case(msg.consumed()) do
+          case(msg.consumed) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:consumed]))
 
@@ -39,7 +39,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
           end
         end,
         defp(encode_rows(acc, msg)) do
-          case(msg.rows()) do
+          case(msg.rows) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:rows]))
 
@@ -48,7 +48,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
           end
         end,
         defp(encode_next_start_primary_key(acc, msg)) do
-          field_value = msg.next_start_primary_key()
+          field_value = msg.next_start_primary_key
 
           case(field_value) do
             nil ->
@@ -59,7 +59,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
           end
         end,
         defp(encode_next_token(acc, msg)) do
-          field_value = msg.next_token()
+          field_value = msg.next_token
 
           case(field_value) do
             nil ->
@@ -117,7 +117,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.ConsumedCapacity.decode!(delimited)
-                field = {:consumed, Protox.Message.merge(msg.consumed(), value)}
+                field = {:consumed, Protox.Message.merge(msg.consumed, value)}
                 {[:consumed | set_fields], [field], rest}
 
               {2, _, bytes} ->

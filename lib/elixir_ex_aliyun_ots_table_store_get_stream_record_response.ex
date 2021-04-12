@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.GetStreamRecordResponse) do
 
       [
         defp(encode_stream_records(acc, msg)) do
-          case(msg.stream_records()) do
+          case(msg.stream_records) do
             [] ->
               acc
 
@@ -40,7 +40,7 @@ defmodule(ExAliyunOts.TableStore.GetStreamRecordResponse) do
           end
         end,
         defp(encode_next_shard_iterator(acc, msg)) do
-          field_value = msg.next_shard_iterator()
+          field_value = msg.next_shard_iterator
 
           case(field_value) do
             nil ->
@@ -92,7 +92,7 @@ defmodule(ExAliyunOts.TableStore.GetStreamRecordResponse) do
                 value =
                   ExAliyunOts.TableStore.GetStreamRecordResponse.StreamRecord.decode!(delimited)
 
-                field = {:stream_records, msg.stream_records() ++ List.wrap(value)}
+                field = {:stream_records, msg.stream_records ++ List.wrap(value)}
                 {[field], rest}
 
               {2, _, bytes} ->

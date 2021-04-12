@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FuzzyAnalyzerParameter) do
 
       [
         defp(encode_min_chars(acc, msg)) do
-          field_value = msg.min_chars()
+          field_value = msg.min_chars
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FuzzyAnalyzerParameter) do
           end
         end,
         defp(encode_max_chars(acc, msg)) do
-          field_value = msg.max_chars()
+          field_value = msg.max_chars
 
           case(field_value) do
             nil ->

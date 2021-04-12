@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.BatchGetRowRequest) do
 
       [
         defp(encode_tables(acc, msg)) do
-          case(msg.tables()) do
+          case(msg.tables) do
             [] ->
               acc
 
@@ -78,7 +78,7 @@ defmodule(ExAliyunOts.TableStore.BatchGetRowRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.TableInBatchGetRowRequest.decode!(delimited)
-                field = {:tables, msg.tables() ++ List.wrap(value)}
+                field = {:tables, msg.tables ++ List.wrap(value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

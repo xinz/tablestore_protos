@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.DropIndexRequest) do
 
       [
         defp(encode_main_table_name(acc, msg)) do
-          case(msg.main_table_name()) do
+          case(msg.main_table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:main_table_name]))
 
@@ -35,7 +35,7 @@ defmodule(ExAliyunOts.TableStore.DropIndexRequest) do
           end
         end,
         defp(encode_index_name(acc, msg)) do
-          case(msg.index_name()) do
+          case(msg.index_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:index_name]))
 

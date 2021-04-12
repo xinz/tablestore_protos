@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoPoint) do
 
       [
         defp(encode_lat(acc, msg)) do
-          field_value = msg.lat()
+          field_value = msg.lat
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoPoint) do
           end
         end,
         defp(encode_lon(acc, msg)) do
-          field_value = msg.lon()
+          field_value = msg.lon
 
           case(field_value) do
             nil ->

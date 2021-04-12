@@ -29,7 +29,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupBySorter) do
 
       [
         defp(encode_group_key_sort(acc, msg)) do
-          field_value = msg.group_key_sort()
+          field_value = msg.group_key_sort
 
           case(field_value) do
             nil ->
@@ -40,7 +40,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupBySorter) do
           end
         end,
         defp(encode_row_count_sort(acc, msg)) do
-          field_value = msg.row_count_sort()
+          field_value = msg.row_count_sort
 
           case(field_value) do
             nil ->
@@ -51,7 +51,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupBySorter) do
           end
         end,
         defp(encode_sub_agg_sort(acc, msg)) do
-          field_value = msg.sub_agg_sort()
+          field_value = msg.sub_agg_sort
 
           case(field_value) do
             nil ->
@@ -100,21 +100,21 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupBySorter) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.GroupKeySort.decode!(delimited)
-                field = {:group_key_sort, Protox.Message.merge(msg.group_key_sort(), value)}
+                field = {:group_key_sort, Protox.Message.merge(msg.group_key_sort, value)}
                 {[field], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.RowCountSort.decode!(delimited)
-                field = {:row_count_sort, Protox.Message.merge(msg.row_count_sort(), value)}
+                field = {:row_count_sort, Protox.Message.merge(msg.row_count_sort, value)}
                 {[field], rest}
 
               {3, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreSearch.SubAggSort.decode!(delimited)
-                field = {:sub_agg_sort, Protox.Message.merge(msg.sub_agg_sort(), value)}
+                field = {:sub_agg_sort, Protox.Message.merge(msg.sub_agg_sort, value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

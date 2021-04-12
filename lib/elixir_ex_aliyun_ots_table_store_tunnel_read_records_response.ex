@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ReadRecordsResponse) do
 
       [
         defp(encode_records(acc, msg)) do
-          case(msg.records()) do
+          case(msg.records) do
             [] ->
               acc
 
@@ -40,7 +40,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ReadRecordsResponse) do
           end
         end,
         defp(encode_next_token(acc, msg)) do
-          case(msg.next_token()) do
+          case(msg.next_token) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:next_token]))
 
@@ -96,7 +96,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ReadRecordsResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreTunnel.Record.decode!(delimited)
-                field = {:records, msg.records() ++ List.wrap(value)}
+                field = {:records, msg.records ++ List.wrap(value)}
                 {[:records | set_fields], [field], rest}
 
               {2, _, bytes} ->

@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.CapacityUnit) do
 
       [
         defp(encode_read(acc, msg)) do
-          field_value = msg.read()
+          field_value = msg.read
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStore.CapacityUnit) do
           end
         end,
         defp(encode_write(acc, msg)) do
-          field_value = msg.write()
+          field_value = msg.write
 
           case(field_value) do
             nil ->

@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ConnectResponse) do
 
       [
         defp(encode_client_id(acc, msg)) do
-          case(msg.client_id()) do
+          case(msg.client_id) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:client_id]))
 

@@ -29,7 +29,7 @@ defmodule(ExAliyunOts.TableStore.CreateIndexRequest) do
 
       [
         defp(encode_main_table_name(acc, msg)) do
-          case(msg.main_table_name()) do
+          case(msg.main_table_name) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:main_table_name]))
 
@@ -38,7 +38,7 @@ defmodule(ExAliyunOts.TableStore.CreateIndexRequest) do
           end
         end,
         defp(encode_index_meta(acc, msg)) do
-          case(msg.index_meta()) do
+          case(msg.index_meta) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:index_meta]))
 
@@ -47,7 +47,7 @@ defmodule(ExAliyunOts.TableStore.CreateIndexRequest) do
           end
         end,
         defp(encode_include_base_data(acc, msg)) do
-          field_value = msg.include_base_data()
+          field_value = msg.include_base_data
 
           case(field_value) do
             nil ->
@@ -112,7 +112,7 @@ defmodule(ExAliyunOts.TableStore.CreateIndexRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.IndexMeta.decode!(delimited)
-                field = {:index_meta, Protox.Message.merge(msg.index_meta(), value)}
+                field = {:index_meta, Protox.Message.merge(msg.index_meta, value)}
                 {[:index_meta | set_fields], [field], rest}
 
               {3, _, bytes} ->

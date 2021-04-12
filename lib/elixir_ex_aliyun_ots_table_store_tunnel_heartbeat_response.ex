@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.HeartbeatResponse) do
 
       [
         defp(encode_channels(acc, msg)) do
-          case(msg.channels()) do
+          case(msg.channels) do
             [] ->
               acc
 
@@ -78,7 +78,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.HeartbeatResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreTunnel.Channel.decode!(delimited)
-                field = {:channels, msg.channels() ++ List.wrap(value)}
+                field = {:channels, msg.channels ++ List.wrap(value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

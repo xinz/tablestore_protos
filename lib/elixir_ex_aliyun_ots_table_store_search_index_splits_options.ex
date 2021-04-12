@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.SearchIndexSplitsOptions) do
 
       [
         defp(encode_index_name(acc, msg)) do
-          field_value = msg.index_name()
+          field_value = msg.index_name
 
           case(field_value) do
             nil ->

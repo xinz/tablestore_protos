@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
 
       [
         defp(encode_table_meta(acc, msg)) do
-          case(msg.table_meta()) do
+          case(msg.table_meta) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:table_meta]))
 
@@ -46,7 +46,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
           end
         end,
         defp(encode_reserved_throughput(acc, msg)) do
-          case(msg.reserved_throughput()) do
+          case(msg.reserved_throughput) do
             nil ->
               raise(Protox.RequiredFieldsError.new([:reserved_throughput]))
 
@@ -55,7 +55,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
           end
         end,
         defp(encode_table_options(acc, msg)) do
-          field_value = msg.table_options()
+          field_value = msg.table_options
 
           case(field_value) do
             nil ->
@@ -66,7 +66,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
           end
         end,
         defp(encode_stream_spec(acc, msg)) do
-          field_value = msg.stream_spec()
+          field_value = msg.stream_spec
 
           case(field_value) do
             nil ->
@@ -77,7 +77,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
           end
         end,
         defp(encode_index_metas(acc, msg)) do
-          case(msg.index_metas()) do
+          case(msg.index_metas) do
             [] ->
               acc
 
@@ -138,7 +138,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.TableMeta.decode!(delimited)
-                field = {:table_meta, Protox.Message.merge(msg.table_meta(), value)}
+                field = {:table_meta, Protox.Message.merge(msg.table_meta, value)}
                 {[:table_meta | set_fields], [field], rest}
 
               {2, _, bytes} ->
@@ -147,7 +147,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
                 value = ExAliyunOts.TableStore.ReservedThroughput.decode!(delimited)
 
                 field =
-                  {:reserved_throughput, Protox.Message.merge(msg.reserved_throughput(), value)}
+                  {:reserved_throughput, Protox.Message.merge(msg.reserved_throughput, value)}
 
                 {[:reserved_throughput | set_fields], [field], rest}
 
@@ -155,21 +155,21 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.TableOptions.decode!(delimited)
-                field = {:table_options, Protox.Message.merge(msg.table_options(), value)}
+                field = {:table_options, Protox.Message.merge(msg.table_options, value)}
                 {[:table_options | set_fields], [field], rest}
 
               {5, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.StreamSpecification.decode!(delimited)
-                field = {:stream_spec, Protox.Message.merge(msg.stream_spec(), value)}
+                field = {:stream_spec, Protox.Message.merge(msg.stream_spec, value)}
                 {[:stream_spec | set_fields], [field], rest}
 
               {7, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStore.IndexMeta.decode!(delimited)
-                field = {:index_metas, msg.index_metas() ++ List.wrap(value)}
+                field = {:index_metas, msg.index_metas ++ List.wrap(value)}
                 {[:index_metas | set_fields], [field], rest}
 
               {tag, wire_type, rest} ->

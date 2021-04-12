@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ListTunnelResponse) do
 
       [
         defp(encode_tunnels(acc, msg)) do
-          case(msg.tunnels()) do
+          case(msg.tunnels) do
             [] ->
               acc
 
@@ -78,7 +78,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ListTunnelResponse) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 <<delimited::binary-size(len), rest::binary>> = bytes
                 value = ExAliyunOts.TableStoreTunnel.TunnelInfo.decode!(delimited)
-                field = {:tunnels, msg.tunnels() ++ List.wrap(value)}
+                field = {:tunnels, msg.tunnels ++ List.wrap(value)}
                 {[field], rest}
 
               {tag, wire_type, rest} ->

@@ -26,7 +26,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitsResponse) do
 
       [
         defp(encode_session_id(acc, msg)) do
-          field_value = msg.session_id()
+          field_value = msg.session_id
 
           case(field_value) do
             nil ->
@@ -37,7 +37,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitsResponse) do
           end
         end,
         defp(encode_splits_size(acc, msg)) do
-          field_value = msg.splits_size()
+          field_value = msg.splits_size
 
           case(field_value) do
             nil ->
