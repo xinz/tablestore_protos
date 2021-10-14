@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStore.ActionType) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :PUT_ROW
       def(default()) do
@@ -9,24 +11,42 @@ defmodule(ExAliyunOts.TableStore.ActionType) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:PUT_ROW)) do
-        1
-      end,
-      def(encode(:UPDATE_ROW)) do
-        2
-      end,
-      def(encode(:DELETE_ROW)) do
-        3
-      end
+      (
+        def(encode(:PUT_ROW)) do
+          1
+        end
+
+        def(encode("PUT_ROW")) do
+          1
+        end
+      ),
+      (
+        def(encode(:UPDATE_ROW)) do
+          2
+        end
+
+        def(encode("UPDATE_ROW")) do
+          2
+        end
+      ),
+      (
+        def(encode(:DELETE_ROW)) do
+          3
+        end
+
+        def(encode("DELETE_ROW")) do
+          3
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :PUT_ROW
@@ -43,7 +63,7 @@ defmodule(ExAliyunOts.TableStore.ActionType) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [{1, :PUT_ROW}, {2, :UPDATE_ROW}, {3, :DELETE_ROW}]
     end

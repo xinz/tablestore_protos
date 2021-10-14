@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStore.UpdateTableRequest) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -30,45 +30,71 @@ defmodule(ExAliyunOts.TableStore.UpdateTableRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:table_name]))
+          try do
+            case(msg.table_name) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:table_name]))
 
-            field_value ->
-              [acc, "\n", Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:table_name, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_reserved_throughput(acc, msg)) do
-          field_value = msg.reserved_throughput
+          try do
+            case(msg.reserved_throughput) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<18>>, Protox.Encode.encode_message(field_value)]
+              _ ->
+                [acc, <<18>>, Protox.Encode.encode_message(msg.reserved_throughput)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:reserved_throughput, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_table_options(acc, msg)) do
-          field_value = msg.table_options
+          try do
+            case(msg.table_options) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<26>>, Protox.Encode.encode_message(field_value)]
+              _ ->
+                [acc, <<26>>, Protox.Encode.encode_message(msg.table_options)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:table_options, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_stream_spec(acc, msg)) do
-          field_value = msg.stream_spec
+          try do
+            case(msg.stream_spec) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\"", Protox.Encode.encode_message(field_value)]
+              _ ->
+                [acc, "\"", Protox.Encode.encode_message(msg.stream_spec)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:stream_spec, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end
       ]
@@ -77,30 +103,32 @@ defmodule(ExAliyunOts.TableStore.UpdateTableRequest) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          {msg, set_fields} =
-            parse_key_value([], bytes, struct(ExAliyunOts.TableStore.UpdateTableRequest))
-
-          case([:table_name] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
           end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            {msg, set_fields} =
+              parse_key_value([], bytes, struct(ExAliyunOts.TableStore.UpdateTableRequest))
+
+            case([:table_name] -- set_fields) do
+              [] ->
+                msg
+
+              missing_fields ->
+                raise(Protox.RequiredFieldsError.new(missing_fields))
+            end
+          end
+        )
       )
 
       (
@@ -117,34 +145,47 @@ defmodule(ExAliyunOts.TableStore.UpdateTableRequest) do
 
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:table_name, value}
-                {[:table_name | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:table_name | set_fields], [table_name: delimited], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = ExAliyunOts.TableStore.ReservedThroughput.decode!(delimited)
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
 
-                field =
-                  {:reserved_throughput, Protox.Message.merge(msg.reserved_throughput, value)}
-
-                {[:reserved_throughput | set_fields], [field], rest}
+                {[:reserved_throughput | set_fields],
+                 [
+                   reserved_throughput:
+                     Protox.Message.merge(
+                       msg.reserved_throughput,
+                       ExAliyunOts.TableStore.ReservedThroughput.decode!(delimited)
+                     )
+                 ], rest}
 
               {3, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = ExAliyunOts.TableStore.TableOptions.decode!(delimited)
-                field = {:table_options, Protox.Message.merge(msg.table_options, value)}
-                {[:table_options | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[:table_options | set_fields],
+                 [
+                   table_options:
+                     Protox.Message.merge(
+                       msg.table_options,
+                       ExAliyunOts.TableStore.TableOptions.decode!(delimited)
+                     )
+                 ], rest}
 
               {4, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = ExAliyunOts.TableStore.StreamSpecification.decode!(delimited)
-                field = {:stream_spec, Protox.Message.merge(msg.stream_spec, value)}
-                {[:stream_spec | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[:stream_spec | set_fields],
+                 [
+                   stream_spec:
+                     Protox.Message.merge(
+                       msg.stream_spec,
+                       ExAliyunOts.TableStore.StreamSpecification.decode!(delimited)
+                     )
+                 ], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -159,33 +200,283 @@ defmodule(ExAliyunOts.TableStore.UpdateTableRequest) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStore.UpdateTableRequest,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
       %{
-        1 => {:table_name, {:default, ""}, :string},
+        1 => {:table_name, {:scalar, ""}, :string},
         2 =>
-          {:reserved_throughput, {:default, nil},
+          {:reserved_throughput, {:scalar, nil},
            {:message, ExAliyunOts.TableStore.ReservedThroughput}},
-        3 => {:table_options, {:default, nil}, {:message, ExAliyunOts.TableStore.TableOptions}},
+        3 => {:table_options, {:scalar, nil}, {:message, ExAliyunOts.TableStore.TableOptions}},
         4 =>
-          {:stream_spec, {:default, nil}, {:message, ExAliyunOts.TableStore.StreamSpecification}}
+          {:stream_spec, {:scalar, nil}, {:message, ExAliyunOts.TableStore.StreamSpecification}}
       }
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
       %{
         reserved_throughput:
-          {2, {:default, nil}, {:message, ExAliyunOts.TableStore.ReservedThroughput}},
-        stream_spec: {4, {:default, nil}, {:message, ExAliyunOts.TableStore.StreamSpecification}},
-        table_name: {1, {:default, ""}, :string},
-        table_options: {3, {:default, nil}, {:message, ExAliyunOts.TableStore.TableOptions}}
+          {2, {:scalar, nil}, {:message, ExAliyunOts.TableStore.ReservedThroughput}},
+        stream_spec: {4, {:scalar, nil}, {:message, ExAliyunOts.TableStore.StreamSpecification}},
+        table_name: {1, {:scalar, ""}, :string},
+        table_options: {3, {:scalar, nil}, {:message, ExAliyunOts.TableStore.TableOptions}}
       }
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "tableName",
+          kind: {:scalar, ""},
+          label: :required,
+          name: :table_name,
+          tag: 1,
+          type: :string
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "reservedThroughput",
+          kind: {:scalar, nil},
+          label: :optional,
+          name: :reserved_throughput,
+          tag: 2,
+          type: {:message, ExAliyunOts.TableStore.ReservedThroughput}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "tableOptions",
+          kind: {:scalar, nil},
+          label: :optional,
+          name: :table_options,
+          tag: 3,
+          type: {:message, ExAliyunOts.TableStore.TableOptions}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "streamSpec",
+          kind: {:scalar, nil},
+          label: :optional,
+          name: :stream_spec,
+          tag: 4,
+          type: {:message, ExAliyunOts.TableStore.StreamSpecification}
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:table_name)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :table_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("tableName")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :table_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("table_name")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :table_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+      ),
+      (
+        def(field_def(:reserved_throughput)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "reservedThroughput",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :reserved_throughput,
+             tag: 2,
+             type: {:message, ExAliyunOts.TableStore.ReservedThroughput}
+           }}
+        end
+
+        def(field_def("reservedThroughput")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "reservedThroughput",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :reserved_throughput,
+             tag: 2,
+             type: {:message, ExAliyunOts.TableStore.ReservedThroughput}
+           }}
+        end
+
+        def(field_def("reserved_throughput")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "reservedThroughput",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :reserved_throughput,
+             tag: 2,
+             type: {:message, ExAliyunOts.TableStore.ReservedThroughput}
+           }}
+        end
+      ),
+      (
+        def(field_def(:table_options)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableOptions",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :table_options,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStore.TableOptions}
+           }}
+        end
+
+        def(field_def("tableOptions")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableOptions",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :table_options,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStore.TableOptions}
+           }}
+        end
+
+        def(field_def("table_options")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableOptions",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :table_options,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStore.TableOptions}
+           }}
+        end
+      ),
+      (
+        def(field_def(:stream_spec)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "streamSpec",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :stream_spec,
+             tag: 4,
+             type: {:message, ExAliyunOts.TableStore.StreamSpecification}
+           }}
+        end
+
+        def(field_def("streamSpec")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "streamSpec",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :stream_spec,
+             tag: 4,
+             type: {:message, ExAliyunOts.TableStore.StreamSpecification}
+           }}
+        end
+
+        def(field_def("stream_spec")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "streamSpec",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :stream_spec,
+             tag: 4,
+             type: {:message, ExAliyunOts.TableStore.StreamSpecification}
+           }}
+        end
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: [:table_name]

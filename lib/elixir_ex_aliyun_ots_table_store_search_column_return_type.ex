@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStoreSearch.ColumnReturnType) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :RETURN_ALL
       def(default()) do
@@ -9,27 +11,51 @@ defmodule(ExAliyunOts.TableStoreSearch.ColumnReturnType) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:RETURN_ALL)) do
-        1
-      end,
-      def(encode(:RETURN_SPECIFIED)) do
-        2
-      end,
-      def(encode(:RETURN_NONE)) do
-        3
-      end,
-      def(encode(:RETURN_ALL_FROM_INDEX)) do
-        4
-      end
+      (
+        def(encode(:RETURN_ALL)) do
+          1
+        end
+
+        def(encode("RETURN_ALL")) do
+          1
+        end
+      ),
+      (
+        def(encode(:RETURN_SPECIFIED)) do
+          2
+        end
+
+        def(encode("RETURN_SPECIFIED")) do
+          2
+        end
+      ),
+      (
+        def(encode(:RETURN_NONE)) do
+          3
+        end
+
+        def(encode("RETURN_NONE")) do
+          3
+        end
+      ),
+      (
+        def(encode(:RETURN_ALL_FROM_INDEX)) do
+          4
+        end
+
+        def(encode("RETURN_ALL_FROM_INDEX")) do
+          4
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :RETURN_ALL
@@ -49,7 +75,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ColumnReturnType) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [{1, :RETURN_ALL}, {2, :RETURN_SPECIFIED}, {3, :RETURN_NONE}, {4, :RETURN_ALL_FROM_INDEX}]
     end

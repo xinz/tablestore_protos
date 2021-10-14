@@ -18,7 +18,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelInfo) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -39,67 +39,102 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelInfo) do
 
       [
         defp(encode_channel_id(acc, msg)) do
-          case(msg.channel_id) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:channel_id]))
+          try do
+            case(msg.channel_id) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:channel_id]))
 
-            field_value ->
-              [acc, "\n", Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, "\n", Protox.Encode.encode_string(msg.channel_id)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:channel_id, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_channel_type(acc, msg)) do
-          field_value = msg.channel_type
+          try do
+            case(msg.channel_type) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<18>>, Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, <<18>>, Protox.Encode.encode_string(msg.channel_type)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:channel_type, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_channel_status(acc, msg)) do
-          field_value = msg.channel_status
+          try do
+            case(msg.channel_status) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<26>>, Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, <<26>>, Protox.Encode.encode_string(msg.channel_status)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:channel_status, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_client_id(acc, msg)) do
-          field_value = msg.client_id
+          try do
+            case(msg.client_id) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\"", Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, "\"", Protox.Encode.encode_string(msg.client_id)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:client_id, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_channel_rpo(acc, msg)) do
-          field_value = msg.channel_rpo
+          try do
+            case(msg.channel_rpo) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "(", Protox.Encode.encode_int64(field_value)]
+              _ ->
+                [acc, "(", Protox.Encode.encode_int64(msg.channel_rpo)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:channel_rpo, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_channel_count(acc, msg)) do
-          field_value = msg.channel_count
+          try do
+            case(msg.channel_count) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "0", Protox.Encode.encode_int64(field_value)]
+              _ ->
+                [acc, "0", Protox.Encode.encode_int64(msg.channel_count)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:channel_count, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end
       ]
@@ -108,30 +143,32 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelInfo) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          {msg, set_fields} =
-            parse_key_value([], bytes, struct(ExAliyunOts.TableStoreTunnel.ChannelInfo))
-
-          case([:channel_id] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
           end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            {msg, set_fields} =
+              parse_key_value([], bytes, struct(ExAliyunOts.TableStoreTunnel.ChannelInfo))
+
+            case([:channel_id] -- set_fields) do
+              [] ->
+                msg
+
+              missing_fields ->
+                raise(Protox.RequiredFieldsError.new(missing_fields))
+            end
+          end
+        )
       )
 
       (
@@ -148,41 +185,31 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelInfo) do
 
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:channel_id, value}
-                {[:channel_id | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:channel_id | set_fields], [channel_id: delimited], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:channel_type, value}
-                {[:channel_type | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:channel_type | set_fields], [channel_type: delimited], rest}
 
               {3, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:channel_status, value}
-                {[:channel_status | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:channel_status | set_fields], [channel_status: delimited], rest}
 
               {4, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:client_id, value}
-                {[:client_id | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:client_id | set_fields], [client_id: delimited], rest}
 
               {5, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_int64(bytes)
-                field = {:channel_rpo, value}
-                {[:channel_rpo | set_fields], [field], rest}
+                {[:channel_rpo | set_fields], [channel_rpo: value], rest}
 
               {6, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_int64(bytes)
-                field = {:channel_count, value}
-                {[:channel_count | set_fields], [field], rest}
+                {[:channel_count | set_fields], [channel_count: value], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -197,33 +224,381 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelInfo) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStoreTunnel.ChannelInfo,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
       %{
-        1 => {:channel_id, {:default, ""}, :string},
-        2 => {:channel_type, {:default, ""}, :string},
-        3 => {:channel_status, {:default, ""}, :string},
-        4 => {:client_id, {:default, ""}, :string},
-        5 => {:channel_rpo, {:default, 0}, :int64},
-        6 => {:channel_count, {:default, 0}, :int64}
+        1 => {:channel_id, {:scalar, ""}, :string},
+        2 => {:channel_type, {:scalar, ""}, :string},
+        3 => {:channel_status, {:scalar, ""}, :string},
+        4 => {:client_id, {:scalar, ""}, :string},
+        5 => {:channel_rpo, {:scalar, 0}, :int64},
+        6 => {:channel_count, {:scalar, 0}, :int64}
       }
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
       %{
-        channel_count: {6, {:default, 0}, :int64},
-        channel_id: {1, {:default, ""}, :string},
-        channel_rpo: {5, {:default, 0}, :int64},
-        channel_status: {3, {:default, ""}, :string},
-        channel_type: {2, {:default, ""}, :string},
-        client_id: {4, {:default, ""}, :string}
+        channel_count: {6, {:scalar, 0}, :int64},
+        channel_id: {1, {:scalar, ""}, :string},
+        channel_rpo: {5, {:scalar, 0}, :int64},
+        channel_status: {3, {:scalar, ""}, :string},
+        channel_type: {2, {:scalar, ""}, :string},
+        client_id: {4, {:scalar, ""}, :string}
       }
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "channelId",
+          kind: {:scalar, ""},
+          label: :required,
+          name: :channel_id,
+          tag: 1,
+          type: :string
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "channelType",
+          kind: {:scalar, ""},
+          label: :optional,
+          name: :channel_type,
+          tag: 2,
+          type: :string
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "channelStatus",
+          kind: {:scalar, ""},
+          label: :optional,
+          name: :channel_status,
+          tag: 3,
+          type: :string
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "clientId",
+          kind: {:scalar, ""},
+          label: :optional,
+          name: :client_id,
+          tag: 4,
+          type: :string
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "channelRpo",
+          kind: {:scalar, 0},
+          label: :optional,
+          name: :channel_rpo,
+          tag: 5,
+          type: :int64
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "channelCount",
+          kind: {:scalar, 0},
+          label: :optional,
+          name: :channel_count,
+          tag: 6,
+          type: :int64
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:channel_id)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelId",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :channel_id,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("channelId")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelId",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :channel_id,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("channel_id")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelId",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :channel_id,
+             tag: 1,
+             type: :string
+           }}
+        end
+      ),
+      (
+        def(field_def(:channel_type)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelType",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :channel_type,
+             tag: 2,
+             type: :string
+           }}
+        end
+
+        def(field_def("channelType")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelType",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :channel_type,
+             tag: 2,
+             type: :string
+           }}
+        end
+
+        def(field_def("channel_type")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelType",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :channel_type,
+             tag: 2,
+             type: :string
+           }}
+        end
+      ),
+      (
+        def(field_def(:channel_status)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelStatus",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :channel_status,
+             tag: 3,
+             type: :string
+           }}
+        end
+
+        def(field_def("channelStatus")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelStatus",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :channel_status,
+             tag: 3,
+             type: :string
+           }}
+        end
+
+        def(field_def("channel_status")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelStatus",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :channel_status,
+             tag: 3,
+             type: :string
+           }}
+        end
+      ),
+      (
+        def(field_def(:client_id)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "clientId",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :client_id,
+             tag: 4,
+             type: :string
+           }}
+        end
+
+        def(field_def("clientId")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "clientId",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :client_id,
+             tag: 4,
+             type: :string
+           }}
+        end
+
+        def(field_def("client_id")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "clientId",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :client_id,
+             tag: 4,
+             type: :string
+           }}
+        end
+      ),
+      (
+        def(field_def(:channel_rpo)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelRpo",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :channel_rpo,
+             tag: 5,
+             type: :int64
+           }}
+        end
+
+        def(field_def("channelRpo")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelRpo",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :channel_rpo,
+             tag: 5,
+             type: :int64
+           }}
+        end
+
+        def(field_def("channel_rpo")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelRpo",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :channel_rpo,
+             tag: 5,
+             type: :int64
+           }}
+        end
+      ),
+      (
+        def(field_def(:channel_count)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelCount",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :channel_count,
+             tag: 6,
+             type: :int64
+           }}
+        end
+
+        def(field_def("channelCount")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelCount",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :channel_count,
+             tag: 6,
+             type: :int64
+           }}
+        end
+
+        def(field_def("channel_count")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channelCount",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :channel_count,
+             tag: 6,
+             type: :int64
+           }}
+        end
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: [:channel_id]

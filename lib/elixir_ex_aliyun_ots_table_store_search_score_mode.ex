@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStoreSearch.ScoreMode) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :SCORE_MODE_NONE
       def(default()) do
@@ -9,30 +11,60 @@ defmodule(ExAliyunOts.TableStoreSearch.ScoreMode) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:SCORE_MODE_NONE)) do
-        1
-      end,
-      def(encode(:SCORE_MODE_AVG)) do
-        2
-      end,
-      def(encode(:SCORE_MODE_MAX)) do
-        3
-      end,
-      def(encode(:SCORE_MODE_TOTAL)) do
-        4
-      end,
-      def(encode(:SCORE_MODE_MIN)) do
-        5
-      end
+      (
+        def(encode(:SCORE_MODE_NONE)) do
+          1
+        end
+
+        def(encode("SCORE_MODE_NONE")) do
+          1
+        end
+      ),
+      (
+        def(encode(:SCORE_MODE_AVG)) do
+          2
+        end
+
+        def(encode("SCORE_MODE_AVG")) do
+          2
+        end
+      ),
+      (
+        def(encode(:SCORE_MODE_MAX)) do
+          3
+        end
+
+        def(encode("SCORE_MODE_MAX")) do
+          3
+        end
+      ),
+      (
+        def(encode(:SCORE_MODE_TOTAL)) do
+          4
+        end
+
+        def(encode("SCORE_MODE_TOTAL")) do
+          4
+        end
+      ),
+      (
+        def(encode(:SCORE_MODE_MIN)) do
+          5
+        end
+
+        def(encode("SCORE_MODE_MIN")) do
+          5
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :SCORE_MODE_NONE
@@ -55,7 +87,7 @@ defmodule(ExAliyunOts.TableStoreSearch.ScoreMode) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [
         {1, :SCORE_MODE_NONE},

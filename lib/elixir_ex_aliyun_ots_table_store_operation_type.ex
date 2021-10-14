@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStore.OperationType) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :PUT
       def(default()) do
@@ -9,24 +11,42 @@ defmodule(ExAliyunOts.TableStore.OperationType) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:PUT)) do
-        1
-      end,
-      def(encode(:UPDATE)) do
-        2
-      end,
-      def(encode(:DELETE)) do
-        3
-      end
+      (
+        def(encode(:PUT)) do
+          1
+        end
+
+        def(encode("PUT")) do
+          1
+        end
+      ),
+      (
+        def(encode(:UPDATE)) do
+          2
+        end
+
+        def(encode("UPDATE")) do
+          2
+        end
+      ),
+      (
+        def(encode(:DELETE)) do
+          3
+        end
+
+        def(encode("DELETE")) do
+          3
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :PUT
@@ -43,7 +63,7 @@ defmodule(ExAliyunOts.TableStore.OperationType) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [{1, :PUT}, {2, :UPDATE}, {3, :DELETE}]
     end

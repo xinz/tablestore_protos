@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStoreSearch.SyncPhase) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :FULL
       def(default()) do
@@ -9,21 +11,33 @@ defmodule(ExAliyunOts.TableStoreSearch.SyncPhase) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:FULL)) do
-        1
-      end,
-      def(encode(:INCR)) do
-        2
-      end
+      (
+        def(encode(:FULL)) do
+          1
+        end
+
+        def(encode("FULL")) do
+          1
+        end
+      ),
+      (
+        def(encode(:INCR)) do
+          2
+        end
+
+        def(encode("INCR")) do
+          2
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :FULL
@@ -37,7 +51,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SyncPhase) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [{1, :FULL}, {2, :INCR}]
     end

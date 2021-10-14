@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -26,40 +26,64 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:table_name]))
+          try do
+            case(msg.table_name) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:table_name]))
 
-            field_value ->
-              [acc, "\n", Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:table_name, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_primary_key(acc, msg)) do
-          case(msg.primary_key) do
-            [] ->
-              acc
+          try do
+            case(msg.primary_key) do
+              [] ->
+                acc
 
-            values ->
-              [
-                acc,
-                Enum.reduce(values, [], fn value, acc ->
-                  [acc, <<18>>, Protox.Encode.encode_message(value)]
-                end)
-              ]
+              values ->
+                [
+                  acc,
+                  Enum.reduce(values, [], fn value, acc ->
+                    [acc, <<18>>, Protox.Encode.encode_message(value)]
+                  end)
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:primary_key, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_defined_column(acc, msg)) do
-          case(msg.defined_column) do
-            [] ->
-              acc
+          try do
+            case(msg.defined_column) do
+              [] ->
+                acc
 
-            values ->
-              [
-                acc,
-                Enum.reduce(values, [], fn value, acc ->
-                  [acc, <<26>>, Protox.Encode.encode_message(value)]
-                end)
-              ]
+              values ->
+                [
+                  acc,
+                  Enum.reduce(values, [], fn value, acc ->
+                    [acc, <<26>>, Protox.Encode.encode_message(value)]
+                  end)
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:defined_column, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end
       ]
@@ -68,29 +92,32 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          {msg, set_fields} = parse_key_value([], bytes, struct(ExAliyunOts.TableStore.TableMeta))
-
-          case([:table_name] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
           end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            {msg, set_fields} =
+              parse_key_value([], bytes, struct(ExAliyunOts.TableStore.TableMeta))
+
+            case([:table_name] -- set_fields) do
+              [] ->
+                msg
+
+              missing_fields ->
+                raise(Protox.RequiredFieldsError.new(missing_fields))
+            end
+          end
+        )
       )
 
       (
@@ -107,24 +134,30 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
 
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:table_name, value}
-                {[:table_name | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:table_name | set_fields], [table_name: delimited], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = ExAliyunOts.TableStore.PrimaryKeySchema.decode!(delimited)
-                field = {:primary_key, msg.primary_key ++ List.wrap(value)}
-                {[:primary_key | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[:primary_key | set_fields],
+                 [
+                   primary_key:
+                     msg.primary_key ++
+                       [ExAliyunOts.TableStore.PrimaryKeySchema.decode!(delimited)]
+                 ], rest}
 
               {3, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = ExAliyunOts.TableStore.DefinedColumnSchema.decode!(delimited)
-                field = {:defined_column, msg.defined_column ++ List.wrap(value)}
-                {[:defined_column | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[:defined_column | set_fields],
+                 [
+                   defined_column:
+                     msg.defined_column ++
+                       [ExAliyunOts.TableStore.DefinedColumnSchema.decode!(delimited)]
+                 ], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -139,17 +172,58 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStore.TableMeta,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
       %{
-        1 => {:table_name, {:default, ""}, :string},
+        1 => {:table_name, {:scalar, ""}, :string},
         2 => {:primary_key, :unpacked, {:message, ExAliyunOts.TableStore.PrimaryKeySchema}},
         3 => {:defined_column, :unpacked, {:message, ExAliyunOts.TableStore.DefinedColumnSchema}}
       }
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
@@ -157,9 +231,169 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
       %{
         defined_column: {3, :unpacked, {:message, ExAliyunOts.TableStore.DefinedColumnSchema}},
         primary_key: {2, :unpacked, {:message, ExAliyunOts.TableStore.PrimaryKeySchema}},
-        table_name: {1, {:default, ""}, :string}
+        table_name: {1, {:scalar, ""}, :string}
       }
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "tableName",
+          kind: {:scalar, ""},
+          label: :required,
+          name: :table_name,
+          tag: 1,
+          type: :string
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "primaryKey",
+          kind: :unpacked,
+          label: :repeated,
+          name: :primary_key,
+          tag: 2,
+          type: {:message, ExAliyunOts.TableStore.PrimaryKeySchema}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "definedColumn",
+          kind: :unpacked,
+          label: :repeated,
+          name: :defined_column,
+          tag: 3,
+          type: {:message, ExAliyunOts.TableStore.DefinedColumnSchema}
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:table_name)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :table_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("tableName")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :table_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("table_name")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :table_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+      ),
+      (
+        def(field_def(:primary_key)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "primaryKey",
+             kind: :unpacked,
+             label: :repeated,
+             name: :primary_key,
+             tag: 2,
+             type: {:message, ExAliyunOts.TableStore.PrimaryKeySchema}
+           }}
+        end
+
+        def(field_def("primaryKey")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "primaryKey",
+             kind: :unpacked,
+             label: :repeated,
+             name: :primary_key,
+             tag: 2,
+             type: {:message, ExAliyunOts.TableStore.PrimaryKeySchema}
+           }}
+        end
+
+        def(field_def("primary_key")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "primaryKey",
+             kind: :unpacked,
+             label: :repeated,
+             name: :primary_key,
+             tag: 2,
+             type: {:message, ExAliyunOts.TableStore.PrimaryKeySchema}
+           }}
+        end
+      ),
+      (
+        def(field_def(:defined_column)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "definedColumn",
+             kind: :unpacked,
+             label: :repeated,
+             name: :defined_column,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStore.DefinedColumnSchema}
+           }}
+        end
+
+        def(field_def("definedColumn")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "definedColumn",
+             kind: :unpacked,
+             label: :repeated,
+             name: :defined_column,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStore.DefinedColumnSchema}
+           }}
+        end
+
+        def(field_def("defined_column")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "definedColumn",
+             kind: :unpacked,
+             label: :repeated,
+             name: :defined_column,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStore.DefinedColumnSchema}
+           }}
+        end
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: [:table_name]

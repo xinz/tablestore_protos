@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.Record) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -26,27 +26,40 @@ defmodule(ExAliyunOts.TableStoreTunnel.Record) do
 
       [
         defp(encode_action_type(acc, msg)) do
-          case(msg.action_type) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:action_type]))
+          try do
+            case(msg.action_type) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:action_type]))
 
-            field_value ->
-              [
-                acc,
-                "\b",
-                field_value
-                |> ExAliyunOts.TableStoreTunnel.ActionType.encode()
-                |> Protox.Encode.encode_enum()
-              ]
+              _ ->
+                [
+                  acc,
+                  "\b",
+                  msg.action_type
+                  |> ExAliyunOts.TableStoreTunnel.ActionType.encode()
+                  |> Protox.Encode.encode_enum()
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:action_type, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_record(acc, msg)) do
-          case(msg.record) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:record]))
+          try do
+            case(msg.record) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:record]))
 
-            field_value ->
-              [acc, <<18>>, Protox.Encode.encode_bytes(field_value)]
+              _ ->
+                [acc, <<18>>, Protox.Encode.encode_bytes(msg.record)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:record, "invalid field value"), __STACKTRACE__)
           end
         end
       ]
@@ -55,30 +68,32 @@ defmodule(ExAliyunOts.TableStoreTunnel.Record) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          {msg, set_fields} =
-            parse_key_value([], bytes, struct(ExAliyunOts.TableStoreTunnel.Record))
-
-          case([:action_type, :record] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
           end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            {msg, set_fields} =
+              parse_key_value([], bytes, struct(ExAliyunOts.TableStoreTunnel.Record))
+
+            case([:action_type, :record] -- set_fields) do
+              [] ->
+                msg
+
+              missing_fields ->
+                raise(Protox.RequiredFieldsError.new(missing_fields))
+            end
+          end
+        )
       )
 
       (
@@ -97,15 +112,12 @@ defmodule(ExAliyunOts.TableStoreTunnel.Record) do
                 {value, rest} =
                   Protox.Decode.parse_enum(bytes, ExAliyunOts.TableStoreTunnel.ActionType)
 
-                field = {:action_type, value}
-                {[:action_type | set_fields], [field], rest}
+                {[:action_type | set_fields], [action_type: value], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:record, value}
-                {[:record | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:record | set_fields], [record: delimited], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -120,26 +132,167 @@ defmodule(ExAliyunOts.TableStoreTunnel.Record) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStoreTunnel.Record,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
       %{
         1 =>
-          {:action_type, {:default, :PUT_ROW}, {:enum, ExAliyunOts.TableStoreTunnel.ActionType}},
-        2 => {:record, {:default, ""}, :bytes}
+          {:action_type, {:scalar, :PUT_ROW}, {:enum, ExAliyunOts.TableStoreTunnel.ActionType}},
+        2 => {:record, {:scalar, ""}, :bytes}
       }
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
       %{
-        action_type: {1, {:default, :PUT_ROW}, {:enum, ExAliyunOts.TableStoreTunnel.ActionType}},
-        record: {2, {:default, ""}, :bytes}
+        action_type: {1, {:scalar, :PUT_ROW}, {:enum, ExAliyunOts.TableStoreTunnel.ActionType}},
+        record: {2, {:scalar, ""}, :bytes}
       }
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "actionType",
+          kind: {:scalar, :PUT_ROW},
+          label: :required,
+          name: :action_type,
+          tag: 1,
+          type: {:enum, ExAliyunOts.TableStoreTunnel.ActionType}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "record",
+          kind: {:scalar, ""},
+          label: :required,
+          name: :record,
+          tag: 2,
+          type: :bytes
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:action_type)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "actionType",
+             kind: {:scalar, :PUT_ROW},
+             label: :required,
+             name: :action_type,
+             tag: 1,
+             type: {:enum, ExAliyunOts.TableStoreTunnel.ActionType}
+           }}
+        end
+
+        def(field_def("actionType")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "actionType",
+             kind: {:scalar, :PUT_ROW},
+             label: :required,
+             name: :action_type,
+             tag: 1,
+             type: {:enum, ExAliyunOts.TableStoreTunnel.ActionType}
+           }}
+        end
+
+        def(field_def("action_type")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "actionType",
+             kind: {:scalar, :PUT_ROW},
+             label: :required,
+             name: :action_type,
+             tag: 1,
+             type: {:enum, ExAliyunOts.TableStoreTunnel.ActionType}
+           }}
+        end
+      ),
+      (
+        def(field_def(:record)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "record",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :record,
+             tag: 2,
+             type: :bytes
+           }}
+        end
+
+        def(field_def("record")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "record",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :record,
+             tag: 2,
+             type: :bytes
+           }}
+        end
+
+        []
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: [:action_type | :record]

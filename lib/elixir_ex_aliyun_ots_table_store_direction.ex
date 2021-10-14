@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStore.Direction) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :FORWARD
       def(default()) do
@@ -9,21 +11,33 @@ defmodule(ExAliyunOts.TableStore.Direction) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:FORWARD)) do
-        0
-      end,
-      def(encode(:BACKWARD)) do
-        1
-      end
+      (
+        def(encode(:FORWARD)) do
+          0
+        end
+
+        def(encode("FORWARD")) do
+          0
+        end
+      ),
+      (
+        def(encode(:BACKWARD)) do
+          1
+        end
+
+        def(encode("BACKWARD")) do
+          1
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(0)) do
         :FORWARD
@@ -37,7 +51,7 @@ defmodule(ExAliyunOts.TableStore.Direction) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [{0, :FORWARD}, {1, :BACKWARD}]
     end

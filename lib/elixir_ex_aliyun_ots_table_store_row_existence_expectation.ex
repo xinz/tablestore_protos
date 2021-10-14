@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStore.RowExistenceExpectation) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :IGNORE
       def(default()) do
@@ -9,24 +11,42 @@ defmodule(ExAliyunOts.TableStore.RowExistenceExpectation) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:IGNORE)) do
-        0
-      end,
-      def(encode(:EXPECT_EXIST)) do
-        1
-      end,
-      def(encode(:EXPECT_NOT_EXIST)) do
-        2
-      end
+      (
+        def(encode(:IGNORE)) do
+          0
+        end
+
+        def(encode("IGNORE")) do
+          0
+        end
+      ),
+      (
+        def(encode(:EXPECT_EXIST)) do
+          1
+        end
+
+        def(encode("EXPECT_EXIST")) do
+          1
+        end
+      ),
+      (
+        def(encode(:EXPECT_NOT_EXIST)) do
+          2
+        end
+
+        def(encode("EXPECT_NOT_EXIST")) do
+          2
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(0)) do
         :IGNORE
@@ -43,7 +63,7 @@ defmodule(ExAliyunOts.TableStore.RowExistenceExpectation) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [{0, :IGNORE}, {1, :EXPECT_EXIST}, {2, :EXPECT_NOT_EXIST}]
     end

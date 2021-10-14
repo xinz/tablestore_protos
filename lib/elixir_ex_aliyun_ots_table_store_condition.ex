@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStore.Condition) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -26,29 +26,43 @@ defmodule(ExAliyunOts.TableStore.Condition) do
 
       [
         defp(encode_row_existence(acc, msg)) do
-          case(msg.row_existence) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:row_existence]))
+          try do
+            case(msg.row_existence) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:row_existence]))
 
-            field_value ->
-              [
-                acc,
-                "\b",
-                field_value
-                |> ExAliyunOts.TableStore.RowExistenceExpectation.encode()
-                |> Protox.Encode.encode_enum()
-              ]
+              _ ->
+                [
+                  acc,
+                  "\b",
+                  msg.row_existence
+                  |> ExAliyunOts.TableStore.RowExistenceExpectation.encode()
+                  |> Protox.Encode.encode_enum()
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:row_existence, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_column_condition(acc, msg)) do
-          field_value = msg.column_condition
+          try do
+            case(msg.column_condition) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<18>>, Protox.Encode.encode_bytes(field_value)]
+              _ ->
+                [acc, <<18>>, Protox.Encode.encode_bytes(msg.column_condition)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:column_condition, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end
       ]
@@ -57,29 +71,32 @@ defmodule(ExAliyunOts.TableStore.Condition) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          {msg, set_fields} = parse_key_value([], bytes, struct(ExAliyunOts.TableStore.Condition))
-
-          case([:row_existence] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
           end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            {msg, set_fields} =
+              parse_key_value([], bytes, struct(ExAliyunOts.TableStore.Condition))
+
+            case([:row_existence] -- set_fields) do
+              [] ->
+                msg
+
+              missing_fields ->
+                raise(Protox.RequiredFieldsError.new(missing_fields))
+            end
+          end
+        )
       )
 
       (
@@ -98,15 +115,12 @@ defmodule(ExAliyunOts.TableStore.Condition) do
                 {value, rest} =
                   Protox.Decode.parse_enum(bytes, ExAliyunOts.TableStore.RowExistenceExpectation)
 
-                field = {:row_existence, value}
-                {[:row_existence | set_fields], [field], rest}
+                {[:row_existence | set_fields], [row_existence: value], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:column_condition, value}
-                {[:column_condition | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:column_condition | set_fields], [column_condition: delimited], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -121,28 +135,180 @@ defmodule(ExAliyunOts.TableStore.Condition) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStore.Condition,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
       %{
         1 =>
-          {:row_existence, {:default, :IGNORE},
+          {:row_existence, {:scalar, :IGNORE},
            {:enum, ExAliyunOts.TableStore.RowExistenceExpectation}},
-        2 => {:column_condition, {:default, ""}, :bytes}
+        2 => {:column_condition, {:scalar, ""}, :bytes}
       }
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
       %{
-        column_condition: {2, {:default, ""}, :bytes},
+        column_condition: {2, {:scalar, ""}, :bytes},
         row_existence:
-          {1, {:default, :IGNORE}, {:enum, ExAliyunOts.TableStore.RowExistenceExpectation}}
+          {1, {:scalar, :IGNORE}, {:enum, ExAliyunOts.TableStore.RowExistenceExpectation}}
       }
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "rowExistence",
+          kind: {:scalar, :IGNORE},
+          label: :required,
+          name: :row_existence,
+          tag: 1,
+          type: {:enum, ExAliyunOts.TableStore.RowExistenceExpectation}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "columnCondition",
+          kind: {:scalar, ""},
+          label: :optional,
+          name: :column_condition,
+          tag: 2,
+          type: :bytes
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:row_existence)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "rowExistence",
+             kind: {:scalar, :IGNORE},
+             label: :required,
+             name: :row_existence,
+             tag: 1,
+             type: {:enum, ExAliyunOts.TableStore.RowExistenceExpectation}
+           }}
+        end
+
+        def(field_def("rowExistence")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "rowExistence",
+             kind: {:scalar, :IGNORE},
+             label: :required,
+             name: :row_existence,
+             tag: 1,
+             type: {:enum, ExAliyunOts.TableStore.RowExistenceExpectation}
+           }}
+        end
+
+        def(field_def("row_existence")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "rowExistence",
+             kind: {:scalar, :IGNORE},
+             label: :required,
+             name: :row_existence,
+             tag: 1,
+             type: {:enum, ExAliyunOts.TableStore.RowExistenceExpectation}
+           }}
+        end
+      ),
+      (
+        def(field_def(:column_condition)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "columnCondition",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :column_condition,
+             tag: 2,
+             type: :bytes
+           }}
+        end
+
+        def(field_def("columnCondition")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "columnCondition",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :column_condition,
+             tag: 2,
+             type: :bytes
+           }}
+        end
+
+        def(field_def("column_condition")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "columnCondition",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :column_condition,
+             tag: 2,
+             type: :bytes
+           }}
+        end
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: [:row_existence]

@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStore.DropIndexRequest) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -26,21 +26,37 @@ defmodule(ExAliyunOts.TableStore.DropIndexRequest) do
 
       [
         defp(encode_main_table_name(acc, msg)) do
-          case(msg.main_table_name) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:main_table_name]))
+          try do
+            case(msg.main_table_name) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:main_table_name]))
 
-            field_value ->
-              [acc, "\n", Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, "\n", Protox.Encode.encode_string(msg.main_table_name)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:main_table_name, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_index_name(acc, msg)) do
-          case(msg.index_name) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:index_name]))
+          try do
+            case(msg.index_name) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:index_name]))
 
-            field_value ->
-              [acc, <<18>>, Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, <<18>>, Protox.Encode.encode_string(msg.index_name)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:index_name, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end
       ]
@@ -49,30 +65,32 @@ defmodule(ExAliyunOts.TableStore.DropIndexRequest) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          {msg, set_fields} =
-            parse_key_value([], bytes, struct(ExAliyunOts.TableStore.DropIndexRequest))
-
-          case([:main_table_name, :index_name] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
           end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            {msg, set_fields} =
+              parse_key_value([], bytes, struct(ExAliyunOts.TableStore.DropIndexRequest))
+
+            case([:main_table_name, :index_name] -- set_fields) do
+              [] ->
+                msg
+
+              missing_fields ->
+                raise(Protox.RequiredFieldsError.new(missing_fields))
+            end
+          end
+        )
       )
 
       (
@@ -89,17 +107,13 @@ defmodule(ExAliyunOts.TableStore.DropIndexRequest) do
 
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:main_table_name, value}
-                {[:main_table_name | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:main_table_name | set_fields], [main_table_name: delimited], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:index_name, value}
-                {[:index_name | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:index_name | set_fields], [index_name: delimited], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -114,22 +128,174 @@ defmodule(ExAliyunOts.TableStore.DropIndexRequest) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStore.DropIndexRequest,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
       %{
-        1 => {:main_table_name, {:default, ""}, :string},
-        2 => {:index_name, {:default, ""}, :string}
+        1 => {:main_table_name, {:scalar, ""}, :string},
+        2 => {:index_name, {:scalar, ""}, :string}
       }
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
-      %{index_name: {2, {:default, ""}, :string}, main_table_name: {1, {:default, ""}, :string}}
+      %{index_name: {2, {:scalar, ""}, :string}, main_table_name: {1, {:scalar, ""}, :string}}
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "mainTableName",
+          kind: {:scalar, ""},
+          label: :required,
+          name: :main_table_name,
+          tag: 1,
+          type: :string
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "indexName",
+          kind: {:scalar, ""},
+          label: :required,
+          name: :index_name,
+          tag: 2,
+          type: :string
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:main_table_name)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "mainTableName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :main_table_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("mainTableName")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "mainTableName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :main_table_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("main_table_name")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "mainTableName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :main_table_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+      ),
+      (
+        def(field_def(:index_name)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "indexName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :index_name,
+             tag: 2,
+             type: :string
+           }}
+        end
+
+        def(field_def("indexName")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "indexName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :index_name,
+             tag: 2,
+             type: :string
+           }}
+        end
+
+        def(field_def("index_name")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "indexName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :index_name,
+             tag: 2,
+             type: :string
+           }}
+        end
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: [:main_table_name | :index_name]

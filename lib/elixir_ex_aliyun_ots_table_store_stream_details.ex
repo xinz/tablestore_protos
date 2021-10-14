@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStore.StreamDetails) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -30,45 +30,68 @@ defmodule(ExAliyunOts.TableStore.StreamDetails) do
 
       [
         defp(encode_enable_stream(acc, msg)) do
-          case(msg.enable_stream) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:enable_stream]))
+          try do
+            case(msg.enable_stream) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:enable_stream]))
 
-            field_value ->
-              [acc, "\b", Protox.Encode.encode_bool(field_value)]
+              _ ->
+                [acc, "\b", Protox.Encode.encode_bool(msg.enable_stream)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:enable_stream, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_stream_id(acc, msg)) do
-          field_value = msg.stream_id
+          try do
+            case(msg.stream_id) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<18>>, Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, <<18>>, Protox.Encode.encode_string(msg.stream_id)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:stream_id, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_expiration_time(acc, msg)) do
-          field_value = msg.expiration_time
+          try do
+            case(msg.expiration_time) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<24>>, Protox.Encode.encode_int32(field_value)]
+              _ ->
+                [acc, <<24>>, Protox.Encode.encode_int32(msg.expiration_time)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:expiration_time, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_last_enable_time(acc, msg)) do
-          field_value = msg.last_enable_time
+          try do
+            case(msg.last_enable_time) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, " ", Protox.Encode.encode_int64(field_value)]
+              _ ->
+                [acc, " ", Protox.Encode.encode_int64(msg.last_enable_time)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:last_enable_time, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end
       ]
@@ -77,30 +100,32 @@ defmodule(ExAliyunOts.TableStore.StreamDetails) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          {msg, set_fields} =
-            parse_key_value([], bytes, struct(ExAliyunOts.TableStore.StreamDetails))
-
-          case([:enable_stream] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
           end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            {msg, set_fields} =
+              parse_key_value([], bytes, struct(ExAliyunOts.TableStore.StreamDetails))
+
+            case([:enable_stream] -- set_fields) do
+              [] ->
+                msg
+
+              missing_fields ->
+                raise(Protox.RequiredFieldsError.new(missing_fields))
+            end
+          end
+        )
       )
 
       (
@@ -117,25 +142,20 @@ defmodule(ExAliyunOts.TableStore.StreamDetails) do
 
               {1, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_bool(bytes)
-                field = {:enable_stream, value}
-                {[:enable_stream | set_fields], [field], rest}
+                {[:enable_stream | set_fields], [enable_stream: value], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:stream_id, value}
-                {[:stream_id | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:stream_id | set_fields], [stream_id: delimited], rest}
 
               {3, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_int32(bytes)
-                field = {:expiration_time, value}
-                {[:expiration_time | set_fields], [field], rest}
+                {[:expiration_time | set_fields], [expiration_time: value], rest}
 
               {4, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_int64(bytes)
-                field = {:last_enable_time, value}
-                {[:last_enable_time | set_fields], [field], rest}
+                {[:last_enable_time | set_fields], [last_enable_time: value], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -150,29 +170,279 @@ defmodule(ExAliyunOts.TableStore.StreamDetails) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStore.StreamDetails,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
       %{
-        1 => {:enable_stream, {:default, false}, :bool},
-        2 => {:stream_id, {:default, ""}, :string},
-        3 => {:expiration_time, {:default, 0}, :int32},
-        4 => {:last_enable_time, {:default, 0}, :int64}
+        1 => {:enable_stream, {:scalar, false}, :bool},
+        2 => {:stream_id, {:scalar, ""}, :string},
+        3 => {:expiration_time, {:scalar, 0}, :int32},
+        4 => {:last_enable_time, {:scalar, 0}, :int64}
       }
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
       %{
-        enable_stream: {1, {:default, false}, :bool},
-        expiration_time: {3, {:default, 0}, :int32},
-        last_enable_time: {4, {:default, 0}, :int64},
-        stream_id: {2, {:default, ""}, :string}
+        enable_stream: {1, {:scalar, false}, :bool},
+        expiration_time: {3, {:scalar, 0}, :int32},
+        last_enable_time: {4, {:scalar, 0}, :int64},
+        stream_id: {2, {:scalar, ""}, :string}
       }
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "enableStream",
+          kind: {:scalar, false},
+          label: :required,
+          name: :enable_stream,
+          tag: 1,
+          type: :bool
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "streamId",
+          kind: {:scalar, ""},
+          label: :optional,
+          name: :stream_id,
+          tag: 2,
+          type: :string
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "expirationTime",
+          kind: {:scalar, 0},
+          label: :optional,
+          name: :expiration_time,
+          tag: 3,
+          type: :int32
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "lastEnableTime",
+          kind: {:scalar, 0},
+          label: :optional,
+          name: :last_enable_time,
+          tag: 4,
+          type: :int64
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:enable_stream)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "enableStream",
+             kind: {:scalar, false},
+             label: :required,
+             name: :enable_stream,
+             tag: 1,
+             type: :bool
+           }}
+        end
+
+        def(field_def("enableStream")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "enableStream",
+             kind: {:scalar, false},
+             label: :required,
+             name: :enable_stream,
+             tag: 1,
+             type: :bool
+           }}
+        end
+
+        def(field_def("enable_stream")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "enableStream",
+             kind: {:scalar, false},
+             label: :required,
+             name: :enable_stream,
+             tag: 1,
+             type: :bool
+           }}
+        end
+      ),
+      (
+        def(field_def(:stream_id)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "streamId",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :stream_id,
+             tag: 2,
+             type: :string
+           }}
+        end
+
+        def(field_def("streamId")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "streamId",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :stream_id,
+             tag: 2,
+             type: :string
+           }}
+        end
+
+        def(field_def("stream_id")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "streamId",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :stream_id,
+             tag: 2,
+             type: :string
+           }}
+        end
+      ),
+      (
+        def(field_def(:expiration_time)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "expirationTime",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :expiration_time,
+             tag: 3,
+             type: :int32
+           }}
+        end
+
+        def(field_def("expirationTime")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "expirationTime",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :expiration_time,
+             tag: 3,
+             type: :int32
+           }}
+        end
+
+        def(field_def("expiration_time")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "expirationTime",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :expiration_time,
+             tag: 3,
+             type: :int32
+           }}
+        end
+      ),
+      (
+        def(field_def(:last_enable_time)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "lastEnableTime",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :last_enable_time,
+             tag: 4,
+             type: :int64
+           }}
+        end
+
+        def(field_def("lastEnableTime")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "lastEnableTime",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :last_enable_time,
+             tag: 4,
+             type: :int64
+           }}
+        end
+
+        def(field_def("last_enable_time")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "lastEnableTime",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :last_enable_time,
+             tag: 4,
+             type: :int64
+           }}
+        end
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: [:enable_stream]

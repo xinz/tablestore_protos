@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.Token) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -26,21 +26,31 @@ defmodule(ExAliyunOts.TableStoreTunnel.Token) do
 
       [
         defp(encode_version(acc, msg)) do
-          case(msg.version) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:version]))
+          try do
+            case(msg.version) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:version]))
 
-            field_value ->
-              [acc, "\b", Protox.Encode.encode_int64(field_value)]
+              _ ->
+                [acc, "\b", Protox.Encode.encode_int64(msg.version)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:version, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_content(acc, msg)) do
-          case(msg.content) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:content]))
+          try do
+            case(msg.content) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:content]))
 
-            field_value ->
-              [acc, <<18>>, Protox.Encode.encode_bytes(field_value)]
+              _ ->
+                [acc, <<18>>, Protox.Encode.encode_bytes(msg.content)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:content, "invalid field value"), __STACKTRACE__)
           end
         end
       ]
@@ -49,30 +59,32 @@ defmodule(ExAliyunOts.TableStoreTunnel.Token) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          {msg, set_fields} =
-            parse_key_value([], bytes, struct(ExAliyunOts.TableStoreTunnel.Token))
-
-          case([:version, :content] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
           end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            {msg, set_fields} =
+              parse_key_value([], bytes, struct(ExAliyunOts.TableStoreTunnel.Token))
+
+            case([:version, :content] -- set_fields) do
+              [] ->
+                msg
+
+              missing_fields ->
+                raise(Protox.RequiredFieldsError.new(missing_fields))
+            end
+          end
+        )
       )
 
       (
@@ -89,15 +101,12 @@ defmodule(ExAliyunOts.TableStoreTunnel.Token) do
 
               {1, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_int64(bytes)
-                field = {:version, value}
-                {[:version | set_fields], [field], rest}
+                {[:version | set_fields], [version: value], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:content, value}
-                {[:content | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:content | set_fields], [content: delimited], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -112,19 +121,149 @@ defmodule(ExAliyunOts.TableStoreTunnel.Token) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStoreTunnel.Token,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
-      %{1 => {:version, {:default, 0}, :int64}, 2 => {:content, {:default, ""}, :bytes}}
+      %{1 => {:version, {:scalar, 0}, :int64}, 2 => {:content, {:scalar, ""}, :bytes}}
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
-      %{content: {2, {:default, ""}, :bytes}, version: {1, {:default, 0}, :int64}}
+      %{content: {2, {:scalar, ""}, :bytes}, version: {1, {:scalar, 0}, :int64}}
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "version",
+          kind: {:scalar, 0},
+          label: :required,
+          name: :version,
+          tag: 1,
+          type: :int64
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "content",
+          kind: {:scalar, ""},
+          label: :required,
+          name: :content,
+          tag: 2,
+          type: :bytes
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:version)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "version",
+             kind: {:scalar, 0},
+             label: :required,
+             name: :version,
+             tag: 1,
+             type: :int64
+           }}
+        end
+
+        def(field_def("version")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "version",
+             kind: {:scalar, 0},
+             label: :required,
+             name: :version,
+             tag: 1,
+             type: :int64
+           }}
+        end
+
+        []
+      ),
+      (
+        def(field_def(:content)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "content",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :content,
+             tag: 2,
+             type: :bytes
+           }}
+        end
+
+        def(field_def("content")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "content",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :content,
+             tag: 2,
+             type: :bytes
+           }}
+        end
+
+        []
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: [:version | :content]

@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceType) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :GEO_DISTANCE_ARC
       def(default()) do
@@ -9,21 +11,33 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceType) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:GEO_DISTANCE_ARC)) do
-        0
-      end,
-      def(encode(:GEO_DISTANCE_PLANE)) do
-        1
-      end
+      (
+        def(encode(:GEO_DISTANCE_ARC)) do
+          0
+        end
+
+        def(encode("GEO_DISTANCE_ARC")) do
+          0
+        end
+      ),
+      (
+        def(encode(:GEO_DISTANCE_PLANE)) do
+          1
+        end
+
+        def(encode("GEO_DISTANCE_PLANE")) do
+          1
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(0)) do
         :GEO_DISTANCE_ARC
@@ -37,7 +51,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceType) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [{0, :GEO_DISTANCE_ARC}, {1, :GEO_DISTANCE_PLANE}]
     end

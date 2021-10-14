@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStoreSearch.GroupByType) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :GROUP_BY_FIELD
       def(default()) do
@@ -9,27 +11,51 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByType) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:GROUP_BY_FIELD)) do
-        1
-      end,
-      def(encode(:GROUP_BY_RANGE)) do
-        2
-      end,
-      def(encode(:GROUP_BY_FILTER)) do
-        3
-      end,
-      def(encode(:GROUP_BY_GEO_DISTANCE)) do
-        4
-      end
+      (
+        def(encode(:GROUP_BY_FIELD)) do
+          1
+        end
+
+        def(encode("GROUP_BY_FIELD")) do
+          1
+        end
+      ),
+      (
+        def(encode(:GROUP_BY_RANGE)) do
+          2
+        end
+
+        def(encode("GROUP_BY_RANGE")) do
+          2
+        end
+      ),
+      (
+        def(encode(:GROUP_BY_FILTER)) do
+          3
+        end
+
+        def(encode("GROUP_BY_FILTER")) do
+          3
+        end
+      ),
+      (
+        def(encode(:GROUP_BY_GEO_DISTANCE)) do
+          4
+        end
+
+        def(encode("GROUP_BY_GEO_DISTANCE")) do
+          4
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :GROUP_BY_FIELD
@@ -49,7 +75,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByType) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [
         {1, :GROUP_BY_FIELD},

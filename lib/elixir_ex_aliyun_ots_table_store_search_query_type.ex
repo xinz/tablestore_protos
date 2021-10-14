@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStoreSearch.QueryType) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :MATCH_QUERY
       def(default()) do
@@ -9,63 +11,159 @@ defmodule(ExAliyunOts.TableStoreSearch.QueryType) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:MATCH_QUERY)) do
-        1
-      end,
-      def(encode(:MATCH_PHRASE_QUERY)) do
-        2
-      end,
-      def(encode(:TERM_QUERY)) do
-        3
-      end,
-      def(encode(:RANGE_QUERY)) do
-        4
-      end,
-      def(encode(:PREFIX_QUERY)) do
-        5
-      end,
-      def(encode(:BOOL_QUERY)) do
-        6
-      end,
-      def(encode(:CONST_SCORE_QUERY)) do
-        7
-      end,
-      def(encode(:FUNCTION_SCORE_QUERY)) do
-        8
-      end,
-      def(encode(:NESTED_QUERY)) do
-        9
-      end,
-      def(encode(:WILDCARD_QUERY)) do
-        10
-      end,
-      def(encode(:MATCH_ALL_QUERY)) do
-        11
-      end,
-      def(encode(:GEO_BOUNDING_BOX_QUERY)) do
-        12
-      end,
-      def(encode(:GEO_DISTANCE_QUERY)) do
-        13
-      end,
-      def(encode(:GEO_POLYGON_QUERY)) do
-        14
-      end,
-      def(encode(:TERMS_QUERY)) do
-        15
-      end,
-      def(encode(:EXISTS_QUERY)) do
-        16
-      end
+      (
+        def(encode(:MATCH_QUERY)) do
+          1
+        end
+
+        def(encode("MATCH_QUERY")) do
+          1
+        end
+      ),
+      (
+        def(encode(:MATCH_PHRASE_QUERY)) do
+          2
+        end
+
+        def(encode("MATCH_PHRASE_QUERY")) do
+          2
+        end
+      ),
+      (
+        def(encode(:TERM_QUERY)) do
+          3
+        end
+
+        def(encode("TERM_QUERY")) do
+          3
+        end
+      ),
+      (
+        def(encode(:RANGE_QUERY)) do
+          4
+        end
+
+        def(encode("RANGE_QUERY")) do
+          4
+        end
+      ),
+      (
+        def(encode(:PREFIX_QUERY)) do
+          5
+        end
+
+        def(encode("PREFIX_QUERY")) do
+          5
+        end
+      ),
+      (
+        def(encode(:BOOL_QUERY)) do
+          6
+        end
+
+        def(encode("BOOL_QUERY")) do
+          6
+        end
+      ),
+      (
+        def(encode(:CONST_SCORE_QUERY)) do
+          7
+        end
+
+        def(encode("CONST_SCORE_QUERY")) do
+          7
+        end
+      ),
+      (
+        def(encode(:FUNCTION_SCORE_QUERY)) do
+          8
+        end
+
+        def(encode("FUNCTION_SCORE_QUERY")) do
+          8
+        end
+      ),
+      (
+        def(encode(:NESTED_QUERY)) do
+          9
+        end
+
+        def(encode("NESTED_QUERY")) do
+          9
+        end
+      ),
+      (
+        def(encode(:WILDCARD_QUERY)) do
+          10
+        end
+
+        def(encode("WILDCARD_QUERY")) do
+          10
+        end
+      ),
+      (
+        def(encode(:MATCH_ALL_QUERY)) do
+          11
+        end
+
+        def(encode("MATCH_ALL_QUERY")) do
+          11
+        end
+      ),
+      (
+        def(encode(:GEO_BOUNDING_BOX_QUERY)) do
+          12
+        end
+
+        def(encode("GEO_BOUNDING_BOX_QUERY")) do
+          12
+        end
+      ),
+      (
+        def(encode(:GEO_DISTANCE_QUERY)) do
+          13
+        end
+
+        def(encode("GEO_DISTANCE_QUERY")) do
+          13
+        end
+      ),
+      (
+        def(encode(:GEO_POLYGON_QUERY)) do
+          14
+        end
+
+        def(encode("GEO_POLYGON_QUERY")) do
+          14
+        end
+      ),
+      (
+        def(encode(:TERMS_QUERY)) do
+          15
+        end
+
+        def(encode("TERMS_QUERY")) do
+          15
+        end
+      ),
+      (
+        def(encode(:EXISTS_QUERY)) do
+          16
+        end
+
+        def(encode("EXISTS_QUERY")) do
+          16
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :MATCH_QUERY
@@ -121,7 +219,7 @@ defmodule(ExAliyunOts.TableStoreSearch.QueryType) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [
         {1, :MATCH_QUERY},

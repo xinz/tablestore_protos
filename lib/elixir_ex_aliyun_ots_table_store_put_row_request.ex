@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStore.PutRowRequest) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -31,52 +31,82 @@ defmodule(ExAliyunOts.TableStore.PutRowRequest) do
 
       [
         defp(encode_table_name(acc, msg)) do
-          case(msg.table_name) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:table_name]))
+          try do
+            case(msg.table_name) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:table_name]))
 
-            field_value ->
-              [acc, "\n", Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:table_name, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_row(acc, msg)) do
-          case(msg.row) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:row]))
+          try do
+            case(msg.row) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:row]))
 
-            field_value ->
-              [acc, <<18>>, Protox.Encode.encode_bytes(field_value)]
+              _ ->
+                [acc, <<18>>, Protox.Encode.encode_bytes(msg.row)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:row, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_condition(acc, msg)) do
-          case(msg.condition) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:condition]))
+          try do
+            case(msg.condition) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:condition]))
 
-            field_value ->
-              [acc, <<26>>, Protox.Encode.encode_message(field_value)]
+              _ ->
+                [acc, <<26>>, Protox.Encode.encode_message(msg.condition)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:condition, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_return_content(acc, msg)) do
-          field_value = msg.return_content
+          try do
+            case(msg.return_content) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\"", Protox.Encode.encode_message(field_value)]
+              _ ->
+                [acc, "\"", Protox.Encode.encode_message(msg.return_content)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:return_content, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_transaction_id(acc, msg)) do
-          field_value = msg.transaction_id
+          try do
+            case(msg.transaction_id) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "*", Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, "*", Protox.Encode.encode_string(msg.transaction_id)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:transaction_id, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end
       ]
@@ -85,30 +115,32 @@ defmodule(ExAliyunOts.TableStore.PutRowRequest) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          {msg, set_fields} =
-            parse_key_value([], bytes, struct(ExAliyunOts.TableStore.PutRowRequest))
-
-          case([:table_name, :row, :condition] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
           end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            {msg, set_fields} =
+              parse_key_value([], bytes, struct(ExAliyunOts.TableStore.PutRowRequest))
+
+            case([:table_name, :row, :condition] -- set_fields) do
+              [] ->
+                msg
+
+              missing_fields ->
+                raise(Protox.RequiredFieldsError.new(missing_fields))
+            end
+          end
+        )
       )
 
       (
@@ -125,38 +157,44 @@ defmodule(ExAliyunOts.TableStore.PutRowRequest) do
 
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:table_name, value}
-                {[:table_name | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:table_name | set_fields], [table_name: delimited], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:row, value}
-                {[:row | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:row | set_fields], [row: delimited], rest}
 
               {3, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = ExAliyunOts.TableStore.Condition.decode!(delimited)
-                field = {:condition, Protox.Message.merge(msg.condition, value)}
-                {[:condition | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[:condition | set_fields],
+                 [
+                   condition:
+                     Protox.Message.merge(
+                       msg.condition,
+                       ExAliyunOts.TableStore.Condition.decode!(delimited)
+                     )
+                 ], rest}
 
               {4, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = ExAliyunOts.TableStore.ReturnContent.decode!(delimited)
-                field = {:return_content, Protox.Message.merge(msg.return_content, value)}
-                {[:return_content | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[:return_content | set_fields],
+                 [
+                   return_content:
+                     Protox.Message.merge(
+                       msg.return_content,
+                       ExAliyunOts.TableStore.ReturnContent.decode!(delimited)
+                     )
+                 ], rest}
 
               {5, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:transaction_id, value}
-                {[:transaction_id | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:transaction_id | set_fields], [transaction_id: delimited], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -171,31 +209,308 @@ defmodule(ExAliyunOts.TableStore.PutRowRequest) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStore.PutRowRequest,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
       %{
-        1 => {:table_name, {:default, ""}, :string},
-        2 => {:row, {:default, ""}, :bytes},
-        3 => {:condition, {:default, nil}, {:message, ExAliyunOts.TableStore.Condition}},
-        4 => {:return_content, {:default, nil}, {:message, ExAliyunOts.TableStore.ReturnContent}},
-        5 => {:transaction_id, {:default, ""}, :string}
+        1 => {:table_name, {:scalar, ""}, :string},
+        2 => {:row, {:scalar, ""}, :bytes},
+        3 => {:condition, {:scalar, nil}, {:message, ExAliyunOts.TableStore.Condition}},
+        4 => {:return_content, {:scalar, nil}, {:message, ExAliyunOts.TableStore.ReturnContent}},
+        5 => {:transaction_id, {:scalar, ""}, :string}
       }
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
       %{
-        condition: {3, {:default, nil}, {:message, ExAliyunOts.TableStore.Condition}},
-        return_content: {4, {:default, nil}, {:message, ExAliyunOts.TableStore.ReturnContent}},
-        row: {2, {:default, ""}, :bytes},
-        table_name: {1, {:default, ""}, :string},
-        transaction_id: {5, {:default, ""}, :string}
+        condition: {3, {:scalar, nil}, {:message, ExAliyunOts.TableStore.Condition}},
+        return_content: {4, {:scalar, nil}, {:message, ExAliyunOts.TableStore.ReturnContent}},
+        row: {2, {:scalar, ""}, :bytes},
+        table_name: {1, {:scalar, ""}, :string},
+        transaction_id: {5, {:scalar, ""}, :string}
       }
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "tableName",
+          kind: {:scalar, ""},
+          label: :required,
+          name: :table_name,
+          tag: 1,
+          type: :string
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "row",
+          kind: {:scalar, ""},
+          label: :required,
+          name: :row,
+          tag: 2,
+          type: :bytes
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "condition",
+          kind: {:scalar, nil},
+          label: :required,
+          name: :condition,
+          tag: 3,
+          type: {:message, ExAliyunOts.TableStore.Condition}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "returnContent",
+          kind: {:scalar, nil},
+          label: :optional,
+          name: :return_content,
+          tag: 4,
+          type: {:message, ExAliyunOts.TableStore.ReturnContent}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "transactionId",
+          kind: {:scalar, ""},
+          label: :optional,
+          name: :transaction_id,
+          tag: 5,
+          type: :string
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:table_name)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :table_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("tableName")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :table_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("table_name")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableName",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :table_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+      ),
+      (
+        def(field_def(:row)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "row",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :row,
+             tag: 2,
+             type: :bytes
+           }}
+        end
+
+        def(field_def("row")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "row",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :row,
+             tag: 2,
+             type: :bytes
+           }}
+        end
+
+        []
+      ),
+      (
+        def(field_def(:condition)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "condition",
+             kind: {:scalar, nil},
+             label: :required,
+             name: :condition,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStore.Condition}
+           }}
+        end
+
+        def(field_def("condition")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "condition",
+             kind: {:scalar, nil},
+             label: :required,
+             name: :condition,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStore.Condition}
+           }}
+        end
+
+        []
+      ),
+      (
+        def(field_def(:return_content)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "returnContent",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :return_content,
+             tag: 4,
+             type: {:message, ExAliyunOts.TableStore.ReturnContent}
+           }}
+        end
+
+        def(field_def("returnContent")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "returnContent",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :return_content,
+             tag: 4,
+             type: {:message, ExAliyunOts.TableStore.ReturnContent}
+           }}
+        end
+
+        def(field_def("return_content")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "returnContent",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :return_content,
+             tag: 4,
+             type: {:message, ExAliyunOts.TableStore.ReturnContent}
+           }}
+        end
+      ),
+      (
+        def(field_def(:transaction_id)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "transactionId",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :transaction_id,
+             tag: 5,
+             type: :string
+           }}
+        end
+
+        def(field_def("transactionId")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "transactionId",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :transaction_id,
+             tag: 5,
+             type: :string
+           }}
+        end
+
+        def(field_def("transaction_id")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "transactionId",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :transaction_id,
+             tag: 5,
+             type: :string
+           }}
+        end
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: [(:table_name | :row) | :condition]

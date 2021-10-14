@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStoreTunnel.ChannelStatus) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :OPEN
       def(default()) do
@@ -9,27 +11,51 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelStatus) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:OPEN)) do
-        1
-      end,
-      def(encode(:CLOSING)) do
-        2
-      end,
-      def(encode(:CLOSE)) do
-        3
-      end,
-      def(encode(:TERMINATED)) do
-        4
-      end
+      (
+        def(encode(:OPEN)) do
+          1
+        end
+
+        def(encode("OPEN")) do
+          1
+        end
+      ),
+      (
+        def(encode(:CLOSING)) do
+          2
+        end
+
+        def(encode("CLOSING")) do
+          2
+        end
+      ),
+      (
+        def(encode(:CLOSE)) do
+          3
+        end
+
+        def(encode("CLOSE")) do
+          3
+        end
+      ),
+      (
+        def(encode(:TERMINATED)) do
+          4
+        end
+
+        def(encode("TERMINATED")) do
+          4
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :OPEN
@@ -49,7 +75,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelStatus) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [{1, :OPEN}, {2, :CLOSING}, {3, :CLOSE}, {4, :TERMINATED}]
     end

@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStoreSearch.NestedQuery) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -26,42 +26,54 @@ defmodule(ExAliyunOts.TableStoreSearch.NestedQuery) do
 
       [
         defp(encode_path(acc, msg)) do
-          field_value = msg.path
+          try do
+            case(msg.path) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\n", Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, "\n", Protox.Encode.encode_string(msg.path)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:path, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_query(acc, msg)) do
-          field_value = msg.query
+          try do
+            case(msg.query) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<18>>, Protox.Encode.encode_message(field_value)]
+              _ ->
+                [acc, <<18>>, Protox.Encode.encode_message(msg.query)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:query, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_score_mode(acc, msg)) do
-          field_value = msg.score_mode
+          try do
+            case(msg.score_mode) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [
-                acc,
-                <<24>>,
-                field_value
-                |> ExAliyunOts.TableStoreSearch.ScoreMode.encode()
-                |> Protox.Encode.encode_enum()
-              ]
+              _ ->
+                [
+                  acc,
+                  <<24>>,
+                  msg.score_mode
+                  |> ExAliyunOts.TableStoreSearch.ScoreMode.encode()
+                  |> Protox.Encode.encode_enum()
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:score_mode, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end
       ]
@@ -70,21 +82,23 @@ defmodule(ExAliyunOts.TableStoreSearch.NestedQuery) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.NestedQuery))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
+          end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.NestedQuery))
+          end
+        )
       )
 
       (
@@ -101,24 +115,26 @@ defmodule(ExAliyunOts.TableStoreSearch.NestedQuery) do
 
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:path, value}
-                {[field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[path: delimited], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = ExAliyunOts.TableStoreSearch.Query.decode!(delimited)
-                field = {:query, Protox.Message.merge(msg.query, value)}
-                {[field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[
+                   query:
+                     Protox.Message.merge(
+                       msg.query,
+                       ExAliyunOts.TableStoreSearch.Query.decode!(delimited)
+                     )
+                 ], rest}
 
               {3, _, bytes} ->
                 {value, rest} =
                   Protox.Decode.parse_enum(bytes, ExAliyunOts.TableStoreSearch.ScoreMode)
 
-                field = {:score_mode, value}
-                {[field], rest}
+                {[score_mode: value], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -133,30 +149,209 @@ defmodule(ExAliyunOts.TableStoreSearch.NestedQuery) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStoreSearch.NestedQuery,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
       %{
-        1 => {:path, {:default, ""}, :string},
-        2 => {:query, {:default, nil}, {:message, ExAliyunOts.TableStoreSearch.Query}},
+        1 => {:path, {:scalar, ""}, :string},
+        2 => {:query, {:scalar, nil}, {:message, ExAliyunOts.TableStoreSearch.Query}},
         3 =>
-          {:score_mode, {:default, :SCORE_MODE_NONE},
+          {:score_mode, {:scalar, :SCORE_MODE_NONE},
            {:enum, ExAliyunOts.TableStoreSearch.ScoreMode}}
       }
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
       %{
-        path: {1, {:default, ""}, :string},
-        query: {2, {:default, nil}, {:message, ExAliyunOts.TableStoreSearch.Query}},
+        path: {1, {:scalar, ""}, :string},
+        query: {2, {:scalar, nil}, {:message, ExAliyunOts.TableStoreSearch.Query}},
         score_mode:
-          {3, {:default, :SCORE_MODE_NONE}, {:enum, ExAliyunOts.TableStoreSearch.ScoreMode}}
+          {3, {:scalar, :SCORE_MODE_NONE}, {:enum, ExAliyunOts.TableStoreSearch.ScoreMode}}
       }
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "path",
+          kind: {:scalar, ""},
+          label: :optional,
+          name: :path,
+          tag: 1,
+          type: :string
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "query",
+          kind: {:scalar, nil},
+          label: :optional,
+          name: :query,
+          tag: 2,
+          type: {:message, ExAliyunOts.TableStoreSearch.Query}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "scoreMode",
+          kind: {:scalar, :SCORE_MODE_NONE},
+          label: :optional,
+          name: :score_mode,
+          tag: 3,
+          type: {:enum, ExAliyunOts.TableStoreSearch.ScoreMode}
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:path)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "path",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :path,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("path")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "path",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :path,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        []
+      ),
+      (
+        def(field_def(:query)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "query",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :query,
+             tag: 2,
+             type: {:message, ExAliyunOts.TableStoreSearch.Query}
+           }}
+        end
+
+        def(field_def("query")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "query",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :query,
+             tag: 2,
+             type: {:message, ExAliyunOts.TableStoreSearch.Query}
+           }}
+        end
+
+        []
+      ),
+      (
+        def(field_def(:score_mode)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "scoreMode",
+             kind: {:scalar, :SCORE_MODE_NONE},
+             label: :optional,
+             name: :score_mode,
+             tag: 3,
+             type: {:enum, ExAliyunOts.TableStoreSearch.ScoreMode}
+           }}
+        end
+
+        def(field_def("scoreMode")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "scoreMode",
+             kind: {:scalar, :SCORE_MODE_NONE},
+             label: :optional,
+             name: :score_mode,
+             tag: 3,
+             type: {:enum, ExAliyunOts.TableStoreSearch.ScoreMode}
+           }}
+        end
+
+        def(field_def("score_mode")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "scoreMode",
+             kind: {:scalar, :SCORE_MODE_NONE},
+             label: :optional,
+             name: :score_mode,
+             tag: 3,
+             type: {:enum, ExAliyunOts.TableStoreSearch.ScoreMode}
+           }}
+        end
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: []

@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStoreFilter.ComparatorType) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :CT_EQUAL
       def(default()) do
@@ -9,33 +11,69 @@ defmodule(ExAliyunOts.TableStoreFilter.ComparatorType) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:CT_EQUAL)) do
-        1
-      end,
-      def(encode(:CT_NOT_EQUAL)) do
-        2
-      end,
-      def(encode(:CT_GREATER_THAN)) do
-        3
-      end,
-      def(encode(:CT_GREATER_EQUAL)) do
-        4
-      end,
-      def(encode(:CT_LESS_THAN)) do
-        5
-      end,
-      def(encode(:CT_LESS_EQUAL)) do
-        6
-      end
+      (
+        def(encode(:CT_EQUAL)) do
+          1
+        end
+
+        def(encode("CT_EQUAL")) do
+          1
+        end
+      ),
+      (
+        def(encode(:CT_NOT_EQUAL)) do
+          2
+        end
+
+        def(encode("CT_NOT_EQUAL")) do
+          2
+        end
+      ),
+      (
+        def(encode(:CT_GREATER_THAN)) do
+          3
+        end
+
+        def(encode("CT_GREATER_THAN")) do
+          3
+        end
+      ),
+      (
+        def(encode(:CT_GREATER_EQUAL)) do
+          4
+        end
+
+        def(encode("CT_GREATER_EQUAL")) do
+          4
+        end
+      ),
+      (
+        def(encode(:CT_LESS_THAN)) do
+          5
+        end
+
+        def(encode("CT_LESS_THAN")) do
+          5
+        end
+      ),
+      (
+        def(encode(:CT_LESS_EQUAL)) do
+          6
+        end
+
+        def(encode("CT_LESS_EQUAL")) do
+          6
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :CT_EQUAL
@@ -61,7 +99,7 @@ defmodule(ExAliyunOts.TableStoreFilter.ComparatorType) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [
         {1, :CT_EQUAL},

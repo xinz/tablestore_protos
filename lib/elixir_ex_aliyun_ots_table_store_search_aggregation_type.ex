@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStoreSearch.AggregationType) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :AGG_AVG
       def(default()) do
@@ -9,33 +11,69 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationType) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:AGG_AVG)) do
-        1
-      end,
-      def(encode(:AGG_DISTINCT_COUNT)) do
-        6
-      end,
-      def(encode(:AGG_MAX)) do
-        2
-      end,
-      def(encode(:AGG_MIN)) do
-        3
-      end,
-      def(encode(:AGG_SUM)) do
-        4
-      end,
-      def(encode(:AGG_COUNT)) do
-        5
-      end
+      (
+        def(encode(:AGG_AVG)) do
+          1
+        end
+
+        def(encode("AGG_AVG")) do
+          1
+        end
+      ),
+      (
+        def(encode(:AGG_DISTINCT_COUNT)) do
+          6
+        end
+
+        def(encode("AGG_DISTINCT_COUNT")) do
+          6
+        end
+      ),
+      (
+        def(encode(:AGG_MAX)) do
+          2
+        end
+
+        def(encode("AGG_MAX")) do
+          2
+        end
+      ),
+      (
+        def(encode(:AGG_MIN)) do
+          3
+        end
+
+        def(encode("AGG_MIN")) do
+          3
+        end
+      ),
+      (
+        def(encode(:AGG_SUM)) do
+          4
+        end
+
+        def(encode("AGG_SUM")) do
+          4
+        end
+      ),
+      (
+        def(encode(:AGG_COUNT)) do
+          5
+        end
+
+        def(encode("AGG_COUNT")) do
+          5
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :AGG_AVG
@@ -61,7 +99,7 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationType) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [
         {1, :AGG_AVG},

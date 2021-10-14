@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStoreFilter.FilterType) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :FT_SINGLE_COLUMN_VALUE
       def(default()) do
@@ -9,24 +11,42 @@ defmodule(ExAliyunOts.TableStoreFilter.FilterType) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:FT_SINGLE_COLUMN_VALUE)) do
-        1
-      end,
-      def(encode(:FT_COMPOSITE_COLUMN_VALUE)) do
-        2
-      end,
-      def(encode(:FT_COLUMN_PAGINATION)) do
-        3
-      end
+      (
+        def(encode(:FT_SINGLE_COLUMN_VALUE)) do
+          1
+        end
+
+        def(encode("FT_SINGLE_COLUMN_VALUE")) do
+          1
+        end
+      ),
+      (
+        def(encode(:FT_COMPOSITE_COLUMN_VALUE)) do
+          2
+        end
+
+        def(encode("FT_COMPOSITE_COLUMN_VALUE")) do
+          2
+        end
+      ),
+      (
+        def(encode(:FT_COLUMN_PAGINATION)) do
+          3
+        end
+
+        def(encode("FT_COLUMN_PAGINATION")) do
+          3
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :FT_SINGLE_COLUMN_VALUE
@@ -43,7 +63,7 @@ defmodule(ExAliyunOts.TableStoreFilter.FilterType) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [{1, :FT_SINGLE_COLUMN_VALUE}, {2, :FT_COMPOSITE_COLUMN_VALUE}, {3, :FT_COLUMN_PAGINATION}]
     end

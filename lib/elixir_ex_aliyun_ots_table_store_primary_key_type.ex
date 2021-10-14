@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStore.PrimaryKeyType) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :INTEGER
       def(default()) do
@@ -9,24 +11,42 @@ defmodule(ExAliyunOts.TableStore.PrimaryKeyType) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:INTEGER)) do
-        1
-      end,
-      def(encode(:STRING)) do
-        2
-      end,
-      def(encode(:BINARY)) do
-        3
-      end
+      (
+        def(encode(:INTEGER)) do
+          1
+        end
+
+        def(encode("INTEGER")) do
+          1
+        end
+      ),
+      (
+        def(encode(:STRING)) do
+          2
+        end
+
+        def(encode("STRING")) do
+          2
+        end
+      ),
+      (
+        def(encode(:BINARY)) do
+          3
+        end
+
+        def(encode("BINARY")) do
+          3
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :INTEGER
@@ -43,7 +63,7 @@ defmodule(ExAliyunOts.TableStore.PrimaryKeyType) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [{1, :INTEGER}, {2, :STRING}, {3, :BINARY}]
     end

@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStore.Error) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -26,23 +26,31 @@ defmodule(ExAliyunOts.TableStore.Error) do
 
       [
         defp(encode_code(acc, msg)) do
-          case(msg.code) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:code]))
+          try do
+            case(msg.code) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:code]))
 
-            field_value ->
-              [acc, "\n", Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, "\n", Protox.Encode.encode_string(msg.code)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:code, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_message(acc, msg)) do
-          field_value = msg.message
+          try do
+            case(msg.message) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<18>>, Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, <<18>>, Protox.Encode.encode_string(msg.message)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:message, "invalid field value"), __STACKTRACE__)
           end
         end
       ]
@@ -51,29 +59,31 @@ defmodule(ExAliyunOts.TableStore.Error) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          {msg, set_fields} = parse_key_value([], bytes, struct(ExAliyunOts.TableStore.Error))
-
-          case([:code] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
           end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            {msg, set_fields} = parse_key_value([], bytes, struct(ExAliyunOts.TableStore.Error))
+
+            case([:code] -- set_fields) do
+              [] ->
+                msg
+
+              missing_fields ->
+                raise(Protox.RequiredFieldsError.new(missing_fields))
+            end
+          end
+        )
       )
 
       (
@@ -90,17 +100,13 @@ defmodule(ExAliyunOts.TableStore.Error) do
 
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:code, value}
-                {[:code | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:code | set_fields], [code: delimited], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:message, value}
-                {[:message | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:message | set_fields], [message: delimited], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -115,19 +121,149 @@ defmodule(ExAliyunOts.TableStore.Error) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStore.Error,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
-      %{1 => {:code, {:default, ""}, :string}, 2 => {:message, {:default, ""}, :string}}
+      %{1 => {:code, {:scalar, ""}, :string}, 2 => {:message, {:scalar, ""}, :string}}
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
-      %{code: {1, {:default, ""}, :string}, message: {2, {:default, ""}, :string}}
+      %{code: {1, {:scalar, ""}, :string}, message: {2, {:scalar, ""}, :string}}
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "code",
+          kind: {:scalar, ""},
+          label: :required,
+          name: :code,
+          tag: 1,
+          type: :string
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "message",
+          kind: {:scalar, ""},
+          label: :optional,
+          name: :message,
+          tag: 2,
+          type: :string
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:code)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "code",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :code,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("code")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "code",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :code,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        []
+      ),
+      (
+        def(field_def(:message)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "message",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :message,
+             tag: 2,
+             type: :string
+           }}
+        end
+
+        def(field_def("message")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "message",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :message,
+             tag: 2,
+             type: :string
+           }}
+        end
+
+        []
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: [:code]

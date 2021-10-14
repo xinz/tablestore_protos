@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStoreTunnel.TunnelType) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :BaseData
       def(default()) do
@@ -9,24 +11,42 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelType) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:BaseData)) do
-        1
-      end,
-      def(encode(:Stream)) do
-        2
-      end,
-      def(encode(:BaseAndStream)) do
-        3
-      end
+      (
+        def(encode(:BaseData)) do
+          1
+        end
+
+        def(encode("BaseData")) do
+          1
+        end
+      ),
+      (
+        def(encode(:Stream)) do
+          2
+        end
+
+        def(encode("Stream")) do
+          2
+        end
+      ),
+      (
+        def(encode(:BaseAndStream)) do
+          3
+        end
+
+        def(encode("BaseAndStream")) do
+          3
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :BaseData
@@ -43,7 +63,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelType) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [{1, :BaseData}, {2, :Stream}, {3, :BaseAndStream}]
     end

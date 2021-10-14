@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationsResult) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -26,17 +26,25 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationsResult) do
 
       [
         defp(encode_agg_results(acc, msg)) do
-          case(msg.agg_results) do
-            [] ->
-              acc
+          try do
+            case(msg.agg_results) do
+              [] ->
+                acc
 
-            values ->
-              [
-                acc,
-                Enum.reduce(values, [], fn value, acc ->
-                  [acc, "\n", Protox.Encode.encode_message(value)]
-                end)
-              ]
+              values ->
+                [
+                  acc,
+                  Enum.reduce(values, [], fn value, acc ->
+                    [acc, "\n", Protox.Encode.encode_message(value)]
+                  end)
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:agg_results, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end
       ]
@@ -45,21 +53,23 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationsResult) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.AggregationsResult))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
+          end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.AggregationsResult))
+          end
+        )
       )
 
       (
@@ -76,10 +86,13 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationsResult) do
 
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = ExAliyunOts.TableStoreSearch.AggregationResult.decode!(delimited)
-                field = {:agg_results, msg.agg_results ++ List.wrap(value)}
-                {[field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[
+                   agg_results:
+                     msg.agg_results ++
+                       [ExAliyunOts.TableStoreSearch.AggregationResult.decode!(delimited)]
+                 ], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -94,6 +107,46 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationsResult) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStoreSearch.AggregationsResult,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
@@ -103,12 +156,75 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationsResult) do
       }
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
       %{agg_results: {1, :unpacked, {:message, ExAliyunOts.TableStoreSearch.AggregationResult}}}
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "aggResults",
+          kind: :unpacked,
+          label: :repeated,
+          name: :agg_results,
+          tag: 1,
+          type: {:message, ExAliyunOts.TableStoreSearch.AggregationResult}
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:agg_results)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "aggResults",
+             kind: :unpacked,
+             label: :repeated,
+             name: :agg_results,
+             tag: 1,
+             type: {:message, ExAliyunOts.TableStoreSearch.AggregationResult}
+           }}
+        end
+
+        def(field_def("aggResults")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "aggResults",
+             kind: :unpacked,
+             label: :repeated,
+             name: :agg_results,
+             tag: 1,
+             type: {:message, ExAliyunOts.TableStoreSearch.AggregationResult}
+           }}
+        end
+
+        def(field_def("agg_results")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "aggResults",
+             kind: :unpacked,
+             label: :repeated,
+             name: :agg_results,
+             tag: 1,
+             type: {:message, ExAliyunOts.TableStoreSearch.AggregationResult}
+           }}
+        end
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: []

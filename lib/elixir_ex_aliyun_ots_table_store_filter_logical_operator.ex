@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStoreFilter.LogicalOperator) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :LO_NOT
       def(default()) do
@@ -9,24 +11,42 @@ defmodule(ExAliyunOts.TableStoreFilter.LogicalOperator) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:LO_NOT)) do
-        1
-      end,
-      def(encode(:LO_AND)) do
-        2
-      end,
-      def(encode(:LO_OR)) do
-        3
-      end
+      (
+        def(encode(:LO_NOT)) do
+          1
+        end
+
+        def(encode("LO_NOT")) do
+          1
+        end
+      ),
+      (
+        def(encode(:LO_AND)) do
+          2
+        end
+
+        def(encode("LO_AND")) do
+          2
+        end
+      ),
+      (
+        def(encode(:LO_OR)) do
+          3
+        end
+
+        def(encode("LO_OR")) do
+          3
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :LO_NOT
@@ -43,7 +63,7 @@ defmodule(ExAliyunOts.TableStoreFilter.LogicalOperator) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [{1, :LO_NOT}, {2, :LO_AND}, {3, :LO_OR}]
     end

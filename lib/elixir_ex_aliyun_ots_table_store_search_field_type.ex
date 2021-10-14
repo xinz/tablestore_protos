@@ -2,6 +2,8 @@
 defmodule(ExAliyunOts.TableStoreSearch.FieldType) do
   @moduledoc false
   (
+    defstruct([])
+
     (
       @spec default() :: :LONG
       def(default()) do
@@ -9,36 +11,78 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldType) do
       end
     )
 
-    @spec encode(atom) :: integer | atom
+    @spec encode(atom()) :: integer() | atom()
     [
-      def(encode(:LONG)) do
-        1
-      end,
-      def(encode(:DOUBLE)) do
-        2
-      end,
-      def(encode(:BOOLEAN)) do
-        3
-      end,
-      def(encode(:KEYWORD)) do
-        4
-      end,
-      def(encode(:TEXT)) do
-        5
-      end,
-      def(encode(:NESTED)) do
-        6
-      end,
-      def(encode(:GEO_POINT)) do
-        7
-      end
+      (
+        def(encode(:LONG)) do
+          1
+        end
+
+        def(encode("LONG")) do
+          1
+        end
+      ),
+      (
+        def(encode(:DOUBLE)) do
+          2
+        end
+
+        def(encode("DOUBLE")) do
+          2
+        end
+      ),
+      (
+        def(encode(:BOOLEAN)) do
+          3
+        end
+
+        def(encode("BOOLEAN")) do
+          3
+        end
+      ),
+      (
+        def(encode(:KEYWORD)) do
+          4
+        end
+
+        def(encode("KEYWORD")) do
+          4
+        end
+      ),
+      (
+        def(encode(:TEXT)) do
+          5
+        end
+
+        def(encode("TEXT")) do
+          5
+        end
+      ),
+      (
+        def(encode(:NESTED)) do
+          6
+        end
+
+        def(encode("NESTED")) do
+          6
+        end
+      ),
+      (
+        def(encode(:GEO_POINT)) do
+          7
+        end
+
+        def(encode("GEO_POINT")) do
+          7
+        end
+      )
     ]
 
     def(encode(x)) do
       x
     end
 
-    @spec decode(integer) :: atom | integer
+    @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
         :LONG
@@ -67,7 +111,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldType) do
       x
     end
 
-    @spec constants() :: [{integer, atom}]
+    @spec constants() :: [{integer(), atom()}]
     def(constants()) do
       [
         {1, :LONG},

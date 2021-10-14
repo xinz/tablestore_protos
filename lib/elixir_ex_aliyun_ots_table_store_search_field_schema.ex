@@ -22,7 +22,7 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -47,128 +47,178 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
 
       [
         defp(encode_field_name(acc, msg)) do
-          field_value = msg.field_name
+          try do
+            case(msg.field_name) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\n", Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, "\n", Protox.Encode.encode_string(msg.field_name)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:field_name, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_field_type(acc, msg)) do
-          field_value = msg.field_type
+          try do
+            case(msg.field_type) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [
-                acc,
-                <<16>>,
-                field_value
-                |> ExAliyunOts.TableStoreSearch.FieldType.encode()
-                |> Protox.Encode.encode_enum()
-              ]
+              _ ->
+                [
+                  acc,
+                  <<16>>,
+                  msg.field_type
+                  |> ExAliyunOts.TableStoreSearch.FieldType.encode()
+                  |> Protox.Encode.encode_enum()
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:field_type, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_index_options(acc, msg)) do
-          field_value = msg.index_options
+          try do
+            case(msg.index_options) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [
-                acc,
-                <<24>>,
-                field_value
-                |> ExAliyunOts.TableStoreSearch.IndexOptions.encode()
-                |> Protox.Encode.encode_enum()
-              ]
+              _ ->
+                [
+                  acc,
+                  <<24>>,
+                  msg.index_options
+                  |> ExAliyunOts.TableStoreSearch.IndexOptions.encode()
+                  |> Protox.Encode.encode_enum()
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:index_options, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_analyzer(acc, msg)) do
-          field_value = msg.analyzer
+          try do
+            case(msg.analyzer) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\"", Protox.Encode.encode_string(field_value)]
+              _ ->
+                [acc, "\"", Protox.Encode.encode_string(msg.analyzer)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:analyzer, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_index(acc, msg)) do
-          field_value = msg.index
+          try do
+            case(msg.index) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "(", Protox.Encode.encode_bool(field_value)]
+              _ ->
+                [acc, "(", Protox.Encode.encode_bool(msg.index)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:index, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_sort_and_agg(acc, msg)) do
-          field_value = msg.sort_and_agg
+          try do
+            case(msg.sort_and_agg) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "0", Protox.Encode.encode_bool(field_value)]
+              _ ->
+                [acc, "0", Protox.Encode.encode_bool(msg.sort_and_agg)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:sort_and_agg, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_store(acc, msg)) do
-          field_value = msg.store
+          try do
+            case(msg.store) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "8", Protox.Encode.encode_bool(field_value)]
+              _ ->
+                [acc, "8", Protox.Encode.encode_bool(msg.store)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:store, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_field_schemas(acc, msg)) do
-          case(msg.field_schemas) do
-            [] ->
-              acc
+          try do
+            case(msg.field_schemas) do
+              [] ->
+                acc
 
-            values ->
-              [
-                acc,
-                Enum.reduce(values, [], fn value, acc ->
-                  [acc, "B", Protox.Encode.encode_message(value)]
-                end)
-              ]
+              values ->
+                [
+                  acc,
+                  Enum.reduce(values, [], fn value, acc ->
+                    [acc, "B", Protox.Encode.encode_message(value)]
+                  end)
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:field_schemas, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
         defp(encode_is_array(acc, msg)) do
-          field_value = msg.is_array
+          try do
+            case(msg.is_array) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "H", Protox.Encode.encode_bool(field_value)]
+              _ ->
+                [acc, "H", Protox.Encode.encode_bool(msg.is_array)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:is_array, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_analyzer_parameter(acc, msg)) do
-          field_value = msg.analyzer_parameter
+          try do
+            case(msg.analyzer_parameter) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "R", Protox.Encode.encode_bytes(field_value)]
+              _ ->
+                [acc, "R", Protox.Encode.encode_bytes(msg.analyzer_parameter)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:analyzer_parameter, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end
       ]
@@ -177,21 +227,23 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.FieldSchema))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
+          end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.FieldSchema))
+          end
+        )
       )
 
       (
@@ -208,65 +260,56 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
 
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:field_name, value}
-                {[field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[field_name: delimited], rest}
 
               {2, _, bytes} ->
                 {value, rest} =
                   Protox.Decode.parse_enum(bytes, ExAliyunOts.TableStoreSearch.FieldType)
 
-                field = {:field_type, value}
-                {[field], rest}
+                {[field_type: value], rest}
 
               {3, _, bytes} ->
                 {value, rest} =
                   Protox.Decode.parse_enum(bytes, ExAliyunOts.TableStoreSearch.IndexOptions)
 
-                field = {:index_options, value}
-                {[field], rest}
+                {[index_options: value], rest}
 
               {4, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:analyzer, value}
-                {[field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[analyzer: delimited], rest}
 
               {5, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_bool(bytes)
-                field = {:index, value}
-                {[field], rest}
+                {[index: value], rest}
 
               {6, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_bool(bytes)
-                field = {:sort_and_agg, value}
-                {[field], rest}
+                {[sort_and_agg: value], rest}
 
               {7, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_bool(bytes)
-                field = {:store, value}
-                {[field], rest}
+                {[store: value], rest}
 
               {8, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = ExAliyunOts.TableStoreSearch.FieldSchema.decode!(delimited)
-                field = {:field_schemas, msg.field_schemas ++ List.wrap(value)}
-                {[field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[
+                   field_schemas:
+                     msg.field_schemas ++
+                       [ExAliyunOts.TableStoreSearch.FieldSchema.decode!(delimited)]
+                 ], rest}
 
               {9, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_bool(bytes)
-                field = {:is_array, value}
-                {[field], rest}
+                {[is_array: value], rest}
 
               {10, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:analyzer_parameter, value}
-                {[field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[analyzer_parameter: delimited], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -281,42 +324,553 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStoreSearch.FieldSchema,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
       %{
-        1 => {:field_name, {:default, ""}, :string},
-        2 => {:field_type, {:default, :LONG}, {:enum, ExAliyunOts.TableStoreSearch.FieldType}},
+        1 => {:field_name, {:scalar, ""}, :string},
+        2 => {:field_type, {:scalar, :LONG}, {:enum, ExAliyunOts.TableStoreSearch.FieldType}},
         3 =>
-          {:index_options, {:default, :DOCS}, {:enum, ExAliyunOts.TableStoreSearch.IndexOptions}},
-        4 => {:analyzer, {:default, ""}, :string},
-        5 => {:index, {:default, false}, :bool},
-        6 => {:sort_and_agg, {:default, false}, :bool},
-        7 => {:store, {:default, false}, :bool},
+          {:index_options, {:scalar, :DOCS}, {:enum, ExAliyunOts.TableStoreSearch.IndexOptions}},
+        4 => {:analyzer, {:scalar, ""}, :string},
+        5 => {:index, {:scalar, false}, :bool},
+        6 => {:sort_and_agg, {:scalar, false}, :bool},
+        7 => {:store, {:scalar, false}, :bool},
         8 => {:field_schemas, :unpacked, {:message, ExAliyunOts.TableStoreSearch.FieldSchema}},
-        9 => {:is_array, {:default, false}, :bool},
-        10 => {:analyzer_parameter, {:default, ""}, :bytes}
+        9 => {:is_array, {:scalar, false}, :bool},
+        10 => {:analyzer_parameter, {:scalar, ""}, :bytes}
       }
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
       %{
-        analyzer: {4, {:default, ""}, :string},
-        analyzer_parameter: {10, {:default, ""}, :bytes},
-        field_name: {1, {:default, ""}, :string},
+        analyzer: {4, {:scalar, ""}, :string},
+        analyzer_parameter: {10, {:scalar, ""}, :bytes},
+        field_name: {1, {:scalar, ""}, :string},
         field_schemas: {8, :unpacked, {:message, ExAliyunOts.TableStoreSearch.FieldSchema}},
-        field_type: {2, {:default, :LONG}, {:enum, ExAliyunOts.TableStoreSearch.FieldType}},
-        index: {5, {:default, false}, :bool},
-        index_options: {3, {:default, :DOCS}, {:enum, ExAliyunOts.TableStoreSearch.IndexOptions}},
-        is_array: {9, {:default, false}, :bool},
-        sort_and_agg: {6, {:default, false}, :bool},
-        store: {7, {:default, false}, :bool}
+        field_type: {2, {:scalar, :LONG}, {:enum, ExAliyunOts.TableStoreSearch.FieldType}},
+        index: {5, {:scalar, false}, :bool},
+        index_options: {3, {:scalar, :DOCS}, {:enum, ExAliyunOts.TableStoreSearch.IndexOptions}},
+        is_array: {9, {:scalar, false}, :bool},
+        sort_and_agg: {6, {:scalar, false}, :bool},
+        store: {7, {:scalar, false}, :bool}
       }
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "fieldName",
+          kind: {:scalar, ""},
+          label: :optional,
+          name: :field_name,
+          tag: 1,
+          type: :string
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "fieldType",
+          kind: {:scalar, :LONG},
+          label: :optional,
+          name: :field_type,
+          tag: 2,
+          type: {:enum, ExAliyunOts.TableStoreSearch.FieldType}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "indexOptions",
+          kind: {:scalar, :DOCS},
+          label: :optional,
+          name: :index_options,
+          tag: 3,
+          type: {:enum, ExAliyunOts.TableStoreSearch.IndexOptions}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "analyzer",
+          kind: {:scalar, ""},
+          label: :optional,
+          name: :analyzer,
+          tag: 4,
+          type: :string
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "index",
+          kind: {:scalar, false},
+          label: :optional,
+          name: :index,
+          tag: 5,
+          type: :bool
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "sortAndAgg",
+          kind: {:scalar, false},
+          label: :optional,
+          name: :sort_and_agg,
+          tag: 6,
+          type: :bool
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "store",
+          kind: {:scalar, false},
+          label: :optional,
+          name: :store,
+          tag: 7,
+          type: :bool
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "fieldSchemas",
+          kind: :unpacked,
+          label: :repeated,
+          name: :field_schemas,
+          tag: 8,
+          type: {:message, ExAliyunOts.TableStoreSearch.FieldSchema}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "isArray",
+          kind: {:scalar, false},
+          label: :optional,
+          name: :is_array,
+          tag: 9,
+          type: :bool
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "analyzerParameter",
+          kind: {:scalar, ""},
+          label: :optional,
+          name: :analyzer_parameter,
+          tag: 10,
+          type: :bytes
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:field_name)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "fieldName",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :field_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("fieldName")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "fieldName",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :field_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+
+        def(field_def("field_name")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "fieldName",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :field_name,
+             tag: 1,
+             type: :string
+           }}
+        end
+      ),
+      (
+        def(field_def(:field_type)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "fieldType",
+             kind: {:scalar, :LONG},
+             label: :optional,
+             name: :field_type,
+             tag: 2,
+             type: {:enum, ExAliyunOts.TableStoreSearch.FieldType}
+           }}
+        end
+
+        def(field_def("fieldType")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "fieldType",
+             kind: {:scalar, :LONG},
+             label: :optional,
+             name: :field_type,
+             tag: 2,
+             type: {:enum, ExAliyunOts.TableStoreSearch.FieldType}
+           }}
+        end
+
+        def(field_def("field_type")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "fieldType",
+             kind: {:scalar, :LONG},
+             label: :optional,
+             name: :field_type,
+             tag: 2,
+             type: {:enum, ExAliyunOts.TableStoreSearch.FieldType}
+           }}
+        end
+      ),
+      (
+        def(field_def(:index_options)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "indexOptions",
+             kind: {:scalar, :DOCS},
+             label: :optional,
+             name: :index_options,
+             tag: 3,
+             type: {:enum, ExAliyunOts.TableStoreSearch.IndexOptions}
+           }}
+        end
+
+        def(field_def("indexOptions")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "indexOptions",
+             kind: {:scalar, :DOCS},
+             label: :optional,
+             name: :index_options,
+             tag: 3,
+             type: {:enum, ExAliyunOts.TableStoreSearch.IndexOptions}
+           }}
+        end
+
+        def(field_def("index_options")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "indexOptions",
+             kind: {:scalar, :DOCS},
+             label: :optional,
+             name: :index_options,
+             tag: 3,
+             type: {:enum, ExAliyunOts.TableStoreSearch.IndexOptions}
+           }}
+        end
+      ),
+      (
+        def(field_def(:analyzer)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "analyzer",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :analyzer,
+             tag: 4,
+             type: :string
+           }}
+        end
+
+        def(field_def("analyzer")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "analyzer",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :analyzer,
+             tag: 4,
+             type: :string
+           }}
+        end
+
+        []
+      ),
+      (
+        def(field_def(:index)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "index",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :index,
+             tag: 5,
+             type: :bool
+           }}
+        end
+
+        def(field_def("index")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "index",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :index,
+             tag: 5,
+             type: :bool
+           }}
+        end
+
+        []
+      ),
+      (
+        def(field_def(:sort_and_agg)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "sortAndAgg",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :sort_and_agg,
+             tag: 6,
+             type: :bool
+           }}
+        end
+
+        def(field_def("sortAndAgg")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "sortAndAgg",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :sort_and_agg,
+             tag: 6,
+             type: :bool
+           }}
+        end
+
+        def(field_def("sort_and_agg")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "sortAndAgg",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :sort_and_agg,
+             tag: 6,
+             type: :bool
+           }}
+        end
+      ),
+      (
+        def(field_def(:store)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "store",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :store,
+             tag: 7,
+             type: :bool
+           }}
+        end
+
+        def(field_def("store")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "store",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :store,
+             tag: 7,
+             type: :bool
+           }}
+        end
+
+        []
+      ),
+      (
+        def(field_def(:field_schemas)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "fieldSchemas",
+             kind: :unpacked,
+             label: :repeated,
+             name: :field_schemas,
+             tag: 8,
+             type: {:message, ExAliyunOts.TableStoreSearch.FieldSchema}
+           }}
+        end
+
+        def(field_def("fieldSchemas")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "fieldSchemas",
+             kind: :unpacked,
+             label: :repeated,
+             name: :field_schemas,
+             tag: 8,
+             type: {:message, ExAliyunOts.TableStoreSearch.FieldSchema}
+           }}
+        end
+
+        def(field_def("field_schemas")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "fieldSchemas",
+             kind: :unpacked,
+             label: :repeated,
+             name: :field_schemas,
+             tag: 8,
+             type: {:message, ExAliyunOts.TableStoreSearch.FieldSchema}
+           }}
+        end
+      ),
+      (
+        def(field_def(:is_array)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "isArray",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :is_array,
+             tag: 9,
+             type: :bool
+           }}
+        end
+
+        def(field_def("isArray")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "isArray",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :is_array,
+             tag: 9,
+             type: :bool
+           }}
+        end
+
+        def(field_def("is_array")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "isArray",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :is_array,
+             tag: 9,
+             type: :bool
+           }}
+        end
+      ),
+      (
+        def(field_def(:analyzer_parameter)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "analyzerParameter",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :analyzer_parameter,
+             tag: 10,
+             type: :bytes
+           }}
+        end
+
+        def(field_def("analyzerParameter")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "analyzerParameter",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :analyzer_parameter,
+             tag: 10,
+             type: :bytes
+           }}
+        end
+
+        def(field_def("analyzer_parameter")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "analyzerParameter",
+             kind: {:scalar, ""},
+             label: :optional,
+             name: :analyzer_parameter,
+             tag: 10,
+             type: :bytes
+           }}
+        end
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: []

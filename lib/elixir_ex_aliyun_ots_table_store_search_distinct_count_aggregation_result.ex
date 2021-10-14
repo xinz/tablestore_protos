@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStoreSearch.DistinctCountAggregationResult) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -26,14 +26,17 @@ defmodule(ExAliyunOts.TableStoreSearch.DistinctCountAggregationResult) do
 
       [
         defp(encode_value(acc, msg)) do
-          field_value = msg.value
+          try do
+            case(msg.value) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\b", Protox.Encode.encode_int64(field_value)]
+              _ ->
+                [acc, "\b", Protox.Encode.encode_int64(msg.value)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:value, "invalid field value"), __STACKTRACE__)
           end
         end
       ]
@@ -42,24 +45,26 @@ defmodule(ExAliyunOts.TableStoreSearch.DistinctCountAggregationResult) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          parse_key_value(
-            bytes,
-            struct(ExAliyunOts.TableStoreSearch.DistinctCountAggregationResult)
-          )
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
+          end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            parse_key_value(
+              bytes,
+              struct(ExAliyunOts.TableStoreSearch.DistinctCountAggregationResult)
+            )
+          end
+        )
       )
 
       (
@@ -76,8 +81,7 @@ defmodule(ExAliyunOts.TableStoreSearch.DistinctCountAggregationResult) do
 
               {1, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_int64(bytes)
-                field = {:value, value}
-                {[field], rest}
+                {[value: value], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -92,19 +96,111 @@ defmodule(ExAliyunOts.TableStoreSearch.DistinctCountAggregationResult) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStoreSearch.DistinctCountAggregationResult,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
-      %{1 => {:value, {:default, 0}, :int64}}
+      %{1 => {:value, {:scalar, 0}, :int64}}
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
-      %{value: {1, {:default, 0}, :int64}}
+      %{value: {1, {:scalar, 0}, :int64}}
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "value",
+          kind: {:scalar, 0},
+          label: :optional,
+          name: :value,
+          tag: 1,
+          type: :int64
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:value)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "value",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :value,
+             tag: 1,
+             type: :int64
+           }}
+        end
+
+        def(field_def("value")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "value",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :value,
+             tag: 1,
+             type: :int64
+           }}
+        end
+
+        []
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: []

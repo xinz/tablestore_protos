@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStoreFilter.Filter) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -26,27 +26,37 @@ defmodule(ExAliyunOts.TableStoreFilter.Filter) do
 
       [
         defp(encode_type(acc, msg)) do
-          case(msg.type) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:type]))
+          try do
+            case(msg.type) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:type]))
 
-            field_value ->
-              [
-                acc,
-                "\b",
-                field_value
-                |> ExAliyunOts.TableStoreFilter.FilterType.encode()
-                |> Protox.Encode.encode_enum()
-              ]
+              _ ->
+                [
+                  acc,
+                  "\b",
+                  msg.type
+                  |> ExAliyunOts.TableStoreFilter.FilterType.encode()
+                  |> Protox.Encode.encode_enum()
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:type, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_filter(acc, msg)) do
-          case(msg.filter) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:filter]))
+          try do
+            case(msg.filter) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:filter]))
 
-            field_value ->
-              [acc, <<18>>, Protox.Encode.encode_bytes(field_value)]
+              _ ->
+                [acc, <<18>>, Protox.Encode.encode_bytes(msg.filter)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:filter, "invalid field value"), __STACKTRACE__)
           end
         end
       ]
@@ -55,30 +65,32 @@ defmodule(ExAliyunOts.TableStoreFilter.Filter) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          {msg, set_fields} =
-            parse_key_value([], bytes, struct(ExAliyunOts.TableStoreFilter.Filter))
-
-          case([:type, :filter] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
           end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            {msg, set_fields} =
+              parse_key_value([], bytes, struct(ExAliyunOts.TableStoreFilter.Filter))
+
+            case([:type, :filter] -- set_fields) do
+              [] ->
+                msg
+
+              missing_fields ->
+                raise(Protox.RequiredFieldsError.new(missing_fields))
+            end
+          end
+        )
       )
 
       (
@@ -97,15 +109,12 @@ defmodule(ExAliyunOts.TableStoreFilter.Filter) do
                 {value, rest} =
                   Protox.Decode.parse_enum(bytes, ExAliyunOts.TableStoreFilter.FilterType)
 
-                field = {:type, value}
-                {[:type | set_fields], [field], rest}
+                {[:type | set_fields], [type: value], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = delimited
-                field = {:filter, value}
-                {[:filter | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[:filter | set_fields], [filter: delimited], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -120,29 +129,159 @@ defmodule(ExAliyunOts.TableStoreFilter.Filter) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStoreFilter.Filter,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
       %{
         1 =>
-          {:type, {:default, :FT_SINGLE_COLUMN_VALUE},
+          {:type, {:scalar, :FT_SINGLE_COLUMN_VALUE},
            {:enum, ExAliyunOts.TableStoreFilter.FilterType}},
-        2 => {:filter, {:default, ""}, :bytes}
+        2 => {:filter, {:scalar, ""}, :bytes}
       }
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
       %{
-        filter: {2, {:default, ""}, :bytes},
+        filter: {2, {:scalar, ""}, :bytes},
         type:
-          {1, {:default, :FT_SINGLE_COLUMN_VALUE},
+          {1, {:scalar, :FT_SINGLE_COLUMN_VALUE},
            {:enum, ExAliyunOts.TableStoreFilter.FilterType}}
       }
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "type",
+          kind: {:scalar, :FT_SINGLE_COLUMN_VALUE},
+          label: :required,
+          name: :type,
+          tag: 1,
+          type: {:enum, ExAliyunOts.TableStoreFilter.FilterType}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "filter",
+          kind: {:scalar, ""},
+          label: :required,
+          name: :filter,
+          tag: 2,
+          type: :bytes
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:type)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "type",
+             kind: {:scalar, :FT_SINGLE_COLUMN_VALUE},
+             label: :required,
+             name: :type,
+             tag: 1,
+             type: {:enum, ExAliyunOts.TableStoreFilter.FilterType}
+           }}
+        end
+
+        def(field_def("type")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "type",
+             kind: {:scalar, :FT_SINGLE_COLUMN_VALUE},
+             label: :required,
+             name: :type,
+             tag: 1,
+             type: {:enum, ExAliyunOts.TableStoreFilter.FilterType}
+           }}
+        end
+
+        []
+      ),
+      (
+        def(field_def(:filter)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "filter",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :filter,
+             tag: 2,
+             type: :bytes
+           }}
+        end
+
+        def(field_def("filter")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "filter",
+             kind: {:scalar, ""},
+             label: :required,
+             name: :filter,
+             tag: 2,
+             type: :bytes
+           }}
+        end
+
+        []
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: [:type | :filter]

@@ -11,7 +11,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.DescribeTunnelResponse) do
           try do
             {:ok, encode!(msg)}
           rescue
-            e ->
+            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
               {:error, e}
           end
         end
@@ -26,37 +26,53 @@ defmodule(ExAliyunOts.TableStoreTunnel.DescribeTunnelResponse) do
 
       [
         defp(encode_tunnel(acc, msg)) do
-          case(msg.tunnel) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:tunnel]))
+          try do
+            case(msg.tunnel) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:tunnel]))
 
-            field_value ->
-              [acc, "\n", Protox.Encode.encode_message(field_value)]
+              _ ->
+                [acc, "\n", Protox.Encode.encode_message(msg.tunnel)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:tunnel, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_channels(acc, msg)) do
-          case(msg.channels) do
-            [] ->
-              acc
+          try do
+            case(msg.channels) do
+              [] ->
+                acc
 
-            values ->
-              [
-                acc,
-                Enum.reduce(values, [], fn value, acc ->
-                  [acc, <<18>>, Protox.Encode.encode_message(value)]
-                end)
-              ]
+              values ->
+                [
+                  acc,
+                  Enum.reduce(values, [], fn value, acc ->
+                    [acc, <<18>>, Protox.Encode.encode_message(value)]
+                  end)
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:channels, "invalid field value"), __STACKTRACE__)
           end
         end,
         defp(encode_tunnel_rpo(acc, msg)) do
-          field_value = msg.tunnel_rpo
+          try do
+            case(msg.tunnel_rpo) do
+              nil ->
+                acc
 
-          case(field_value) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<24>>, Protox.Encode.encode_int64(field_value)]
+              _ ->
+                [acc, <<24>>, Protox.Encode.encode_int64(msg.tunnel_rpo)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:tunnel_rpo, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end
       ]
@@ -65,34 +81,36 @@ defmodule(ExAliyunOts.TableStoreTunnel.DescribeTunnelResponse) do
     )
 
     (
-      @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
-        try do
-          {:ok, decode!(bytes)}
-        rescue
-          e ->
-            {:error, e}
-        end
-      end
-
       (
-        @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
-          {msg, set_fields} =
-            parse_key_value(
-              [],
-              bytes,
-              struct(ExAliyunOts.TableStoreTunnel.DescribeTunnelResponse)
-            )
-
-          case([:tunnel] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+        @spec decode(binary) :: {:ok, struct} | {:error, any}
+        def(decode(bytes)) do
+          try do
+            {:ok, decode!(bytes)}
+          rescue
+            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
+              {:error, e}
           end
         end
+
+        (
+          @spec decode!(binary) :: struct | no_return
+          def(decode!(bytes)) do
+            {msg, set_fields} =
+              parse_key_value(
+                [],
+                bytes,
+                struct(ExAliyunOts.TableStoreTunnel.DescribeTunnelResponse)
+              )
+
+            case([:tunnel] -- set_fields) do
+              [] ->
+                msg
+
+              missing_fields ->
+                raise(Protox.RequiredFieldsError.new(missing_fields))
+            end
+          end
+        )
       )
 
       (
@@ -109,22 +127,30 @@ defmodule(ExAliyunOts.TableStoreTunnel.DescribeTunnelResponse) do
 
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = ExAliyunOts.TableStoreTunnel.TunnelInfo.decode!(delimited)
-                field = {:tunnel, Protox.Message.merge(msg.tunnel, value)}
-                {[:tunnel | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[:tunnel | set_fields],
+                 [
+                   tunnel:
+                     Protox.Message.merge(
+                       msg.tunnel,
+                       ExAliyunOts.TableStoreTunnel.TunnelInfo.decode!(delimited)
+                     )
+                 ], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
-                <<delimited::binary-size(len), rest::binary>> = bytes
-                value = ExAliyunOts.TableStoreTunnel.ChannelInfo.decode!(delimited)
-                field = {:channels, msg.channels ++ List.wrap(value)}
-                {[:channels | set_fields], [field], rest}
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[:channels | set_fields],
+                 [
+                   channels:
+                     msg.channels ++ [ExAliyunOts.TableStoreTunnel.ChannelInfo.decode!(delimited)]
+                 ], rest}
 
               {3, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_int64(bytes)
-                field = {:tunnel_rpo, value}
-                {[:tunnel_rpo | set_fields], [field], rest}
+                {[:tunnel_rpo | set_fields], [tunnel_rpo: value], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -139,27 +165,206 @@ defmodule(ExAliyunOts.TableStoreTunnel.DescribeTunnelResponse) do
       []
     )
 
+    (
+      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+      def(json_decode(input, opts \\ [])) do
+        try do
+          {:ok, json_decode!(input, opts)}
+        rescue
+          e in Protox.JsonDecodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
+      end
+
+      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      def(json_decode!(input, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+        Protox.JsonDecode.decode!(
+          input,
+          ExAliyunOts.TableStoreTunnel.DescribeTunnelResponse,
+          &json_library_wrapper.decode!(json_library, &1)
+        )
+      end
+
+      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+      def(json_encode!(msg, opts \\ [])) do
+        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      end
+    )
+
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
       %{
-        1 => {:tunnel, {:default, nil}, {:message, ExAliyunOts.TableStoreTunnel.TunnelInfo}},
+        1 => {:tunnel, {:scalar, nil}, {:message, ExAliyunOts.TableStoreTunnel.TunnelInfo}},
         2 => {:channels, :unpacked, {:message, ExAliyunOts.TableStoreTunnel.ChannelInfo}},
-        3 => {:tunnel_rpo, {:default, 0}, :int64}
+        3 => {:tunnel_rpo, {:scalar, 0}, :int64}
       }
     end
 
+    @deprecated "Use fields_defs()/0 instead"
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
       %{
         channels: {2, :unpacked, {:message, ExAliyunOts.TableStoreTunnel.ChannelInfo}},
-        tunnel: {1, {:default, nil}, {:message, ExAliyunOts.TableStoreTunnel.TunnelInfo}},
-        tunnel_rpo: {3, {:default, 0}, :int64}
+        tunnel: {1, {:scalar, nil}, {:message, ExAliyunOts.TableStoreTunnel.TunnelInfo}},
+        tunnel_rpo: {3, {:scalar, 0}, :int64}
       }
     end
+
+    @spec fields_defs() :: list(Protox.Field.t())
+    def(fields_defs()) do
+      [
+        %{
+          __struct__: Protox.Field,
+          json_name: "tunnel",
+          kind: {:scalar, nil},
+          label: :required,
+          name: :tunnel,
+          tag: 1,
+          type: {:message, ExAliyunOts.TableStoreTunnel.TunnelInfo}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "channels",
+          kind: :unpacked,
+          label: :repeated,
+          name: :channels,
+          tag: 2,
+          type: {:message, ExAliyunOts.TableStoreTunnel.ChannelInfo}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "tunnelRpo",
+          kind: {:scalar, 0},
+          label: :optional,
+          name: :tunnel_rpo,
+          tag: 3,
+          type: :int64
+        }
+      ]
+    end
+
+    [
+      @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
+      (
+        def(field_def(:tunnel)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tunnel",
+             kind: {:scalar, nil},
+             label: :required,
+             name: :tunnel,
+             tag: 1,
+             type: {:message, ExAliyunOts.TableStoreTunnel.TunnelInfo}
+           }}
+        end
+
+        def(field_def("tunnel")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tunnel",
+             kind: {:scalar, nil},
+             label: :required,
+             name: :tunnel,
+             tag: 1,
+             type: {:message, ExAliyunOts.TableStoreTunnel.TunnelInfo}
+           }}
+        end
+
+        []
+      ),
+      (
+        def(field_def(:channels)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channels",
+             kind: :unpacked,
+             label: :repeated,
+             name: :channels,
+             tag: 2,
+             type: {:message, ExAliyunOts.TableStoreTunnel.ChannelInfo}
+           }}
+        end
+
+        def(field_def("channels")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "channels",
+             kind: :unpacked,
+             label: :repeated,
+             name: :channels,
+             tag: 2,
+             type: {:message, ExAliyunOts.TableStoreTunnel.ChannelInfo}
+           }}
+        end
+
+        []
+      ),
+      (
+        def(field_def(:tunnel_rpo)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tunnelRpo",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :tunnel_rpo,
+             tag: 3,
+             type: :int64
+           }}
+        end
+
+        def(field_def("tunnelRpo")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tunnelRpo",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :tunnel_rpo,
+             tag: 3,
+             type: :int64
+           }}
+        end
+
+        def(field_def("tunnel_rpo")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tunnelRpo",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :tunnel_rpo,
+             tag: 3,
+             type: :int64
+           }}
+        end
+      ),
+      def(field_def(_)) do
+        {:error, :no_such_field}
+      end
+    ]
 
     []
     @spec required_fields() :: [:tunnel]
