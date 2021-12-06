@@ -38,7 +38,7 @@ defmodule TablestoreProtos.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:protox, "~> 1.2"},
+      {:protox, "~> 1.6"},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false}
     ]
   end
