@@ -281,7 +281,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchGetRowRequest) do
                 {[:time_range | set_fields],
                  [
                    time_range:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.time_range,
                        ExAliyunOts.TableStore.TimeRange.decode!(delimited)
                      )
@@ -330,17 +330,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchGetRowRequest) do
         end
       end
 
-      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-      def(json_encode(msg, opts \\ [])) do
-        try do
-          {:ok, json_encode!(msg, opts)}
-        rescue
-          e in Protox.JsonEncodingError ->
-            {:error, e}
-        end
-      end
-
-      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
       def(json_decode!(input, opts \\ [])) do
         {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
@@ -349,6 +339,16 @@ defmodule(ExAliyunOts.TableStore.TableInBatchGetRowRequest) do
           ExAliyunOts.TableStore.TableInBatchGetRowRequest,
           &json_library_wrapper.decode!(json_library, &1)
         )
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
       end
 
       @spec json_encode!(struct(), keyword()) :: iodata() | no_return()

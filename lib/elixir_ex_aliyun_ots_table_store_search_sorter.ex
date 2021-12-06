@@ -137,7 +137,7 @@ defmodule(ExAliyunOts.TableStoreSearch.Sorter) do
 
                 {[
                    field_sort:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.field_sort,
                        ExAliyunOts.TableStoreSearch.FieldSort.decode!(delimited)
                      )
@@ -149,7 +149,7 @@ defmodule(ExAliyunOts.TableStoreSearch.Sorter) do
 
                 {[
                    geo_distance_sort:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.geo_distance_sort,
                        ExAliyunOts.TableStoreSearch.GeoDistanceSort.decode!(delimited)
                      )
@@ -161,7 +161,7 @@ defmodule(ExAliyunOts.TableStoreSearch.Sorter) do
 
                 {[
                    score_sort:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.score_sort,
                        ExAliyunOts.TableStoreSearch.ScoreSort.decode!(delimited)
                      )
@@ -173,7 +173,7 @@ defmodule(ExAliyunOts.TableStoreSearch.Sorter) do
 
                 {[
                    pk_sort:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.pk_sort,
                        ExAliyunOts.TableStoreSearch.PrimaryKeySort.decode!(delimited)
                      )
@@ -203,17 +203,7 @@ defmodule(ExAliyunOts.TableStoreSearch.Sorter) do
         end
       end
 
-      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-      def(json_encode(msg, opts \\ [])) do
-        try do
-          {:ok, json_encode!(msg, opts)}
-        rescue
-          e in Protox.JsonEncodingError ->
-            {:error, e}
-        end
-      end
-
-      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
       def(json_decode!(input, opts \\ [])) do
         {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
@@ -222,6 +212,16 @@ defmodule(ExAliyunOts.TableStoreSearch.Sorter) do
           ExAliyunOts.TableStoreSearch.Sorter,
           &json_library_wrapper.decode!(json_library, &1)
         )
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
       end
 
       @spec json_encode!(struct(), keyword()) :: iodata() | no_return()

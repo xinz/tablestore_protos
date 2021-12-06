@@ -79,5 +79,27 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexOptions) do
     def(constants()) do
       [{1, :DOCS}, {2, :FREQS}, {3, :POSITIONS}, {4, :OFFSETS}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:DOCS)) do
+          true
+        end,
+        def(has_constant?(:FREQS)) do
+          true
+        end,
+        def(has_constant?(:POSITIONS)) do
+          true
+        end,
+        def(has_constant?(:OFFSETS)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

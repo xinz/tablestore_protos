@@ -123,5 +123,36 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldType) do
         {7, :GEO_POINT}
       ]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:LONG)) do
+          true
+        end,
+        def(has_constant?(:DOUBLE)) do
+          true
+        end,
+        def(has_constant?(:BOOLEAN)) do
+          true
+        end,
+        def(has_constant?(:KEYWORD)) do
+          true
+        end,
+        def(has_constant?(:TEXT)) do
+          true
+        end,
+        def(has_constant?(:NESTED)) do
+          true
+        end,
+        def(has_constant?(:GEO_POINT)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

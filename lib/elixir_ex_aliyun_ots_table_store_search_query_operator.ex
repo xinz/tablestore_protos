@@ -55,5 +55,21 @@ defmodule(ExAliyunOts.TableStoreSearch.QueryOperator) do
     def(constants()) do
       [{1, :OR}, {2, :AND}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:OR)) do
+          true
+        end,
+        def(has_constant?(:AND)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

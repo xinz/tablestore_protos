@@ -55,5 +55,21 @@ defmodule(ExAliyunOts.TableStoreSearch.SortOrder) do
     def(constants()) do
       [{0, :SORT_ORDER_ASC}, {1, :SORT_ORDER_DESC}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:SORT_ORDER_ASC)) do
+          true
+        end,
+        def(has_constant?(:SORT_ORDER_DESC)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

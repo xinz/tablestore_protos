@@ -91,5 +91,30 @@ defmodule(ExAliyunOts.TableStore.DefinedColumnType) do
     def(constants()) do
       [{1, :DCT_INTEGER}, {2, :DCT_DOUBLE}, {3, :DCT_BOOLEAN}, {4, :DCT_STRING}, {7, :DCT_BLOB}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:DCT_INTEGER)) do
+          true
+        end,
+        def(has_constant?(:DCT_DOUBLE)) do
+          true
+        end,
+        def(has_constant?(:DCT_BOOLEAN)) do
+          true
+        end,
+        def(has_constant?(:DCT_STRING)) do
+          true
+        end,
+        def(has_constant?(:DCT_BLOB)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

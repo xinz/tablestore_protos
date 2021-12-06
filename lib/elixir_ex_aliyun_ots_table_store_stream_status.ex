@@ -55,5 +55,21 @@ defmodule(ExAliyunOts.TableStore.StreamStatus) do
     def(constants()) do
       [{1, :STREAM_ENABLING}, {2, :STREAM_ACTIVE}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:STREAM_ENABLING)) do
+          true
+        end,
+        def(has_constant?(:STREAM_ACTIVE)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

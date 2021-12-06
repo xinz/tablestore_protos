@@ -132,7 +132,7 @@ defmodule(ExAliyunOts.TableStore.UpdateTableResponse) do
                 {[:reserved_throughput_details | set_fields],
                  [
                    reserved_throughput_details:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.reserved_throughput_details,
                        ExAliyunOts.TableStore.ReservedThroughputDetails.decode!(delimited)
                      )
@@ -145,7 +145,7 @@ defmodule(ExAliyunOts.TableStore.UpdateTableResponse) do
                 {[:table_options | set_fields],
                  [
                    table_options:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.table_options,
                        ExAliyunOts.TableStore.TableOptions.decode!(delimited)
                      )
@@ -158,7 +158,7 @@ defmodule(ExAliyunOts.TableStore.UpdateTableResponse) do
                 {[:stream_details | set_fields],
                  [
                    stream_details:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.stream_details,
                        ExAliyunOts.TableStore.StreamDetails.decode!(delimited)
                      )
@@ -188,17 +188,7 @@ defmodule(ExAliyunOts.TableStore.UpdateTableResponse) do
         end
       end
 
-      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-      def(json_encode(msg, opts \\ [])) do
-        try do
-          {:ok, json_encode!(msg, opts)}
-        rescue
-          e in Protox.JsonEncodingError ->
-            {:error, e}
-        end
-      end
-
-      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
       def(json_decode!(input, opts \\ [])) do
         {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
@@ -207,6 +197,16 @@ defmodule(ExAliyunOts.TableStore.UpdateTableResponse) do
           ExAliyunOts.TableStore.UpdateTableResponse,
           &json_library_wrapper.decode!(json_library, &1)
         )
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
       end
 
       @spec json_encode!(struct(), keyword()) :: iodata() | no_return()

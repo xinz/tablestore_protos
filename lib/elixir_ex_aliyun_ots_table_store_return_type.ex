@@ -67,5 +67,24 @@ defmodule(ExAliyunOts.TableStore.ReturnType) do
     def(constants()) do
       [{0, :RT_NONE}, {1, :RT_PK}, {2, :RT_AFTER_MODIFY}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:RT_NONE)) do
+          true
+        end,
+        def(has_constant?(:RT_PK)) do
+          true
+        end,
+        def(has_constant?(:RT_AFTER_MODIFY)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

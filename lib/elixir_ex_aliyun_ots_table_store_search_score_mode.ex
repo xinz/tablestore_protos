@@ -97,5 +97,30 @@ defmodule(ExAliyunOts.TableStoreSearch.ScoreMode) do
         {5, :SCORE_MODE_MIN}
       ]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:SCORE_MODE_NONE)) do
+          true
+        end,
+        def(has_constant?(:SCORE_MODE_AVG)) do
+          true
+        end,
+        def(has_constant?(:SCORE_MODE_MAX)) do
+          true
+        end,
+        def(has_constant?(:SCORE_MODE_TOTAL)) do
+          true
+        end,
+        def(has_constant?(:SCORE_MODE_MIN)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

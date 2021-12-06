@@ -67,5 +67,24 @@ defmodule(ExAliyunOts.TableStoreFilter.FilterType) do
     def(constants()) do
       [{1, :FT_SINGLE_COLUMN_VALUE}, {2, :FT_COMPOSITE_COLUMN_VALUE}, {3, :FT_COLUMN_PAGINATION}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:FT_SINGLE_COLUMN_VALUE)) do
+          true
+        end,
+        def(has_constant?(:FT_COMPOSITE_COLUMN_VALUE)) do
+          true
+        end,
+        def(has_constant?(:FT_COLUMN_PAGINATION)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

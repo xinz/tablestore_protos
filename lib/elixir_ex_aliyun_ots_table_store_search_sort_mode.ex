@@ -67,5 +67,24 @@ defmodule(ExAliyunOts.TableStoreSearch.SortMode) do
     def(constants()) do
       [{0, :SORT_MODE_MIN}, {1, :SORT_MODE_MAX}, {2, :SORT_MODE_AVG}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:SORT_MODE_MIN)) do
+          true
+        end,
+        def(has_constant?(:SORT_MODE_MAX)) do
+          true
+        end,
+        def(has_constant?(:SORT_MODE_AVG)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

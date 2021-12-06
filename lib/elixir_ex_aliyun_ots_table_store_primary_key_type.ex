@@ -67,5 +67,24 @@ defmodule(ExAliyunOts.TableStore.PrimaryKeyType) do
     def(constants()) do
       [{1, :INTEGER}, {2, :STRING}, {3, :BINARY}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:INTEGER)) do
+          true
+        end,
+        def(has_constant?(:STRING)) do
+          true
+        end,
+        def(has_constant?(:BINARY)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

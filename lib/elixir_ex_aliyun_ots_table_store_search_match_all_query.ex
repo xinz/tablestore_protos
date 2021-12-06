@@ -78,17 +78,7 @@ defmodule(ExAliyunOts.TableStoreSearch.MatchAllQuery) do
         end
       end
 
-      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-      def(json_encode(msg, opts \\ [])) do
-        try do
-          {:ok, json_encode!(msg, opts)}
-        rescue
-          e in Protox.JsonEncodingError ->
-            {:error, e}
-        end
-      end
-
-      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
       def(json_decode!(input, opts \\ [])) do
         {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
@@ -97,6 +87,16 @@ defmodule(ExAliyunOts.TableStoreSearch.MatchAllQuery) do
           ExAliyunOts.TableStoreSearch.MatchAllQuery,
           &json_library_wrapper.decode!(json_library, &1)
         )
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
       end
 
       @spec json_encode!(struct(), keyword()) :: iodata() | no_return()

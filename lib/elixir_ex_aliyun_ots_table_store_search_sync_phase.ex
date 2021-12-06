@@ -55,5 +55,21 @@ defmodule(ExAliyunOts.TableStoreSearch.SyncPhase) do
     def(constants()) do
       [{1, :FULL}, {2, :INCR}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:FULL)) do
+          true
+        end,
+        def(has_constant?(:INCR)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

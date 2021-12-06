@@ -134,7 +134,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
 
                 {[
                    index_setting:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.index_setting,
                        ExAliyunOts.TableStoreSearch.IndexSetting.decode!(delimited)
                      )
@@ -146,7 +146,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
 
                 {[
                    index_sort:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.index_sort,
                        ExAliyunOts.TableStoreSearch.Sort.decode!(delimited)
                      )
@@ -176,17 +176,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
         end
       end
 
-      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-      def(json_encode(msg, opts \\ [])) do
-        try do
-          {:ok, json_encode!(msg, opts)}
-        rescue
-          e in Protox.JsonEncodingError ->
-            {:error, e}
-        end
-      end
-
-      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
       def(json_decode!(input, opts \\ [])) do
         {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
@@ -195,6 +185,16 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
           ExAliyunOts.TableStoreSearch.IndexSchema,
           &json_library_wrapper.decode!(json_library, &1)
         )
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
       end
 
       @spec json_encode!(struct(), keyword()) :: iodata() | no_return()

@@ -67,5 +67,24 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelType) do
     def(constants()) do
       [{1, :BaseData}, {2, :Stream}, {3, :BaseAndStream}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:BaseData)) do
+          true
+        end,
+        def(has_constant?(:Stream)) do
+          true
+        end,
+        def(has_constant?(:BaseAndStream)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

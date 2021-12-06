@@ -67,5 +67,24 @@ defmodule(ExAliyunOts.TableStore.ActionType) do
     def(constants()) do
       [{1, :PUT_ROW}, {2, :UPDATE_ROW}, {3, :DELETE_ROW}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:PUT_ROW)) do
+          true
+        end,
+        def(has_constant?(:UPDATE_ROW)) do
+          true
+        end,
+        def(has_constant?(:DELETE_ROW)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

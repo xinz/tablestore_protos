@@ -43,5 +43,18 @@ defmodule(ExAliyunOts.TableStore.PrimaryKeyOption) do
     def(constants()) do
       [{1, :AUTO_INCREMENT}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:AUTO_INCREMENT)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

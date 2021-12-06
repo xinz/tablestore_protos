@@ -123,7 +123,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByFilterResultItem) do
 
                 {[
                    sub_aggs_result:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.sub_aggs_result,
                        ExAliyunOts.TableStoreSearch.AggregationsResult.decode!(delimited)
                      )
@@ -135,7 +135,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByFilterResultItem) do
 
                 {[
                    sub_group_bys_result:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.sub_group_bys_result,
                        ExAliyunOts.TableStoreSearch.GroupBysResult.decode!(delimited)
                      )
@@ -165,17 +165,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByFilterResultItem) do
         end
       end
 
-      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-      def(json_encode(msg, opts \\ [])) do
-        try do
-          {:ok, json_encode!(msg, opts)}
-        rescue
-          e in Protox.JsonEncodingError ->
-            {:error, e}
-        end
-      end
-
-      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
       def(json_decode!(input, opts \\ [])) do
         {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
@@ -184,6 +174,16 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByFilterResultItem) do
           ExAliyunOts.TableStoreSearch.GroupByFilterResultItem,
           &json_library_wrapper.decode!(json_library, &1)
         )
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
       end
 
       @spec json_encode!(struct(), keyword()) :: iodata() | no_return()

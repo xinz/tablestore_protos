@@ -55,5 +55,21 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceType) do
     def(constants()) do
       [{0, :GEO_DISTANCE_ARC}, {1, :GEO_DISTANCE_PLANE}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:GEO_DISTANCE_ARC)) do
+          true
+        end,
+        def(has_constant?(:GEO_DISTANCE_PLANE)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

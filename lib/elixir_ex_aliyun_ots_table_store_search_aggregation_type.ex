@@ -110,5 +110,33 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationType) do
         {5, :AGG_COUNT}
       ]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:AGG_AVG)) do
+          true
+        end,
+        def(has_constant?(:AGG_DISTINCT_COUNT)) do
+          true
+        end,
+        def(has_constant?(:AGG_MAX)) do
+          true
+        end,
+        def(has_constant?(:AGG_MIN)) do
+          true
+        end,
+        def(has_constant?(:AGG_SUM)) do
+          true
+        end,
+        def(has_constant?(:AGG_COUNT)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

@@ -110,5 +110,33 @@ defmodule(ExAliyunOts.TableStoreFilter.ComparatorType) do
         {6, :CT_LESS_EQUAL}
       ]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:CT_EQUAL)) do
+          true
+        end,
+        def(has_constant?(:CT_NOT_EQUAL)) do
+          true
+        end,
+        def(has_constant?(:CT_GREATER_THAN)) do
+          true
+        end,
+        def(has_constant?(:CT_GREATER_EQUAL)) do
+          true
+        end,
+        def(has_constant?(:CT_LESS_THAN)) do
+          true
+        end,
+        def(has_constant?(:CT_LESS_EQUAL)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

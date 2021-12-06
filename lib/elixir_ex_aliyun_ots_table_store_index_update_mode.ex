@@ -55,5 +55,21 @@ defmodule(ExAliyunOts.TableStore.IndexUpdateMode) do
     def(constants()) do
       [{0, :IUM_ASYNC_INDEX}, {1, :IUM_SYNC_INDEX}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:IUM_ASYNC_INDEX)) do
+          true
+        end,
+        def(has_constant?(:IUM_SYNC_INDEX)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

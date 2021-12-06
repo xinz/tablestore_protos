@@ -55,5 +55,21 @@ defmodule(ExAliyunOts.TableStore.IndexType) do
     def(constants()) do
       [{0, :IT_GLOBAL_INDEX}, {1, :IT_LOCAL_INDEX}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:IT_GLOBAL_INDEX)) do
+          true
+        end,
+        def(has_constant?(:IT_LOCAL_INDEX)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

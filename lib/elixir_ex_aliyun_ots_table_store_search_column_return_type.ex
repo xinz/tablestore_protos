@@ -79,5 +79,27 @@ defmodule(ExAliyunOts.TableStoreSearch.ColumnReturnType) do
     def(constants()) do
       [{1, :RETURN_ALL}, {2, :RETURN_SPECIFIED}, {3, :RETURN_NONE}, {4, :RETURN_ALL_FROM_INDEX}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:RETURN_ALL)) do
+          true
+        end,
+        def(has_constant?(:RETURN_SPECIFIED)) do
+          true
+        end,
+        def(has_constant?(:RETURN_NONE)) do
+          true
+        end,
+        def(has_constant?(:RETURN_ALL_FROM_INDEX)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

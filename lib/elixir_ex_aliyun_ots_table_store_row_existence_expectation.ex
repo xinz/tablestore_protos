@@ -67,5 +67,24 @@ defmodule(ExAliyunOts.TableStore.RowExistenceExpectation) do
     def(constants()) do
       [{0, :IGNORE}, {1, :EXPECT_EXIST}, {2, :EXPECT_NOT_EXIST}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:IGNORE)) do
+          true
+        end,
+        def(has_constant?(:EXPECT_EXIST)) do
+          true
+        end,
+        def(has_constant?(:EXPECT_NOT_EXIST)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

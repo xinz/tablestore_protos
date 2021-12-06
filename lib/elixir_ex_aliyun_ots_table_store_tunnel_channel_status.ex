@@ -79,5 +79,27 @@ defmodule(ExAliyunOts.TableStoreTunnel.ChannelStatus) do
     def(constants()) do
       [{1, :OPEN}, {2, :CLOSING}, {3, :CLOSE}, {4, :TERMINATED}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:OPEN)) do
+          true
+        end,
+        def(has_constant?(:CLOSING)) do
+          true
+        end,
+        def(has_constant?(:CLOSE)) do
+          true
+        end,
+        def(has_constant?(:TERMINATED)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

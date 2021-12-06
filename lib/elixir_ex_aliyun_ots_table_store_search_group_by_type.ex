@@ -84,5 +84,27 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByType) do
         {4, :GROUP_BY_GEO_DISTANCE}
       ]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:GROUP_BY_FIELD)) do
+          true
+        end,
+        def(has_constant?(:GROUP_BY_RANGE)) do
+          true
+        end,
+        def(has_constant?(:GROUP_BY_FILTER)) do
+          true
+        end,
+        def(has_constant?(:GROUP_BY_GEO_DISTANCE)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

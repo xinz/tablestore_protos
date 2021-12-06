@@ -240,5 +240,63 @@ defmodule(ExAliyunOts.TableStoreSearch.QueryType) do
         {16, :EXISTS_QUERY}
       ]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:MATCH_QUERY)) do
+          true
+        end,
+        def(has_constant?(:MATCH_PHRASE_QUERY)) do
+          true
+        end,
+        def(has_constant?(:TERM_QUERY)) do
+          true
+        end,
+        def(has_constant?(:RANGE_QUERY)) do
+          true
+        end,
+        def(has_constant?(:PREFIX_QUERY)) do
+          true
+        end,
+        def(has_constant?(:BOOL_QUERY)) do
+          true
+        end,
+        def(has_constant?(:CONST_SCORE_QUERY)) do
+          true
+        end,
+        def(has_constant?(:FUNCTION_SCORE_QUERY)) do
+          true
+        end,
+        def(has_constant?(:NESTED_QUERY)) do
+          true
+        end,
+        def(has_constant?(:WILDCARD_QUERY)) do
+          true
+        end,
+        def(has_constant?(:MATCH_ALL_QUERY)) do
+          true
+        end,
+        def(has_constant?(:GEO_BOUNDING_BOX_QUERY)) do
+          true
+        end,
+        def(has_constant?(:GEO_DISTANCE_QUERY)) do
+          true
+        end,
+        def(has_constant?(:GEO_POLYGON_QUERY)) do
+          true
+        end,
+        def(has_constant?(:TERMS_QUERY)) do
+          true
+        end,
+        def(has_constant?(:EXISTS_QUERY)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

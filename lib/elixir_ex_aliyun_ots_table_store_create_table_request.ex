@@ -179,7 +179,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
                 {[:table_meta | set_fields],
                  [
                    table_meta:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.table_meta,
                        ExAliyunOts.TableStore.TableMeta.decode!(delimited)
                      )
@@ -192,7 +192,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
                 {[:reserved_throughput | set_fields],
                  [
                    reserved_throughput:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.reserved_throughput,
                        ExAliyunOts.TableStore.ReservedThroughput.decode!(delimited)
                      )
@@ -205,7 +205,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
                 {[:table_options | set_fields],
                  [
                    table_options:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.table_options,
                        ExAliyunOts.TableStore.TableOptions.decode!(delimited)
                      )
@@ -218,7 +218,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
                 {[:stream_spec | set_fields],
                  [
                    stream_spec:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.stream_spec,
                        ExAliyunOts.TableStore.StreamSpecification.decode!(delimited)
                      )
@@ -258,17 +258,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
         end
       end
 
-      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-      def(json_encode(msg, opts \\ [])) do
-        try do
-          {:ok, json_encode!(msg, opts)}
-        rescue
-          e in Protox.JsonEncodingError ->
-            {:error, e}
-        end
-      end
-
-      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
       def(json_decode!(input, opts \\ [])) do
         {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
@@ -277,6 +267,16 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
           ExAliyunOts.TableStore.CreateTableRequest,
           &json_library_wrapper.decode!(json_library, &1)
         )
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
       end
 
       @spec json_encode!(struct(), keyword()) :: iodata() | no_return()

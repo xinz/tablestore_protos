@@ -158,7 +158,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByField) do
 
                 {[
                    sort:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.sort,
                        ExAliyunOts.TableStoreSearch.GroupBySort.decode!(delimited)
                      )
@@ -170,7 +170,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByField) do
 
                 {[
                    sub_aggs:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.sub_aggs,
                        ExAliyunOts.TableStoreSearch.Aggregations.decode!(delimited)
                      )
@@ -182,7 +182,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByField) do
 
                 {[
                    sub_group_bys:
-                     Protox.Message.merge(
+                     Protox.MergeMessage.merge(
                        msg.sub_group_bys,
                        ExAliyunOts.TableStoreSearch.GroupBys.decode!(delimited)
                      )
@@ -212,17 +212,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByField) do
         end
       end
 
-      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-      def(json_encode(msg, opts \\ [])) do
-        try do
-          {:ok, json_encode!(msg, opts)}
-        rescue
-          e in Protox.JsonEncodingError ->
-            {:error, e}
-        end
-      end
-
-      @spec json_decode!(iodata(), keyword()) :: iodata() | no_return()
+      @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
       def(json_decode!(input, opts \\ [])) do
         {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
@@ -231,6 +221,16 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByField) do
           ExAliyunOts.TableStoreSearch.GroupByField,
           &json_library_wrapper.decode!(json_library, &1)
         )
+      end
+
+      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+      def(json_encode(msg, opts \\ [])) do
+        try do
+          {:ok, json_encode!(msg, opts)}
+        rescue
+          e in Protox.JsonEncodingError ->
+            {:error, e}
+        end
       end
 
       @spec json_encode!(struct(), keyword()) :: iodata() | no_return()

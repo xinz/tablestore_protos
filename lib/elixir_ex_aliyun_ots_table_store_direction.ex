@@ -55,5 +55,21 @@ defmodule(ExAliyunOts.TableStore.Direction) do
     def(constants()) do
       [{0, :FORWARD}, {1, :BACKWARD}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:FORWARD)) do
+          true
+        end,
+        def(has_constant?(:BACKWARD)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end

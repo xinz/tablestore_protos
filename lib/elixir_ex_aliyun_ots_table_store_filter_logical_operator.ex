@@ -67,5 +67,24 @@ defmodule(ExAliyunOts.TableStoreFilter.LogicalOperator) do
     def(constants()) do
       [{1, :LO_NOT}, {2, :LO_AND}, {3, :LO_OR}]
     end
+
+    @spec has_constant?(any()) :: boolean()
+    (
+      [
+        def(has_constant?(:LO_NOT)) do
+          true
+        end,
+        def(has_constant?(:LO_AND)) do
+          true
+        end,
+        def(has_constant?(:LO_OR)) do
+          true
+        end
+      ]
+
+      def(has_constant?(_)) do
+        false
+      end
+    )
   )
 end
