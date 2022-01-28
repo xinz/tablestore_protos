@@ -7,7 +7,8 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
       column_name: nil,
       column_value: nil,
       filter_if_missing: nil,
-      latest_version_only: nil
+      latest_version_only: nil,
+      value_trans_rule: nil
     )
 
     (
@@ -30,6 +31,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
           |> encode_column_value(msg)
           |> encode_filter_if_missing(msg)
           |> encode_latest_version_only(msg)
+          |> encode_value_trans_rule(msg)
         end
       )
 
@@ -126,6 +128,23 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
                 __STACKTRACE__
               )
           end
+        end,
+        defp(encode_value_trans_rule(acc, msg)) do
+          try do
+            case(msg.value_trans_rule) do
+              nil ->
+                acc
+
+              _ ->
+                [acc, "2", Protox.Encode.encode_message(msg.value_trans_rule)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:value_trans_rule, "invalid field value"),
+                __STACKTRACE__
+              )
+          end
         end
       ]
 
@@ -204,6 +223,19 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
                 {value, rest} = Protox.Decode.parse_bool(bytes)
                 {[:latest_version_only | set_fields], [latest_version_only: value], rest}
 
+              {6, _, bytes} ->
+                {len, bytes} = Protox.Varint.decode(bytes)
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[:value_trans_rule | set_fields],
+                 [
+                   value_trans_rule:
+                     Protox.MergeMessage.merge(
+                       msg.value_trans_rule,
+                       ExAliyunOts.TableStoreFilter.ValueTransferRule.decode!(delimited)
+                     )
+                 ], rest}
+
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
                 {set_fields, [], rest}
@@ -268,7 +300,10 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
         2 => {:column_name, {:scalar, ""}, :string},
         3 => {:column_value, {:scalar, ""}, :bytes},
         4 => {:filter_if_missing, {:scalar, false}, :bool},
-        5 => {:latest_version_only, {:scalar, false}, :bool}
+        5 => {:latest_version_only, {:scalar, false}, :bool},
+        6 =>
+          {:value_trans_rule, {:scalar, nil},
+           {:message, ExAliyunOts.TableStoreFilter.ValueTransferRule}}
       }
     end
 
@@ -283,7 +318,9 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
         comparator:
           {1, {:scalar, :CT_EQUAL}, {:enum, ExAliyunOts.TableStoreFilter.ComparatorType}},
         filter_if_missing: {4, {:scalar, false}, :bool},
-        latest_version_only: {5, {:scalar, false}, :bool}
+        latest_version_only: {5, {:scalar, false}, :bool},
+        value_trans_rule:
+          {6, {:scalar, nil}, {:message, ExAliyunOts.TableStoreFilter.ValueTransferRule}}
       }
     end
 
@@ -334,6 +371,15 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
           name: :latest_version_only,
           tag: 5,
           type: :bool
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "valueTransRule",
+          kind: {:scalar, nil},
+          label: :optional,
+          name: :value_trans_rule,
+          tag: 6,
+          type: {:message, ExAliyunOts.TableStoreFilter.ValueTransferRule}
         }
       ]
     end
@@ -529,6 +575,46 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
            }}
         end
       ),
+      (
+        def(field_def(:value_trans_rule)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "valueTransRule",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :value_trans_rule,
+             tag: 6,
+             type: {:message, ExAliyunOts.TableStoreFilter.ValueTransferRule}
+           }}
+        end
+
+        def(field_def("valueTransRule")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "valueTransRule",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :value_trans_rule,
+             tag: 6,
+             type: {:message, ExAliyunOts.TableStoreFilter.ValueTransferRule}
+           }}
+        end
+
+        def(field_def("value_trans_rule")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "valueTransRule",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :value_trans_rule,
+             tag: 6,
+             type: {:message, ExAliyunOts.TableStoreFilter.ValueTransferRule}
+           }}
+        end
+      ),
       def(field_def(_)) do
         {:error, :no_such_field}
       end
@@ -565,6 +651,9 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
       end,
       def(default(:latest_version_only)) do
         {:ok, false}
+      end,
+      def(default(:value_trans_rule)) do
+        {:ok, nil}
       end,
       def(default(_)) do
         {:error, :no_such_field}

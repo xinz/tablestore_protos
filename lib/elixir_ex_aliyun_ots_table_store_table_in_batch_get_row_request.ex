@@ -9,6 +9,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchGetRowRequest) do
       columns_to_get: [],
       time_range: nil,
       max_versions: nil,
+      cache_blocks: nil,
       filter: nil,
       start_column: nil,
       end_column: nil
@@ -35,6 +36,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchGetRowRequest) do
           |> encode_columns_to_get(msg)
           |> encode_time_range(msg)
           |> encode_max_versions(msg)
+          |> encode_cache_blocks(msg)
           |> encode_filter(msg)
           |> encode_start_column(msg)
           |> encode_end_column(msg)
@@ -154,6 +156,23 @@ defmodule(ExAliyunOts.TableStore.TableInBatchGetRowRequest) do
             ArgumentError ->
               reraise(
                 Protox.EncodingError.new(:max_versions, "invalid field value"),
+                __STACKTRACE__
+              )
+          end
+        end,
+        defp(encode_cache_blocks(acc, msg)) do
+          try do
+            case(msg.cache_blocks) do
+              nil ->
+                acc
+
+              _ ->
+                [acc, "8", Protox.Encode.encode_bool(msg.cache_blocks)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:cache_blocks, "invalid field value"),
                 __STACKTRACE__
               )
           end
@@ -291,6 +310,10 @@ defmodule(ExAliyunOts.TableStore.TableInBatchGetRowRequest) do
                 {value, rest} = Protox.Decode.parse_int32(bytes)
                 {[:max_versions | set_fields], [max_versions: value], rest}
 
+              {7, _, bytes} ->
+                {value, rest} = Protox.Decode.parse_bool(bytes)
+                {[:cache_blocks | set_fields], [cache_blocks: value], rest}
+
               {8, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
@@ -370,6 +393,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchGetRowRequest) do
         4 => {:columns_to_get, :unpacked, :string},
         5 => {:time_range, {:scalar, nil}, {:message, ExAliyunOts.TableStore.TimeRange}},
         6 => {:max_versions, {:scalar, 0}, :int32},
+        7 => {:cache_blocks, {:scalar, true}, :bool},
         8 => {:filter, {:scalar, ""}, :bytes},
         9 => {:start_column, {:scalar, ""}, :string},
         10 => {:end_column, {:scalar, ""}, :string}
@@ -382,6 +406,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchGetRowRequest) do
           }
     def(defs_by_name()) do
       %{
+        cache_blocks: {7, {:scalar, true}, :bool},
         columns_to_get: {4, :unpacked, :string},
         end_column: {10, {:scalar, ""}, :string},
         filter: {8, {:scalar, ""}, :bytes},
@@ -450,6 +475,15 @@ defmodule(ExAliyunOts.TableStore.TableInBatchGetRowRequest) do
           name: :max_versions,
           tag: 6,
           type: :int32
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "cacheBlocks",
+          kind: {:scalar, true},
+          label: :optional,
+          name: :cache_blocks,
+          tag: 7,
+          type: :bool
         },
         %{
           __struct__: Protox.Field,
@@ -713,6 +747,46 @@ defmodule(ExAliyunOts.TableStore.TableInBatchGetRowRequest) do
         end
       ),
       (
+        def(field_def(:cache_blocks)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "cacheBlocks",
+             kind: {:scalar, true},
+             label: :optional,
+             name: :cache_blocks,
+             tag: 7,
+             type: :bool
+           }}
+        end
+
+        def(field_def("cacheBlocks")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "cacheBlocks",
+             kind: {:scalar, true},
+             label: :optional,
+             name: :cache_blocks,
+             tag: 7,
+             type: :bool
+           }}
+        end
+
+        def(field_def("cache_blocks")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "cacheBlocks",
+             kind: {:scalar, true},
+             label: :optional,
+             name: :cache_blocks,
+             tag: 7,
+             type: :bool
+           }}
+        end
+      ),
+      (
         def(field_def(:filter)) do
           {:ok,
            %{
@@ -856,6 +930,9 @@ defmodule(ExAliyunOts.TableStore.TableInBatchGetRowRequest) do
       end,
       def(default(:max_versions)) do
         {:ok, 0}
+      end,
+      def(default(:cache_blocks)) do
+        {:ok, true}
       end,
       def(default(:filter)) do
         {:ok, ""}

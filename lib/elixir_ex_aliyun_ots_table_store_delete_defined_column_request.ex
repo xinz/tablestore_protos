@@ -1,8 +1,8 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
+defmodule(ExAliyunOts.TableStore.DeleteDefinedColumnRequest) do
   @moduledoc false
   (
-    defstruct(shard_iterator: nil, next_token: nil)
+    defstruct(table_name: nil, columns: [])
 
     (
       (
@@ -18,45 +18,47 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
 
         @spec encode!(struct) :: iodata | no_return
         def(encode!(msg)) do
-          [] |> encode_shard_iterator(msg) |> encode_next_token(msg)
+          [] |> encode_table_name(msg) |> encode_columns(msg)
         end
       )
 
       []
 
       [
-        defp(encode_shard_iterator(acc, msg)) do
+        defp(encode_table_name(acc, msg)) do
           try do
-            case(msg.shard_iterator) do
+            case(msg.table_name) do
               nil ->
-                raise(Protox.RequiredFieldsError.new([:shard_iterator]))
+                raise(Protox.RequiredFieldsError.new([:table_name]))
 
               _ ->
-                [acc, "\n", Protox.Encode.encode_string(msg.shard_iterator)]
+                [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
             end
           rescue
             ArgumentError ->
               reraise(
-                Protox.EncodingError.new(:shard_iterator, "invalid field value"),
+                Protox.EncodingError.new(:table_name, "invalid field value"),
                 __STACKTRACE__
               )
           end
         end,
-        defp(encode_next_token(acc, msg)) do
+        defp(encode_columns(acc, msg)) do
           try do
-            case(msg.next_token) do
-              nil ->
+            case(msg.columns) do
+              [] ->
                 acc
 
-              _ ->
-                [acc, <<18>>, Protox.Encode.encode_string(msg.next_token)]
+              values ->
+                [
+                  acc,
+                  Enum.reduce(values, [], fn value, acc ->
+                    [acc, <<18>>, Protox.Encode.encode_string(value)]
+                  end)
+                ]
             end
           rescue
             ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:next_token, "invalid field value"),
-                __STACKTRACE__
-              )
+              reraise(Protox.EncodingError.new(:columns, "invalid field value"), __STACKTRACE__)
           end
         end
       ]
@@ -80,9 +82,13 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
           @spec decode!(binary) :: struct | no_return
           def(decode!(bytes)) do
             {msg, set_fields} =
-              parse_key_value([], bytes, struct(ExAliyunOts.TableStore.GetShardIteratorResponse))
+              parse_key_value(
+                [],
+                bytes,
+                struct(ExAliyunOts.TableStore.DeleteDefinedColumnRequest)
+              )
 
-            case([:shard_iterator] -- set_fields) do
+            case([:table_name] -- set_fields) do
               [] ->
                 msg
 
@@ -108,12 +114,12 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[:shard_iterator | set_fields], [shard_iterator: delimited], rest}
+                {[:table_name | set_fields], [table_name: delimited], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[:next_token | set_fields], [next_token: delimited], rest}
+                {[:columns | set_fields], [columns: msg.columns ++ [delimited]], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -145,7 +151,7 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
 
         Protox.JsonDecode.decode!(
           input,
-          ExAliyunOts.TableStore.GetShardIteratorResponse,
+          ExAliyunOts.TableStore.DeleteDefinedColumnRequest,
           &json_library_wrapper.decode!(json_library, &1)
         )
       end
@@ -172,10 +178,7 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
-      %{
-        1 => {:shard_iterator, {:scalar, ""}, :string},
-        2 => {:next_token, {:scalar, ""}, :string}
-      }
+      %{1 => {:table_name, {:scalar, ""}, :string}, 2 => {:columns, :unpacked, :string}}
     end
 
     @deprecated "Use fields_defs()/0 instead"
@@ -183,7 +186,7 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
-      %{next_token: {2, {:scalar, ""}, :string}, shard_iterator: {1, {:scalar, ""}, :string}}
+      %{columns: {2, :unpacked, :string}, table_name: {1, {:scalar, ""}, :string}}
     end
 
     @spec fields_defs() :: list(Protox.Field.t())
@@ -191,19 +194,19 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
       [
         %{
           __struct__: Protox.Field,
-          json_name: "shardIterator",
+          json_name: "tableName",
           kind: {:scalar, ""},
           label: :required,
-          name: :shard_iterator,
+          name: :table_name,
           tag: 1,
           type: :string
         },
         %{
           __struct__: Protox.Field,
-          json_name: "nextToken",
-          kind: {:scalar, ""},
-          label: :optional,
-          name: :next_token,
+          json_name: "columns",
+          kind: :unpacked,
+          label: :repeated,
+          name: :columns,
           tag: 2,
           type: :string
         }
@@ -213,84 +216,73 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:shard_iterator)) do
+        def(field_def(:table_name)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "shardIterator",
+             json_name: "tableName",
              kind: {:scalar, ""},
              label: :required,
-             name: :shard_iterator,
+             name: :table_name,
              tag: 1,
              type: :string
            }}
         end
 
-        def(field_def("shardIterator")) do
+        def(field_def("tableName")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "shardIterator",
+             json_name: "tableName",
              kind: {:scalar, ""},
              label: :required,
-             name: :shard_iterator,
+             name: :table_name,
              tag: 1,
              type: :string
            }}
         end
 
-        def(field_def("shard_iterator")) do
+        def(field_def("table_name")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "shardIterator",
+             json_name: "tableName",
              kind: {:scalar, ""},
              label: :required,
-             name: :shard_iterator,
+             name: :table_name,
              tag: 1,
              type: :string
            }}
         end
       ),
       (
-        def(field_def(:next_token)) do
+        def(field_def(:columns)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "nextToken",
-             kind: {:scalar, ""},
-             label: :optional,
-             name: :next_token,
+             json_name: "columns",
+             kind: :unpacked,
+             label: :repeated,
+             name: :columns,
              tag: 2,
              type: :string
            }}
         end
 
-        def(field_def("nextToken")) do
+        def(field_def("columns")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "nextToken",
-             kind: {:scalar, ""},
-             label: :optional,
-             name: :next_token,
+             json_name: "columns",
+             kind: :unpacked,
+             label: :repeated,
+             name: :columns,
              tag: 2,
              type: :string
            }}
         end
 
-        def(field_def("next_token")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "nextToken",
-             kind: {:scalar, ""},
-             label: :optional,
-             name: :next_token,
-             tag: 2,
-             type: :string
-           }}
-        end
+        []
       ),
       def(field_def(_)) do
         {:error, :no_such_field}
@@ -298,9 +290,9 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
     ]
 
     []
-    @spec required_fields() :: [:shard_iterator]
+    @spec required_fields() :: [:table_name]
     def(required_fields()) do
-      [:shard_iterator]
+      [:table_name]
     end
 
     @spec syntax() :: atom
@@ -310,11 +302,11 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
 
     [
       @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-      def(default(:shard_iterator)) do
+      def(default(:table_name)) do
         {:ok, ""}
       end,
-      def(default(:next_token)) do
-        {:ok, ""}
+      def(default(:columns)) do
+        {:error, :no_default_value}
       end,
       def(default(_)) do
         {:error, :no_such_field}

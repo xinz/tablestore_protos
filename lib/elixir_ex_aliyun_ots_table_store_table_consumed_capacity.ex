@@ -1,8 +1,8 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.GetShardIteratorRequest) do
+defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
   @moduledoc false
   (
-    defstruct(stream_id: nil, shard_id: nil, timestamp: nil, token: nil)
+    defstruct(table_name: nil, consumed: nil, reserved_throughput: nil)
 
     (
       (
@@ -18,71 +18,59 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorRequest) do
 
         @spec encode!(struct) :: iodata | no_return
         def(encode!(msg)) do
-          []
-          |> encode_stream_id(msg)
-          |> encode_shard_id(msg)
-          |> encode_timestamp(msg)
-          |> encode_token(msg)
+          [] |> encode_table_name(msg) |> encode_consumed(msg) |> encode_reserved_throughput(msg)
         end
       )
 
       []
 
       [
-        defp(encode_stream_id(acc, msg)) do
+        defp(encode_table_name(acc, msg)) do
           try do
-            case(msg.stream_id) do
-              nil ->
-                raise(Protox.RequiredFieldsError.new([:stream_id]))
-
-              _ ->
-                [acc, "\n", Protox.Encode.encode_string(msg.stream_id)]
-            end
-          rescue
-            ArgumentError ->
-              reraise(Protox.EncodingError.new(:stream_id, "invalid field value"), __STACKTRACE__)
-          end
-        end,
-        defp(encode_shard_id(acc, msg)) do
-          try do
-            case(msg.shard_id) do
-              nil ->
-                raise(Protox.RequiredFieldsError.new([:shard_id]))
-
-              _ ->
-                [acc, <<18>>, Protox.Encode.encode_string(msg.shard_id)]
-            end
-          rescue
-            ArgumentError ->
-              reraise(Protox.EncodingError.new(:shard_id, "invalid field value"), __STACKTRACE__)
-          end
-        end,
-        defp(encode_timestamp(acc, msg)) do
-          try do
-            case(msg.timestamp) do
+            case(msg.table_name) do
               nil ->
                 acc
 
               _ ->
-                [acc, <<24>>, Protox.Encode.encode_int64(msg.timestamp)]
+                [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
             end
           rescue
             ArgumentError ->
-              reraise(Protox.EncodingError.new(:timestamp, "invalid field value"), __STACKTRACE__)
+              reraise(
+                Protox.EncodingError.new(:table_name, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end,
-        defp(encode_token(acc, msg)) do
+        defp(encode_consumed(acc, msg)) do
           try do
-            case(msg.token) do
+            case(msg.consumed) do
               nil ->
                 acc
 
               _ ->
-                [acc, "\"", Protox.Encode.encode_string(msg.token)]
+                [acc, <<18>>, Protox.Encode.encode_message(msg.consumed)]
             end
           rescue
             ArgumentError ->
-              reraise(Protox.EncodingError.new(:token, "invalid field value"), __STACKTRACE__)
+              reraise(Protox.EncodingError.new(:consumed, "invalid field value"), __STACKTRACE__)
+          end
+        end,
+        defp(encode_reserved_throughput(acc, msg)) do
+          try do
+            case(msg.reserved_throughput) do
+              nil ->
+                acc
+
+              _ ->
+                [acc, <<26>>, Protox.Encode.encode_message(msg.reserved_throughput)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:reserved_throughput, "invalid field value"),
+                __STACKTRACE__
+              )
           end
         end
       ]
@@ -105,28 +93,19 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorRequest) do
         (
           @spec decode!(binary) :: struct | no_return
           def(decode!(bytes)) do
-            {msg, set_fields} =
-              parse_key_value([], bytes, struct(ExAliyunOts.TableStore.GetShardIteratorRequest))
-
-            case([:stream_id, :shard_id] -- set_fields) do
-              [] ->
-                msg
-
-              missing_fields ->
-                raise(Protox.RequiredFieldsError.new(missing_fields))
-            end
+            parse_key_value(bytes, struct(ExAliyunOts.TableStore.TableConsumedCapacity))
           end
         )
       )
 
       (
-        @spec parse_key_value([atom], binary, struct) :: {struct, [atom]}
-        defp(parse_key_value(set_fields, <<>>, msg)) do
-          {msg, set_fields}
+        @spec parse_key_value(binary, struct) :: struct
+        defp(parse_key_value(<<>>, msg)) do
+          msg
         end
 
-        defp(parse_key_value(set_fields, bytes, msg)) do
-          {new_set_fields, field, rest} =
+        defp(parse_key_value(bytes, msg)) do
+          {field, rest} =
             case(Protox.Decode.parse_key(bytes)) do
               {0, _, _} ->
                 raise(%Protox.IllegalTagError{})
@@ -134,29 +113,39 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorRequest) do
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[:stream_id | set_fields], [stream_id: delimited], rest}
+                {[table_name: delimited], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[:shard_id | set_fields], [shard_id: delimited], rest}
+
+                {[
+                   consumed:
+                     Protox.MergeMessage.merge(
+                       msg.consumed,
+                       ExAliyunOts.TableStore.ConsumedCapacity.decode!(delimited)
+                     )
+                 ], rest}
 
               {3, _, bytes} ->
-                {value, rest} = Protox.Decode.parse_int64(bytes)
-                {[:timestamp | set_fields], [timestamp: value], rest}
-
-              {4, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[:token | set_fields], [token: delimited], rest}
+
+                {[
+                   reserved_throughput:
+                     Protox.MergeMessage.merge(
+                       msg.reserved_throughput,
+                       ExAliyunOts.TableStore.ReservedThroughput.decode!(delimited)
+                     )
+                 ], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
-                {set_fields, [], rest}
+                {[], rest}
             end
 
           msg_updated = struct(msg, field)
-          parse_key_value(new_set_fields, rest, msg_updated)
+          parse_key_value(rest, msg_updated)
         end
       )
 
@@ -180,7 +169,7 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorRequest) do
 
         Protox.JsonDecode.decode!(
           input,
-          ExAliyunOts.TableStore.GetShardIteratorRequest,
+          ExAliyunOts.TableStore.TableConsumedCapacity,
           &json_library_wrapper.decode!(json_library, &1)
         )
       end
@@ -208,10 +197,11 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorRequest) do
           }
     def(defs()) do
       %{
-        1 => {:stream_id, {:scalar, ""}, :string},
-        2 => {:shard_id, {:scalar, ""}, :string},
-        3 => {:timestamp, {:scalar, 0}, :int64},
-        4 => {:token, {:scalar, ""}, :string}
+        1 => {:table_name, {:scalar, ""}, :string},
+        2 => {:consumed, {:scalar, nil}, {:message, ExAliyunOts.TableStore.ConsumedCapacity}},
+        3 =>
+          {:reserved_throughput, {:scalar, nil},
+           {:message, ExAliyunOts.TableStore.ReservedThroughput}}
       }
     end
 
@@ -221,10 +211,10 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorRequest) do
           }
     def(defs_by_name()) do
       %{
-        shard_id: {2, {:scalar, ""}, :string},
-        stream_id: {1, {:scalar, ""}, :string},
-        timestamp: {3, {:scalar, 0}, :int64},
-        token: {4, {:scalar, ""}, :string}
+        consumed: {2, {:scalar, nil}, {:message, ExAliyunOts.TableStore.ConsumedCapacity}},
+        reserved_throughput:
+          {3, {:scalar, nil}, {:message, ExAliyunOts.TableStore.ReservedThroughput}},
+        table_name: {1, {:scalar, ""}, :string}
       }
     end
 
@@ -233,39 +223,30 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorRequest) do
       [
         %{
           __struct__: Protox.Field,
-          json_name: "streamId",
+          json_name: "tableName",
           kind: {:scalar, ""},
-          label: :required,
-          name: :stream_id,
+          label: :optional,
+          name: :table_name,
           tag: 1,
           type: :string
         },
         %{
           __struct__: Protox.Field,
-          json_name: "shardId",
-          kind: {:scalar, ""},
-          label: :required,
-          name: :shard_id,
+          json_name: "consumed",
+          kind: {:scalar, nil},
+          label: :optional,
+          name: :consumed,
           tag: 2,
-          type: :string
+          type: {:message, ExAliyunOts.TableStore.ConsumedCapacity}
         },
         %{
           __struct__: Protox.Field,
-          json_name: "timestamp",
-          kind: {:scalar, 0},
+          json_name: "reservedThroughput",
+          kind: {:scalar, nil},
           label: :optional,
-          name: :timestamp,
+          name: :reserved_throughput,
           tag: 3,
-          type: :int64
-        },
-        %{
-          __struct__: Protox.Field,
-          json_name: "token",
-          kind: {:scalar, ""},
-          label: :optional,
-          name: :token,
-          tag: 4,
-          type: :string
+          type: {:message, ExAliyunOts.TableStore.ReservedThroughput}
         }
       ]
     end
@@ -273,142 +254,113 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorRequest) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:stream_id)) do
+        def(field_def(:table_name)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "streamId",
+             json_name: "tableName",
              kind: {:scalar, ""},
-             label: :required,
-             name: :stream_id,
+             label: :optional,
+             name: :table_name,
              tag: 1,
              type: :string
            }}
         end
 
-        def(field_def("streamId")) do
+        def(field_def("tableName")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "streamId",
+             json_name: "tableName",
              kind: {:scalar, ""},
-             label: :required,
-             name: :stream_id,
+             label: :optional,
+             name: :table_name,
              tag: 1,
              type: :string
            }}
         end
 
-        def(field_def("stream_id")) do
+        def(field_def("table_name")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "streamId",
+             json_name: "tableName",
              kind: {:scalar, ""},
-             label: :required,
-             name: :stream_id,
+             label: :optional,
+             name: :table_name,
              tag: 1,
              type: :string
            }}
         end
       ),
       (
-        def(field_def(:shard_id)) do
+        def(field_def(:consumed)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "shardId",
-             kind: {:scalar, ""},
-             label: :required,
-             name: :shard_id,
-             tag: 2,
-             type: :string
-           }}
-        end
-
-        def(field_def("shardId")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "shardId",
-             kind: {:scalar, ""},
-             label: :required,
-             name: :shard_id,
-             tag: 2,
-             type: :string
-           }}
-        end
-
-        def(field_def("shard_id")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "shardId",
-             kind: {:scalar, ""},
-             label: :required,
-             name: :shard_id,
-             tag: 2,
-             type: :string
-           }}
-        end
-      ),
-      (
-        def(field_def(:timestamp)) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "timestamp",
-             kind: {:scalar, 0},
+             json_name: "consumed",
+             kind: {:scalar, nil},
              label: :optional,
-             name: :timestamp,
-             tag: 3,
-             type: :int64
+             name: :consumed,
+             tag: 2,
+             type: {:message, ExAliyunOts.TableStore.ConsumedCapacity}
            }}
         end
 
-        def(field_def("timestamp")) do
+        def(field_def("consumed")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "timestamp",
-             kind: {:scalar, 0},
+             json_name: "consumed",
+             kind: {:scalar, nil},
              label: :optional,
-             name: :timestamp,
-             tag: 3,
-             type: :int64
+             name: :consumed,
+             tag: 2,
+             type: {:message, ExAliyunOts.TableStore.ConsumedCapacity}
            }}
         end
 
         []
       ),
       (
-        def(field_def(:token)) do
+        def(field_def(:reserved_throughput)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "token",
-             kind: {:scalar, ""},
+             json_name: "reservedThroughput",
+             kind: {:scalar, nil},
              label: :optional,
-             name: :token,
-             tag: 4,
-             type: :string
+             name: :reserved_throughput,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStore.ReservedThroughput}
            }}
         end
 
-        def(field_def("token")) do
+        def(field_def("reservedThroughput")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "token",
-             kind: {:scalar, ""},
+             json_name: "reservedThroughput",
+             kind: {:scalar, nil},
              label: :optional,
-             name: :token,
-             tag: 4,
-             type: :string
+             name: :reserved_throughput,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStore.ReservedThroughput}
            }}
         end
 
-        []
+        def(field_def("reserved_throughput")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "reservedThroughput",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :reserved_throughput,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStore.ReservedThroughput}
+           }}
+        end
       ),
       def(field_def(_)) do
         {:error, :no_such_field}
@@ -416,9 +368,9 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorRequest) do
     ]
 
     []
-    @spec required_fields() :: [:stream_id | :shard_id]
+    @spec required_fields() :: []
     def(required_fields()) do
-      [:stream_id, :shard_id]
+      []
     end
 
     @spec syntax() :: atom
@@ -428,17 +380,14 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorRequest) do
 
     [
       @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-      def(default(:stream_id)) do
+      def(default(:table_name)) do
         {:ok, ""}
       end,
-      def(default(:shard_id)) do
-        {:ok, ""}
+      def(default(:consumed)) do
+        {:ok, nil}
       end,
-      def(default(:timestamp)) do
-        {:ok, 0}
-      end,
-      def(default(:token)) do
-        {:ok, ""}
+      def(default(:reserved_throughput)) do
+        {:ok, nil}
       end,
       def(default(_)) do
         {:error, :no_such_field}

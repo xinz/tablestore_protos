@@ -1,60 +1,60 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStoreSearch.GroupByType) do
+defmodule(ExAliyunOts.TableStore.TableStatus) do
   @moduledoc false
   (
     defstruct([])
 
     (
-      @spec default() :: :GROUP_BY_FIELD
+      @spec default() :: :ACTIVE
       def(default()) do
-        :GROUP_BY_FIELD
+        :ACTIVE
       end
     )
 
     @spec encode(atom()) :: integer() | atom()
     [
       (
-        def(encode(:GROUP_BY_FIELD)) do
+        def(encode(:ACTIVE)) do
           1
         end
 
-        def(encode("GROUP_BY_FIELD")) do
+        def(encode("ACTIVE")) do
           1
         end
       ),
       (
-        def(encode(:GROUP_BY_RANGE)) do
+        def(encode(:INACTIVE)) do
           2
         end
 
-        def(encode("GROUP_BY_RANGE")) do
+        def(encode("INACTIVE")) do
           2
         end
       ),
       (
-        def(encode(:GROUP_BY_FILTER)) do
+        def(encode(:LOADING)) do
           3
         end
 
-        def(encode("GROUP_BY_FILTER")) do
+        def(encode("LOADING")) do
           3
         end
       ),
       (
-        def(encode(:GROUP_BY_GEO_DISTANCE)) do
+        def(encode(:UNLOADING)) do
           4
         end
 
-        def(encode("GROUP_BY_GEO_DISTANCE")) do
+        def(encode("UNLOADING")) do
           4
         end
       ),
       (
-        def(encode(:GROUP_BY_HISTOGRAM)) do
+        def(encode(:UPDATING)) do
           5
         end
 
-        def(encode("GROUP_BY_HISTOGRAM")) do
+        def(encode("UPDATING")) do
           5
         end
       )
@@ -67,19 +67,19 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByType) do
     @spec decode(integer()) :: atom() | integer()
     [
       def(decode(1)) do
-        :GROUP_BY_FIELD
+        :ACTIVE
       end,
       def(decode(2)) do
-        :GROUP_BY_RANGE
+        :INACTIVE
       end,
       def(decode(3)) do
-        :GROUP_BY_FILTER
+        :LOADING
       end,
       def(decode(4)) do
-        :GROUP_BY_GEO_DISTANCE
+        :UNLOADING
       end,
       def(decode(5)) do
-        :GROUP_BY_HISTOGRAM
+        :UPDATING
       end
     ]
 
@@ -89,31 +89,25 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByType) do
 
     @spec constants() :: [{integer(), atom()}]
     def(constants()) do
-      [
-        {1, :GROUP_BY_FIELD},
-        {2, :GROUP_BY_RANGE},
-        {3, :GROUP_BY_FILTER},
-        {4, :GROUP_BY_GEO_DISTANCE},
-        {5, :GROUP_BY_HISTOGRAM}
-      ]
+      [{1, :ACTIVE}, {2, :INACTIVE}, {3, :LOADING}, {4, :UNLOADING}, {5, :UPDATING}]
     end
 
     @spec has_constant?(any()) :: boolean()
     (
       [
-        def(has_constant?(:GROUP_BY_FIELD)) do
+        def(has_constant?(:ACTIVE)) do
           true
         end,
-        def(has_constant?(:GROUP_BY_RANGE)) do
+        def(has_constant?(:INACTIVE)) do
           true
         end,
-        def(has_constant?(:GROUP_BY_FILTER)) do
+        def(has_constant?(:LOADING)) do
           true
         end,
-        def(has_constant?(:GROUP_BY_GEO_DISTANCE)) do
+        def(has_constant?(:UNLOADING)) do
           true
         end,
-        def(has_constant?(:GROUP_BY_HISTOGRAM)) do
+        def(has_constant?(:UPDATING)) do
           true
         end
       ]
