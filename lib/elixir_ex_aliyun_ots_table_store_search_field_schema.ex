@@ -12,7 +12,9 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
       store: nil,
       field_schemas: [],
       is_array: nil,
-      analyzer_parameter: nil
+      analyzer_parameter: nil,
+      is_virtual_field: nil,
+      source_field_names: []
     )
 
     (
@@ -40,6 +42,8 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
           |> encode_field_schemas(msg)
           |> encode_is_array(msg)
           |> encode_analyzer_parameter(msg)
+          |> encode_is_virtual_field(msg)
+          |> encode_source_field_names(msg)
         end
       )
 
@@ -220,6 +224,45 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
                 __STACKTRACE__
               )
           end
+        end,
+        defp(encode_is_virtual_field(acc, msg)) do
+          try do
+            case(msg.is_virtual_field) do
+              nil ->
+                acc
+
+              _ ->
+                [acc, "X", Protox.Encode.encode_bool(msg.is_virtual_field)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:is_virtual_field, "invalid field value"),
+                __STACKTRACE__
+              )
+          end
+        end,
+        defp(encode_source_field_names(acc, msg)) do
+          try do
+            case(msg.source_field_names) do
+              [] ->
+                acc
+
+              values ->
+                [
+                  acc,
+                  Enum.reduce(values, [], fn value, acc ->
+                    [acc, "b", Protox.Encode.encode_string(value)]
+                  end)
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:source_field_names, "invalid field value"),
+                __STACKTRACE__
+              )
+          end
         end
       ]
 
@@ -311,6 +354,15 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
                 {[analyzer_parameter: delimited], rest}
 
+              {11, _, bytes} ->
+                {value, rest} = Protox.Decode.parse_bool(bytes)
+                {[is_virtual_field: value], rest}
+
+              {12, _, bytes} ->
+                {len, bytes} = Protox.Varint.decode(bytes)
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+                {[source_field_names: msg.source_field_names ++ [delimited]], rest}
+
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
                 {[], rest}
@@ -379,7 +431,9 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
         7 => {:store, {:scalar, false}, :bool},
         8 => {:field_schemas, :unpacked, {:message, ExAliyunOts.TableStoreSearch.FieldSchema}},
         9 => {:is_array, {:scalar, false}, :bool},
-        10 => {:analyzer_parameter, {:scalar, ""}, :bytes}
+        10 => {:analyzer_parameter, {:scalar, ""}, :bytes},
+        11 => {:is_virtual_field, {:scalar, false}, :bool},
+        12 => {:source_field_names, :unpacked, :string}
       }
     end
 
@@ -397,7 +451,9 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
         index: {5, {:scalar, false}, :bool},
         index_options: {3, {:scalar, :DOCS}, {:enum, ExAliyunOts.TableStoreSearch.IndexOptions}},
         is_array: {9, {:scalar, false}, :bool},
+        is_virtual_field: {11, {:scalar, false}, :bool},
         sort_and_agg: {6, {:scalar, false}, :bool},
+        source_field_names: {12, :unpacked, :string},
         store: {7, {:scalar, false}, :bool}
       }
     end
@@ -494,6 +550,24 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
           name: :analyzer_parameter,
           tag: 10,
           type: :bytes
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "isVirtualField",
+          kind: {:scalar, false},
+          label: :optional,
+          name: :is_virtual_field,
+          tag: 11,
+          type: :bool
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "sourceFieldNames",
+          kind: :unpacked,
+          label: :repeated,
+          name: :source_field_names,
+          tag: 12,
+          type: :string
         }
       ]
     end
@@ -867,6 +941,86 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
            }}
         end
       ),
+      (
+        def(field_def(:is_virtual_field)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "isVirtualField",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :is_virtual_field,
+             tag: 11,
+             type: :bool
+           }}
+        end
+
+        def(field_def("isVirtualField")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "isVirtualField",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :is_virtual_field,
+             tag: 11,
+             type: :bool
+           }}
+        end
+
+        def(field_def("is_virtual_field")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "isVirtualField",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :is_virtual_field,
+             tag: 11,
+             type: :bool
+           }}
+        end
+      ),
+      (
+        def(field_def(:source_field_names)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "sourceFieldNames",
+             kind: :unpacked,
+             label: :repeated,
+             name: :source_field_names,
+             tag: 12,
+             type: :string
+           }}
+        end
+
+        def(field_def("sourceFieldNames")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "sourceFieldNames",
+             kind: :unpacked,
+             label: :repeated,
+             name: :source_field_names,
+             tag: 12,
+             type: :string
+           }}
+        end
+
+        def(field_def("source_field_names")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "sourceFieldNames",
+             kind: :unpacked,
+             label: :repeated,
+             name: :source_field_names,
+             tag: 12,
+             type: :string
+           }}
+        end
+      ),
       def(field_def(_)) do
         {:error, :no_such_field}
       end
@@ -914,6 +1068,12 @@ defmodule(ExAliyunOts.TableStoreSearch.FieldSchema) do
       end,
       def(default(:analyzer_parameter)) do
         {:ok, ""}
+      end,
+      def(default(:is_virtual_field)) do
+        {:ok, false}
+      end,
+      def(default(:source_field_names)) do
+        {:error, :no_default_value}
       end,
       def(default(_)) do
         {:error, :no_such_field}

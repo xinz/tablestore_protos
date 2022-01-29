@@ -66,6 +66,24 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationType) do
         def(encode("AGG_COUNT")) do
           5
         end
+      ),
+      (
+        def(encode(:AGG_TOP_ROWS)) do
+          7
+        end
+
+        def(encode("AGG_TOP_ROWS")) do
+          7
+        end
+      ),
+      (
+        def(encode(:AGG_PERCENTILES)) do
+          8
+        end
+
+        def(encode("AGG_PERCENTILES")) do
+          8
+        end
       )
     ]
 
@@ -92,6 +110,12 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationType) do
       end,
       def(decode(6)) do
         :AGG_DISTINCT_COUNT
+      end,
+      def(decode(7)) do
+        :AGG_TOP_ROWS
+      end,
+      def(decode(8)) do
+        :AGG_PERCENTILES
       end
     ]
 
@@ -107,7 +131,9 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationType) do
         {2, :AGG_MAX},
         {3, :AGG_MIN},
         {4, :AGG_SUM},
-        {5, :AGG_COUNT}
+        {5, :AGG_COUNT},
+        {7, :AGG_TOP_ROWS},
+        {8, :AGG_PERCENTILES}
       ]
     end
 
@@ -130,6 +156,12 @@ defmodule(ExAliyunOts.TableStoreSearch.AggregationType) do
           true
         end,
         def(has_constant?(:AGG_COUNT)) do
+          true
+        end,
+        def(has_constant?(:AGG_TOP_ROWS)) do
+          true
+        end,
+        def(has_constant?(:AGG_PERCENTILES)) do
           true
         end
       ]

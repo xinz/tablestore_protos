@@ -1,8 +1,8 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.TableMeta) do
+defmodule(ExAliyunOts.TableStore.AddDefinedColumnRequest) do
   @moduledoc false
   (
-    defstruct(table_name: nil, primary_key: [], defined_column: [], index_meta: [])
+    defstruct(table_name: nil, columns: [])
 
     (
       (
@@ -18,11 +18,7 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
 
         @spec encode!(struct) :: iodata | no_return
         def(encode!(msg)) do
-          []
-          |> encode_table_name(msg)
-          |> encode_primary_key(msg)
-          |> encode_defined_column(msg)
-          |> encode_index_meta(msg)
+          [] |> encode_table_name(msg) |> encode_columns(msg)
         end
       )
 
@@ -46,9 +42,9 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
               )
           end
         end,
-        defp(encode_primary_key(acc, msg)) do
+        defp(encode_columns(acc, msg)) do
           try do
-            case(msg.primary_key) do
+            case(msg.columns) do
               [] ->
                 acc
 
@@ -62,54 +58,7 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
             end
           rescue
             ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:primary_key, "invalid field value"),
-                __STACKTRACE__
-              )
-          end
-        end,
-        defp(encode_defined_column(acc, msg)) do
-          try do
-            case(msg.defined_column) do
-              [] ->
-                acc
-
-              values ->
-                [
-                  acc,
-                  Enum.reduce(values, [], fn value, acc ->
-                    [acc, <<26>>, Protox.Encode.encode_message(value)]
-                  end)
-                ]
-            end
-          rescue
-            ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:defined_column, "invalid field value"),
-                __STACKTRACE__
-              )
-          end
-        end,
-        defp(encode_index_meta(acc, msg)) do
-          try do
-            case(msg.index_meta) do
-              [] ->
-                acc
-
-              values ->
-                [
-                  acc,
-                  Enum.reduce(values, [], fn value, acc ->
-                    [acc, "\"", Protox.Encode.encode_message(value)]
-                  end)
-                ]
-            end
-          rescue
-            ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:index_meta, "invalid field value"),
-                __STACKTRACE__
-              )
+              reraise(Protox.EncodingError.new(:columns, "invalid field value"), __STACKTRACE__)
           end
         end
       ]
@@ -133,7 +82,7 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
           @spec decode!(binary) :: struct | no_return
           def(decode!(bytes)) do
             {msg, set_fields} =
-              parse_key_value([], bytes, struct(ExAliyunOts.TableStore.TableMeta))
+              parse_key_value([], bytes, struct(ExAliyunOts.TableStore.AddDefinedColumnRequest))
 
             case([:table_name] -- set_fields) do
               [] ->
@@ -167,32 +116,11 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
 
-                {[:primary_key | set_fields],
+                {[:columns | set_fields],
                  [
-                   primary_key:
-                     msg.primary_key ++
-                       [ExAliyunOts.TableStore.PrimaryKeySchema.decode!(delimited)]
-                 ], rest}
-
-              {3, _, bytes} ->
-                {len, bytes} = Protox.Varint.decode(bytes)
-                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-
-                {[:defined_column | set_fields],
-                 [
-                   defined_column:
-                     msg.defined_column ++
+                   columns:
+                     msg.columns ++
                        [ExAliyunOts.TableStore.DefinedColumnSchema.decode!(delimited)]
-                 ], rest}
-
-              {4, _, bytes} ->
-                {len, bytes} = Protox.Varint.decode(bytes)
-                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-
-                {[:index_meta | set_fields],
-                 [
-                   index_meta:
-                     msg.index_meta ++ [ExAliyunOts.TableStore.IndexMeta.decode!(delimited)]
                  ], rest}
 
               {tag, wire_type, rest} ->
@@ -225,7 +153,7 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
 
         Protox.JsonDecode.decode!(
           input,
-          ExAliyunOts.TableStore.TableMeta,
+          ExAliyunOts.TableStore.AddDefinedColumnRequest,
           &json_library_wrapper.decode!(json_library, &1)
         )
       end
@@ -254,9 +182,7 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
     def(defs()) do
       %{
         1 => {:table_name, {:scalar, ""}, :string},
-        2 => {:primary_key, :unpacked, {:message, ExAliyunOts.TableStore.PrimaryKeySchema}},
-        3 => {:defined_column, :unpacked, {:message, ExAliyunOts.TableStore.DefinedColumnSchema}},
-        4 => {:index_meta, :unpacked, {:message, ExAliyunOts.TableStore.IndexMeta}}
+        2 => {:columns, :unpacked, {:message, ExAliyunOts.TableStore.DefinedColumnSchema}}
       }
     end
 
@@ -266,9 +192,7 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
           }
     def(defs_by_name()) do
       %{
-        defined_column: {3, :unpacked, {:message, ExAliyunOts.TableStore.DefinedColumnSchema}},
-        index_meta: {4, :unpacked, {:message, ExAliyunOts.TableStore.IndexMeta}},
-        primary_key: {2, :unpacked, {:message, ExAliyunOts.TableStore.PrimaryKeySchema}},
+        columns: {2, :unpacked, {:message, ExAliyunOts.TableStore.DefinedColumnSchema}},
         table_name: {1, {:scalar, ""}, :string}
       }
     end
@@ -287,30 +211,12 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
         },
         %{
           __struct__: Protox.Field,
-          json_name: "primaryKey",
+          json_name: "columns",
           kind: :unpacked,
           label: :repeated,
-          name: :primary_key,
+          name: :columns,
           tag: 2,
-          type: {:message, ExAliyunOts.TableStore.PrimaryKeySchema}
-        },
-        %{
-          __struct__: Protox.Field,
-          json_name: "definedColumn",
-          kind: :unpacked,
-          label: :repeated,
-          name: :defined_column,
-          tag: 3,
           type: {:message, ExAliyunOts.TableStore.DefinedColumnSchema}
-        },
-        %{
-          __struct__: Protox.Field,
-          json_name: "indexMeta",
-          kind: :unpacked,
-          label: :repeated,
-          name: :index_meta,
-          tag: 4,
-          type: {:message, ExAliyunOts.TableStore.IndexMeta}
         }
       ]
     end
@@ -358,124 +264,33 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
         end
       ),
       (
-        def(field_def(:primary_key)) do
+        def(field_def(:columns)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "primaryKey",
+             json_name: "columns",
              kind: :unpacked,
              label: :repeated,
-             name: :primary_key,
+             name: :columns,
              tag: 2,
-             type: {:message, ExAliyunOts.TableStore.PrimaryKeySchema}
-           }}
-        end
-
-        def(field_def("primaryKey")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "primaryKey",
-             kind: :unpacked,
-             label: :repeated,
-             name: :primary_key,
-             tag: 2,
-             type: {:message, ExAliyunOts.TableStore.PrimaryKeySchema}
-           }}
-        end
-
-        def(field_def("primary_key")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "primaryKey",
-             kind: :unpacked,
-             label: :repeated,
-             name: :primary_key,
-             tag: 2,
-             type: {:message, ExAliyunOts.TableStore.PrimaryKeySchema}
-           }}
-        end
-      ),
-      (
-        def(field_def(:defined_column)) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "definedColumn",
-             kind: :unpacked,
-             label: :repeated,
-             name: :defined_column,
-             tag: 3,
              type: {:message, ExAliyunOts.TableStore.DefinedColumnSchema}
            }}
         end
 
-        def(field_def("definedColumn")) do
+        def(field_def("columns")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "definedColumn",
+             json_name: "columns",
              kind: :unpacked,
              label: :repeated,
-             name: :defined_column,
-             tag: 3,
+             name: :columns,
+             tag: 2,
              type: {:message, ExAliyunOts.TableStore.DefinedColumnSchema}
            }}
         end
 
-        def(field_def("defined_column")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "definedColumn",
-             kind: :unpacked,
-             label: :repeated,
-             name: :defined_column,
-             tag: 3,
-             type: {:message, ExAliyunOts.TableStore.DefinedColumnSchema}
-           }}
-        end
-      ),
-      (
-        def(field_def(:index_meta)) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "indexMeta",
-             kind: :unpacked,
-             label: :repeated,
-             name: :index_meta,
-             tag: 4,
-             type: {:message, ExAliyunOts.TableStore.IndexMeta}
-           }}
-        end
-
-        def(field_def("indexMeta")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "indexMeta",
-             kind: :unpacked,
-             label: :repeated,
-             name: :index_meta,
-             tag: 4,
-             type: {:message, ExAliyunOts.TableStore.IndexMeta}
-           }}
-        end
-
-        def(field_def("index_meta")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "indexMeta",
-             kind: :unpacked,
-             label: :repeated,
-             name: :index_meta,
-             tag: 4,
-             type: {:message, ExAliyunOts.TableStore.IndexMeta}
-           }}
-        end
+        []
       ),
       def(field_def(_)) do
         {:error, :no_such_field}
@@ -498,13 +313,7 @@ defmodule(ExAliyunOts.TableStore.TableMeta) do
       def(default(:table_name)) do
         {:ok, ""}
       end,
-      def(default(:primary_key)) do
-        {:error, :no_default_value}
-      end,
-      def(default(:defined_column)) do
-        {:error, :no_default_value}
-      end,
-      def(default(:index_meta)) do
+      def(default(:columns)) do
         {:error, :no_default_value}
       end,
       def(default(_)) do

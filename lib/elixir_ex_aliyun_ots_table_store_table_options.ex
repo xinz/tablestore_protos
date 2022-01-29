@@ -2,7 +2,13 @@
 defmodule(ExAliyunOts.TableStore.TableOptions) do
   @moduledoc false
   (
-    defstruct(time_to_live: nil, max_versions: nil, deviation_cell_version_in_sec: nil)
+    defstruct(
+      time_to_live: nil,
+      max_versions: nil,
+      bloom_filter_type: nil,
+      block_size: nil,
+      deviation_cell_version_in_sec: nil
+    )
 
     (
       (
@@ -21,6 +27,8 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
           []
           |> encode_time_to_live(msg)
           |> encode_max_versions(msg)
+          |> encode_bloom_filter_type(msg)
+          |> encode_block_size(msg)
           |> encode_deviation_cell_version_in_sec(msg)
         end
       )
@@ -58,6 +66,46 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
             ArgumentError ->
               reraise(
                 Protox.EncodingError.new(:max_versions, "invalid field value"),
+                __STACKTRACE__
+              )
+          end
+        end,
+        defp(encode_bloom_filter_type(acc, msg)) do
+          try do
+            case(msg.bloom_filter_type) do
+              nil ->
+                acc
+
+              _ ->
+                [
+                  acc,
+                  <<24>>,
+                  msg.bloom_filter_type
+                  |> ExAliyunOts.TableStore.BloomFilterType.encode()
+                  |> Protox.Encode.encode_enum()
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:bloom_filter_type, "invalid field value"),
+                __STACKTRACE__
+              )
+          end
+        end,
+        defp(encode_block_size(acc, msg)) do
+          try do
+            case(msg.block_size) do
+              nil ->
+                acc
+
+              _ ->
+                [acc, " ", Protox.Encode.encode_int32(msg.block_size)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:block_size, "invalid field value"),
                 __STACKTRACE__
               )
           end
@@ -124,6 +172,16 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
                 {value, rest} = Protox.Decode.parse_int32(bytes)
                 {[max_versions: value], rest}
 
+              {3, _, bytes} ->
+                {value, rest} =
+                  Protox.Decode.parse_enum(bytes, ExAliyunOts.TableStore.BloomFilterType)
+
+                {[bloom_filter_type: value], rest}
+
+              {4, _, bytes} ->
+                {value, rest} = Protox.Decode.parse_int32(bytes)
+                {[block_size: value], rest}
+
               {5, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_int64(bytes)
                 {[deviation_cell_version_in_sec: value], rest}
@@ -188,6 +246,9 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
       %{
         1 => {:time_to_live, {:scalar, 0}, :int32},
         2 => {:max_versions, {:scalar, 0}, :int32},
+        3 =>
+          {:bloom_filter_type, {:scalar, :NONE}, {:enum, ExAliyunOts.TableStore.BloomFilterType}},
+        4 => {:block_size, {:scalar, 0}, :int32},
         5 => {:deviation_cell_version_in_sec, {:scalar, 0}, :int64}
       }
     end
@@ -198,6 +259,8 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
           }
     def(defs_by_name()) do
       %{
+        block_size: {4, {:scalar, 0}, :int32},
+        bloom_filter_type: {3, {:scalar, :NONE}, {:enum, ExAliyunOts.TableStore.BloomFilterType}},
         deviation_cell_version_in_sec: {5, {:scalar, 0}, :int64},
         max_versions: {2, {:scalar, 0}, :int32},
         time_to_live: {1, {:scalar, 0}, :int32}
@@ -223,6 +286,24 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
           label: :optional,
           name: :max_versions,
           tag: 2,
+          type: :int32
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "bloomFilterType",
+          kind: {:scalar, :NONE},
+          label: :optional,
+          name: :bloom_filter_type,
+          tag: 3,
+          type: {:enum, ExAliyunOts.TableStore.BloomFilterType}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "blockSize",
+          kind: {:scalar, 0},
+          label: :optional,
+          name: :block_size,
+          tag: 4,
           type: :int32
         },
         %{
@@ -320,6 +401,86 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
         end
       ),
       (
+        def(field_def(:bloom_filter_type)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "bloomFilterType",
+             kind: {:scalar, :NONE},
+             label: :optional,
+             name: :bloom_filter_type,
+             tag: 3,
+             type: {:enum, ExAliyunOts.TableStore.BloomFilterType}
+           }}
+        end
+
+        def(field_def("bloomFilterType")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "bloomFilterType",
+             kind: {:scalar, :NONE},
+             label: :optional,
+             name: :bloom_filter_type,
+             tag: 3,
+             type: {:enum, ExAliyunOts.TableStore.BloomFilterType}
+           }}
+        end
+
+        def(field_def("bloom_filter_type")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "bloomFilterType",
+             kind: {:scalar, :NONE},
+             label: :optional,
+             name: :bloom_filter_type,
+             tag: 3,
+             type: {:enum, ExAliyunOts.TableStore.BloomFilterType}
+           }}
+        end
+      ),
+      (
+        def(field_def(:block_size)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "blockSize",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :block_size,
+             tag: 4,
+             type: :int32
+           }}
+        end
+
+        def(field_def("blockSize")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "blockSize",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :block_size,
+             tag: 4,
+             type: :int32
+           }}
+        end
+
+        def(field_def("block_size")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "blockSize",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :block_size,
+             tag: 4,
+             type: :int32
+           }}
+        end
+      ),
+      (
         def(field_def(:deviation_cell_version_in_sec)) do
           {:ok,
            %{
@@ -381,6 +542,12 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
         {:ok, 0}
       end,
       def(default(:max_versions)) do
+        {:ok, 0}
+      end,
+      def(default(:bloom_filter_type)) do
+        {:ok, :NONE}
+      end,
+      def(default(:block_size)) do
         {:ok, 0}
       end,
       def(default(:deviation_cell_version_in_sec)) do

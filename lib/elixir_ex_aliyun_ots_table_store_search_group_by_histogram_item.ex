@@ -1,13 +1,8 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
+defmodule(ExAliyunOts.TableStoreSearch.GroupByHistogramItem) do
   @moduledoc false
   (
-    defstruct(
-      table_name: nil,
-      split_size: nil,
-      split_size_unit_in_byte: nil,
-      split_point_limit: nil
-    )
+    defstruct(key: nil, value: nil, sub_aggs_result: nil, sub_group_bys_result: nil)
 
     (
       (
@@ -24,80 +19,74 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
         @spec encode!(struct) :: iodata | no_return
         def(encode!(msg)) do
           []
-          |> encode_table_name(msg)
-          |> encode_split_size(msg)
-          |> encode_split_size_unit_in_byte(msg)
-          |> encode_split_point_limit(msg)
+          |> encode_key(msg)
+          |> encode_value(msg)
+          |> encode_sub_aggs_result(msg)
+          |> encode_sub_group_bys_result(msg)
         end
       )
 
       []
 
       [
-        defp(encode_table_name(acc, msg)) do
+        defp(encode_key(acc, msg)) do
           try do
-            case(msg.table_name) do
-              nil ->
-                raise(Protox.RequiredFieldsError.new([:table_name]))
-
-              _ ->
-                [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
-            end
-          rescue
-            ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:table_name, "invalid field value"),
-                __STACKTRACE__
-              )
-          end
-        end,
-        defp(encode_split_size(acc, msg)) do
-          try do
-            case(msg.split_size) do
-              nil ->
-                raise(Protox.RequiredFieldsError.new([:split_size]))
-
-              _ ->
-                [acc, <<16>>, Protox.Encode.encode_int64(msg.split_size)]
-            end
-          rescue
-            ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:split_size, "invalid field value"),
-                __STACKTRACE__
-              )
-          end
-        end,
-        defp(encode_split_size_unit_in_byte(acc, msg)) do
-          try do
-            case(msg.split_size_unit_in_byte) do
+            case(msg.key) do
               nil ->
                 acc
 
               _ ->
-                [acc, <<24>>, Protox.Encode.encode_int64(msg.split_size_unit_in_byte)]
+                [acc, "\n", Protox.Encode.encode_bytes(msg.key)]
             end
           rescue
             ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:split_size_unit_in_byte, "invalid field value"),
-                __STACKTRACE__
-              )
+              reraise(Protox.EncodingError.new(:key, "invalid field value"), __STACKTRACE__)
           end
         end,
-        defp(encode_split_point_limit(acc, msg)) do
+        defp(encode_value(acc, msg)) do
           try do
-            case(msg.split_point_limit) do
+            case(msg.value) do
               nil ->
                 acc
 
               _ ->
-                [acc, " ", Protox.Encode.encode_int32(msg.split_point_limit)]
+                [acc, <<16>>, Protox.Encode.encode_int64(msg.value)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:value, "invalid field value"), __STACKTRACE__)
+          end
+        end,
+        defp(encode_sub_aggs_result(acc, msg)) do
+          try do
+            case(msg.sub_aggs_result) do
+              nil ->
+                acc
+
+              _ ->
+                [acc, <<26>>, Protox.Encode.encode_message(msg.sub_aggs_result)]
             end
           rescue
             ArgumentError ->
               reraise(
-                Protox.EncodingError.new(:split_point_limit, "invalid field value"),
+                Protox.EncodingError.new(:sub_aggs_result, "invalid field value"),
+                __STACKTRACE__
+              )
+          end
+        end,
+        defp(encode_sub_group_bys_result(acc, msg)) do
+          try do
+            case(msg.sub_group_bys_result) do
+              nil ->
+                acc
+
+              _ ->
+                [acc, "\"", Protox.Encode.encode_message(msg.sub_group_bys_result)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:sub_group_bys_result, "invalid field value"),
                 __STACKTRACE__
               )
           end
@@ -122,32 +111,19 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
         (
           @spec decode!(binary) :: struct | no_return
           def(decode!(bytes)) do
-            {msg, set_fields} =
-              parse_key_value(
-                [],
-                bytes,
-                struct(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest)
-              )
-
-            case([:table_name, :split_size] -- set_fields) do
-              [] ->
-                msg
-
-              missing_fields ->
-                raise(Protox.RequiredFieldsError.new(missing_fields))
-            end
+            parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.GroupByHistogramItem))
           end
         )
       )
 
       (
-        @spec parse_key_value([atom], binary, struct) :: {struct, [atom]}
-        defp(parse_key_value(set_fields, <<>>, msg)) do
-          {msg, set_fields}
+        @spec parse_key_value(binary, struct) :: struct
+        defp(parse_key_value(<<>>, msg)) do
+          msg
         end
 
-        defp(parse_key_value(set_fields, bytes, msg)) do
-          {new_set_fields, field, rest} =
+        defp(parse_key_value(bytes, msg)) do
+          {field, rest} =
             case(Protox.Decode.parse_key(bytes)) do
               {0, _, _} ->
                 raise(%Protox.IllegalTagError{})
@@ -155,27 +131,43 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[:table_name | set_fields], [table_name: delimited], rest}
+                {[key: delimited], rest}
 
               {2, _, bytes} ->
                 {value, rest} = Protox.Decode.parse_int64(bytes)
-                {[:split_size | set_fields], [split_size: value], rest}
+                {[value: value], rest}
 
               {3, _, bytes} ->
-                {value, rest} = Protox.Decode.parse_int64(bytes)
-                {[:split_size_unit_in_byte | set_fields], [split_size_unit_in_byte: value], rest}
+                {len, bytes} = Protox.Varint.decode(bytes)
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[
+                   sub_aggs_result:
+                     Protox.MergeMessage.merge(
+                       msg.sub_aggs_result,
+                       ExAliyunOts.TableStoreSearch.AggregationsResult.decode!(delimited)
+                     )
+                 ], rest}
 
               {4, _, bytes} ->
-                {value, rest} = Protox.Decode.parse_int32(bytes)
-                {[:split_point_limit | set_fields], [split_point_limit: value], rest}
+                {len, bytes} = Protox.Varint.decode(bytes)
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[
+                   sub_group_bys_result:
+                     Protox.MergeMessage.merge(
+                       msg.sub_group_bys_result,
+                       ExAliyunOts.TableStoreSearch.GroupBysResult.decode!(delimited)
+                     )
+                 ], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
-                {set_fields, [], rest}
+                {[], rest}
             end
 
           msg_updated = struct(msg, field)
-          parse_key_value(new_set_fields, rest, msg_updated)
+          parse_key_value(rest, msg_updated)
         end
       )
 
@@ -199,7 +191,7 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
 
         Protox.JsonDecode.decode!(
           input,
-          ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest,
+          ExAliyunOts.TableStoreSearch.GroupByHistogramItem,
           &json_library_wrapper.decode!(json_library, &1)
         )
       end
@@ -227,10 +219,14 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
           }
     def(defs()) do
       %{
-        1 => {:table_name, {:scalar, ""}, :string},
-        2 => {:split_size, {:scalar, 0}, :int64},
-        3 => {:split_size_unit_in_byte, {:scalar, 0}, :int64},
-        4 => {:split_point_limit, {:scalar, 0}, :int32}
+        1 => {:key, {:scalar, ""}, :bytes},
+        2 => {:value, {:scalar, 0}, :int64},
+        3 =>
+          {:sub_aggs_result, {:scalar, nil},
+           {:message, ExAliyunOts.TableStoreSearch.AggregationsResult}},
+        4 =>
+          {:sub_group_bys_result, {:scalar, nil},
+           {:message, ExAliyunOts.TableStoreSearch.GroupBysResult}}
       }
     end
 
@@ -240,10 +236,12 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
           }
     def(defs_by_name()) do
       %{
-        split_point_limit: {4, {:scalar, 0}, :int32},
-        split_size: {2, {:scalar, 0}, :int64},
-        split_size_unit_in_byte: {3, {:scalar, 0}, :int64},
-        table_name: {1, {:scalar, ""}, :string}
+        key: {1, {:scalar, ""}, :bytes},
+        sub_aggs_result:
+          {3, {:scalar, nil}, {:message, ExAliyunOts.TableStoreSearch.AggregationsResult}},
+        sub_group_bys_result:
+          {4, {:scalar, nil}, {:message, ExAliyunOts.TableStoreSearch.GroupBysResult}},
+        value: {2, {:scalar, 0}, :int64}
       }
     end
 
@@ -252,39 +250,39 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
       [
         %{
           __struct__: Protox.Field,
-          json_name: "tableName",
+          json_name: "key",
           kind: {:scalar, ""},
-          label: :required,
-          name: :table_name,
+          label: :optional,
+          name: :key,
           tag: 1,
-          type: :string
+          type: :bytes
         },
         %{
           __struct__: Protox.Field,
-          json_name: "splitSize",
+          json_name: "value",
           kind: {:scalar, 0},
-          label: :required,
-          name: :split_size,
+          label: :optional,
+          name: :value,
           tag: 2,
           type: :int64
         },
         %{
           __struct__: Protox.Field,
-          json_name: "splitSizeUnitInByte",
-          kind: {:scalar, 0},
+          json_name: "subAggsResult",
+          kind: {:scalar, nil},
           label: :optional,
-          name: :split_size_unit_in_byte,
+          name: :sub_aggs_result,
           tag: 3,
-          type: :int64
+          type: {:message, ExAliyunOts.TableStoreSearch.AggregationsResult}
         },
         %{
           __struct__: Protox.Field,
-          json_name: "splitPointLimit",
-          kind: {:scalar, 0},
+          json_name: "subGroupBysResult",
+          kind: {:scalar, nil},
           label: :optional,
-          name: :split_point_limit,
+          name: :sub_group_bys_result,
           tag: 4,
-          type: :int32
+          type: {:message, ExAliyunOts.TableStoreSearch.GroupBysResult}
         }
       ]
     end
@@ -292,162 +290,140 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:table_name)) do
+        def(field_def(:key)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "tableName",
+             json_name: "key",
              kind: {:scalar, ""},
-             label: :required,
-             name: :table_name,
+             label: :optional,
+             name: :key,
              tag: 1,
-             type: :string
+             type: :bytes
            }}
         end
 
-        def(field_def("tableName")) do
+        def(field_def("key")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "tableName",
+             json_name: "key",
              kind: {:scalar, ""},
-             label: :required,
-             name: :table_name,
+             label: :optional,
+             name: :key,
              tag: 1,
-             type: :string
+             type: :bytes
            }}
         end
 
-        def(field_def("table_name")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "tableName",
-             kind: {:scalar, ""},
-             label: :required,
-             name: :table_name,
-             tag: 1,
-             type: :string
-           }}
-        end
+        []
       ),
       (
-        def(field_def(:split_size)) do
+        def(field_def(:value)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "splitSize",
+             json_name: "value",
              kind: {:scalar, 0},
-             label: :required,
-             name: :split_size,
+             label: :optional,
+             name: :value,
              tag: 2,
              type: :int64
            }}
         end
 
-        def(field_def("splitSize")) do
+        def(field_def("value")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "splitSize",
+             json_name: "value",
              kind: {:scalar, 0},
-             label: :required,
-             name: :split_size,
+             label: :optional,
+             name: :value,
              tag: 2,
              type: :int64
            }}
         end
 
-        def(field_def("split_size")) do
+        []
+      ),
+      (
+        def(field_def(:sub_aggs_result)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "splitSize",
-             kind: {:scalar, 0},
-             label: :required,
-             name: :split_size,
-             tag: 2,
-             type: :int64
+             json_name: "subAggsResult",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :sub_aggs_result,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStoreSearch.AggregationsResult}
+           }}
+        end
+
+        def(field_def("subAggsResult")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "subAggsResult",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :sub_aggs_result,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStoreSearch.AggregationsResult}
+           }}
+        end
+
+        def(field_def("sub_aggs_result")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "subAggsResult",
+             kind: {:scalar, nil},
+             label: :optional,
+             name: :sub_aggs_result,
+             tag: 3,
+             type: {:message, ExAliyunOts.TableStoreSearch.AggregationsResult}
            }}
         end
       ),
       (
-        def(field_def(:split_size_unit_in_byte)) do
+        def(field_def(:sub_group_bys_result)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "splitSizeUnitInByte",
-             kind: {:scalar, 0},
+             json_name: "subGroupBysResult",
+             kind: {:scalar, nil},
              label: :optional,
-             name: :split_size_unit_in_byte,
-             tag: 3,
-             type: :int64
-           }}
-        end
-
-        def(field_def("splitSizeUnitInByte")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "splitSizeUnitInByte",
-             kind: {:scalar, 0},
-             label: :optional,
-             name: :split_size_unit_in_byte,
-             tag: 3,
-             type: :int64
-           }}
-        end
-
-        def(field_def("split_size_unit_in_byte")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "splitSizeUnitInByte",
-             kind: {:scalar, 0},
-             label: :optional,
-             name: :split_size_unit_in_byte,
-             tag: 3,
-             type: :int64
-           }}
-        end
-      ),
-      (
-        def(field_def(:split_point_limit)) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "splitPointLimit",
-             kind: {:scalar, 0},
-             label: :optional,
-             name: :split_point_limit,
+             name: :sub_group_bys_result,
              tag: 4,
-             type: :int32
+             type: {:message, ExAliyunOts.TableStoreSearch.GroupBysResult}
            }}
         end
 
-        def(field_def("splitPointLimit")) do
+        def(field_def("subGroupBysResult")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "splitPointLimit",
-             kind: {:scalar, 0},
+             json_name: "subGroupBysResult",
+             kind: {:scalar, nil},
              label: :optional,
-             name: :split_point_limit,
+             name: :sub_group_bys_result,
              tag: 4,
-             type: :int32
+             type: {:message, ExAliyunOts.TableStoreSearch.GroupBysResult}
            }}
         end
 
-        def(field_def("split_point_limit")) do
+        def(field_def("sub_group_bys_result")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "splitPointLimit",
-             kind: {:scalar, 0},
+             json_name: "subGroupBysResult",
+             kind: {:scalar, nil},
              label: :optional,
-             name: :split_point_limit,
+             name: :sub_group_bys_result,
              tag: 4,
-             type: :int32
+             type: {:message, ExAliyunOts.TableStoreSearch.GroupBysResult}
            }}
         end
       ),
@@ -457,9 +433,9 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
     ]
 
     []
-    @spec required_fields() :: [:table_name | :split_size]
+    @spec required_fields() :: []
     def(required_fields()) do
-      [:table_name, :split_size]
+      []
     end
 
     @spec syntax() :: atom
@@ -469,17 +445,17 @@ defmodule(ExAliyunOts.TableStore.ComputeSplitPointsBySizeRequest) do
 
     [
       @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-      def(default(:table_name)) do
+      def(default(:key)) do
         {:ok, ""}
       end,
-      def(default(:split_size)) do
+      def(default(:value)) do
         {:ok, 0}
       end,
-      def(default(:split_size_unit_in_byte)) do
-        {:ok, 0}
+      def(default(:sub_aggs_result)) do
+        {:ok, nil}
       end,
-      def(default(:split_point_limit)) do
-        {:ok, 0}
+      def(default(:sub_group_bys_result)) do
+        {:ok, nil}
       end,
       def(default(_)) do
         {:error, :no_such_field}

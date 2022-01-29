@@ -6,6 +6,7 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
       table_meta: nil,
       reserved_throughput_details: nil,
       table_options: nil,
+      table_status: nil,
       stream_details: nil,
       shard_splits: [],
       index_metas: []
@@ -29,6 +30,7 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
           |> encode_table_meta(msg)
           |> encode_reserved_throughput_details(msg)
           |> encode_table_options(msg)
+          |> encode_table_status(msg)
           |> encode_stream_details(msg)
           |> encode_shard_splits(msg)
           |> encode_index_metas(msg)
@@ -85,6 +87,29 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
             ArgumentError ->
               reraise(
                 Protox.EncodingError.new(:table_options, "invalid field value"),
+                __STACKTRACE__
+              )
+          end
+        end,
+        defp(encode_table_status(acc, msg)) do
+          try do
+            case(msg.table_status) do
+              nil ->
+                raise(Protox.RequiredFieldsError.new([:table_status]))
+
+              _ ->
+                [
+                  acc,
+                  " ",
+                  msg.table_status
+                  |> ExAliyunOts.TableStore.TableStatus.encode()
+                  |> Protox.Encode.encode_enum()
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:table_status, "invalid field value"),
                 __STACKTRACE__
               )
           end
@@ -173,7 +198,10 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
             {msg, set_fields} =
               parse_key_value([], bytes, struct(ExAliyunOts.TableStore.DescribeTableResponse))
 
-            case([:table_meta, :reserved_throughput_details, :table_options] -- set_fields) do
+            case(
+              [:table_meta, :reserved_throughput_details, :table_options, :table_status] --
+                set_fields
+            ) do
               [] ->
                 msg
 
@@ -234,6 +262,12 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
                        ExAliyunOts.TableStore.TableOptions.decode!(delimited)
                      )
                  ], rest}
+
+              {4, _, bytes} ->
+                {value, rest} =
+                  Protox.Decode.parse_enum(bytes, ExAliyunOts.TableStore.TableStatus)
+
+                {[:table_status | set_fields], [table_status: value], rest}
 
               {5, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
@@ -328,6 +362,7 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
           {:reserved_throughput_details, {:scalar, nil},
            {:message, ExAliyunOts.TableStore.ReservedThroughputDetails}},
         3 => {:table_options, {:scalar, nil}, {:message, ExAliyunOts.TableStore.TableOptions}},
+        4 => {:table_status, {:scalar, :ACTIVE}, {:enum, ExAliyunOts.TableStore.TableStatus}},
         5 => {:stream_details, {:scalar, nil}, {:message, ExAliyunOts.TableStore.StreamDetails}},
         6 => {:shard_splits, :unpacked, :bytes},
         8 => {:index_metas, :unpacked, {:message, ExAliyunOts.TableStore.IndexMeta}}
@@ -346,7 +381,8 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
         shard_splits: {6, :unpacked, :bytes},
         stream_details: {5, {:scalar, nil}, {:message, ExAliyunOts.TableStore.StreamDetails}},
         table_meta: {1, {:scalar, nil}, {:message, ExAliyunOts.TableStore.TableMeta}},
-        table_options: {3, {:scalar, nil}, {:message, ExAliyunOts.TableStore.TableOptions}}
+        table_options: {3, {:scalar, nil}, {:message, ExAliyunOts.TableStore.TableOptions}},
+        table_status: {4, {:scalar, :ACTIVE}, {:enum, ExAliyunOts.TableStore.TableStatus}}
       }
     end
 
@@ -379,6 +415,15 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
           name: :table_options,
           tag: 3,
           type: {:message, ExAliyunOts.TableStore.TableOptions}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "tableStatus",
+          kind: {:scalar, :ACTIVE},
+          label: :required,
+          name: :table_status,
+          tag: 4,
+          type: {:enum, ExAliyunOts.TableStore.TableStatus}
         },
         %{
           __struct__: Protox.Field,
@@ -533,6 +578,46 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
         end
       ),
       (
+        def(field_def(:table_status)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableStatus",
+             kind: {:scalar, :ACTIVE},
+             label: :required,
+             name: :table_status,
+             tag: 4,
+             type: {:enum, ExAliyunOts.TableStore.TableStatus}
+           }}
+        end
+
+        def(field_def("tableStatus")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableStatus",
+             kind: {:scalar, :ACTIVE},
+             label: :required,
+             name: :table_status,
+             tag: 4,
+             type: {:enum, ExAliyunOts.TableStore.TableStatus}
+           }}
+        end
+
+        def(field_def("table_status")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "tableStatus",
+             kind: {:scalar, :ACTIVE},
+             label: :required,
+             name: :table_status,
+             tag: 4,
+             type: {:enum, ExAliyunOts.TableStore.TableStatus}
+           }}
+        end
+      ),
+      (
         def(field_def(:stream_details)) do
           {:ok,
            %{
@@ -658,9 +743,12 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
     ]
 
     []
-    @spec required_fields() :: [(:table_meta | :reserved_throughput_details) | :table_options]
+
+    @spec required_fields() :: [
+            ((:table_meta | :reserved_throughput_details) | :table_options) | :table_status
+          ]
     def(required_fields()) do
-      [:table_meta, :reserved_throughput_details, :table_options]
+      [:table_meta, :reserved_throughput_details, :table_options, :table_status]
     end
 
     @spec syntax() :: atom
@@ -678,6 +766,9 @@ defmodule(ExAliyunOts.TableStore.DescribeTableResponse) do
       end,
       def(default(:table_options)) do
         {:ok, nil}
+      end,
+      def(default(:table_status)) do
+        {:ok, :ACTIVE}
       end,
       def(default(:stream_details)) do
         {:ok, nil}

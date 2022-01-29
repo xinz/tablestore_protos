@@ -1,8 +1,8 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
+defmodule(ExAliyunOts.TableStoreSearch.TopRowsAggregation) do
   @moduledoc false
   (
-    defstruct(shard_iterator: nil, next_token: nil)
+    defstruct(limit: nil, sort: nil)
 
     (
       (
@@ -18,45 +18,39 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
 
         @spec encode!(struct) :: iodata | no_return
         def(encode!(msg)) do
-          [] |> encode_shard_iterator(msg) |> encode_next_token(msg)
+          [] |> encode_limit(msg) |> encode_sort(msg)
         end
       )
 
       []
 
       [
-        defp(encode_shard_iterator(acc, msg)) do
+        defp(encode_limit(acc, msg)) do
           try do
-            case(msg.shard_iterator) do
-              nil ->
-                raise(Protox.RequiredFieldsError.new([:shard_iterator]))
-
-              _ ->
-                [acc, "\n", Protox.Encode.encode_string(msg.shard_iterator)]
-            end
-          rescue
-            ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:shard_iterator, "invalid field value"),
-                __STACKTRACE__
-              )
-          end
-        end,
-        defp(encode_next_token(acc, msg)) do
-          try do
-            case(msg.next_token) do
+            case(msg.limit) do
               nil ->
                 acc
 
               _ ->
-                [acc, <<18>>, Protox.Encode.encode_string(msg.next_token)]
+                [acc, "\b", Protox.Encode.encode_int32(msg.limit)]
             end
           rescue
             ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:next_token, "invalid field value"),
-                __STACKTRACE__
-              )
+              reraise(Protox.EncodingError.new(:limit, "invalid field value"), __STACKTRACE__)
+          end
+        end,
+        defp(encode_sort(acc, msg)) do
+          try do
+            case(msg.sort) do
+              nil ->
+                acc
+
+              _ ->
+                [acc, <<18>>, Protox.Encode.encode_message(msg.sort)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:sort, "invalid field value"), __STACKTRACE__)
           end
         end
       ]
@@ -79,49 +73,46 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
         (
           @spec decode!(binary) :: struct | no_return
           def(decode!(bytes)) do
-            {msg, set_fields} =
-              parse_key_value([], bytes, struct(ExAliyunOts.TableStore.GetShardIteratorResponse))
-
-            case([:shard_iterator] -- set_fields) do
-              [] ->
-                msg
-
-              missing_fields ->
-                raise(Protox.RequiredFieldsError.new(missing_fields))
-            end
+            parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.TopRowsAggregation))
           end
         )
       )
 
       (
-        @spec parse_key_value([atom], binary, struct) :: {struct, [atom]}
-        defp(parse_key_value(set_fields, <<>>, msg)) do
-          {msg, set_fields}
+        @spec parse_key_value(binary, struct) :: struct
+        defp(parse_key_value(<<>>, msg)) do
+          msg
         end
 
-        defp(parse_key_value(set_fields, bytes, msg)) do
-          {new_set_fields, field, rest} =
+        defp(parse_key_value(bytes, msg)) do
+          {field, rest} =
             case(Protox.Decode.parse_key(bytes)) do
               {0, _, _} ->
                 raise(%Protox.IllegalTagError{})
 
               {1, _, bytes} ->
-                {len, bytes} = Protox.Varint.decode(bytes)
-                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[:shard_iterator | set_fields], [shard_iterator: delimited], rest}
+                {value, rest} = Protox.Decode.parse_int32(bytes)
+                {[limit: value], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[:next_token | set_fields], [next_token: delimited], rest}
+
+                {[
+                   sort:
+                     Protox.MergeMessage.merge(
+                       msg.sort,
+                       ExAliyunOts.TableStoreSearch.Sort.decode!(delimited)
+                     )
+                 ], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
-                {set_fields, [], rest}
+                {[], rest}
             end
 
           msg_updated = struct(msg, field)
-          parse_key_value(new_set_fields, rest, msg_updated)
+          parse_key_value(rest, msg_updated)
         end
       )
 
@@ -145,7 +136,7 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
 
         Protox.JsonDecode.decode!(
           input,
-          ExAliyunOts.TableStore.GetShardIteratorResponse,
+          ExAliyunOts.TableStoreSearch.TopRowsAggregation,
           &json_library_wrapper.decode!(json_library, &1)
         )
       end
@@ -173,8 +164,8 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
           }
     def(defs()) do
       %{
-        1 => {:shard_iterator, {:scalar, ""}, :string},
-        2 => {:next_token, {:scalar, ""}, :string}
+        1 => {:limit, {:scalar, 0}, :int32},
+        2 => {:sort, {:scalar, nil}, {:message, ExAliyunOts.TableStoreSearch.Sort}}
       }
     end
 
@@ -183,7 +174,10 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
-      %{next_token: {2, {:scalar, ""}, :string}, shard_iterator: {1, {:scalar, ""}, :string}}
+      %{
+        limit: {1, {:scalar, 0}, :int32},
+        sort: {2, {:scalar, nil}, {:message, ExAliyunOts.TableStoreSearch.Sort}}
+      }
     end
 
     @spec fields_defs() :: list(Protox.Field.t())
@@ -191,21 +185,21 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
       [
         %{
           __struct__: Protox.Field,
-          json_name: "shardIterator",
-          kind: {:scalar, ""},
-          label: :required,
-          name: :shard_iterator,
+          json_name: "limit",
+          kind: {:scalar, 0},
+          label: :optional,
+          name: :limit,
           tag: 1,
-          type: :string
+          type: :int32
         },
         %{
           __struct__: Protox.Field,
-          json_name: "nextToken",
-          kind: {:scalar, ""},
+          json_name: "sort",
+          kind: {:scalar, nil},
           label: :optional,
-          name: :next_token,
+          name: :sort,
           tag: 2,
-          type: :string
+          type: {:message, ExAliyunOts.TableStoreSearch.Sort}
         }
       ]
     end
@@ -213,84 +207,62 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:shard_iterator)) do
+        def(field_def(:limit)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "shardIterator",
-             kind: {:scalar, ""},
-             label: :required,
-             name: :shard_iterator,
+             json_name: "limit",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :limit,
              tag: 1,
-             type: :string
+             type: :int32
            }}
         end
 
-        def(field_def("shardIterator")) do
+        def(field_def("limit")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "shardIterator",
-             kind: {:scalar, ""},
-             label: :required,
-             name: :shard_iterator,
+             json_name: "limit",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :limit,
              tag: 1,
-             type: :string
+             type: :int32
            }}
         end
 
-        def(field_def("shard_iterator")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "shardIterator",
-             kind: {:scalar, ""},
-             label: :required,
-             name: :shard_iterator,
-             tag: 1,
-             type: :string
-           }}
-        end
+        []
       ),
       (
-        def(field_def(:next_token)) do
+        def(field_def(:sort)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "nextToken",
-             kind: {:scalar, ""},
+             json_name: "sort",
+             kind: {:scalar, nil},
              label: :optional,
-             name: :next_token,
+             name: :sort,
              tag: 2,
-             type: :string
+             type: {:message, ExAliyunOts.TableStoreSearch.Sort}
            }}
         end
 
-        def(field_def("nextToken")) do
+        def(field_def("sort")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "nextToken",
-             kind: {:scalar, ""},
+             json_name: "sort",
+             kind: {:scalar, nil},
              label: :optional,
-             name: :next_token,
+             name: :sort,
              tag: 2,
-             type: :string
+             type: {:message, ExAliyunOts.TableStoreSearch.Sort}
            }}
         end
 
-        def(field_def("next_token")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "nextToken",
-             kind: {:scalar, ""},
-             label: :optional,
-             name: :next_token,
-             tag: 2,
-             type: :string
-           }}
-        end
+        []
       ),
       def(field_def(_)) do
         {:error, :no_such_field}
@@ -298,9 +270,9 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
     ]
 
     []
-    @spec required_fields() :: [:shard_iterator]
+    @spec required_fields() :: []
     def(required_fields()) do
-      [:shard_iterator]
+      []
     end
 
     @spec syntax() :: atom
@@ -310,11 +282,11 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
 
     [
       @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-      def(default(:shard_iterator)) do
-        {:ok, ""}
+      def(default(:limit)) do
+        {:ok, 0}
       end,
-      def(default(:next_token)) do
-        {:ok, ""}
+      def(default(:sort)) do
+        {:ok, nil}
       end,
       def(default(_)) do
         {:error, :no_such_field}

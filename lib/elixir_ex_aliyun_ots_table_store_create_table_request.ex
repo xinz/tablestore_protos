@@ -6,6 +6,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
       table_meta: nil,
       reserved_throughput: nil,
       table_options: nil,
+      partitions: [],
       stream_spec: nil,
       index_metas: []
     )
@@ -28,6 +29,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
           |> encode_table_meta(msg)
           |> encode_reserved_throughput(msg)
           |> encode_table_options(msg)
+          |> encode_partitions(msg)
           |> encode_stream_spec(msg)
           |> encode_index_metas(msg)
         end
@@ -83,6 +85,28 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
             ArgumentError ->
               reraise(
                 Protox.EncodingError.new(:table_options, "invalid field value"),
+                __STACKTRACE__
+              )
+          end
+        end,
+        defp(encode_partitions(acc, msg)) do
+          try do
+            case(msg.partitions) do
+              [] ->
+                acc
+
+              values ->
+                [
+                  acc,
+                  Enum.reduce(values, [], fn value, acc ->
+                    [acc, "\"", Protox.Encode.encode_message(value)]
+                  end)
+                ]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:partitions, "invalid field value"),
                 __STACKTRACE__
               )
           end
@@ -211,6 +235,16 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
                      )
                  ], rest}
 
+              {4, _, bytes} ->
+                {len, bytes} = Protox.Varint.decode(bytes)
+                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+                {[:partitions | set_fields],
+                 [
+                   partitions:
+                     msg.partitions ++ [ExAliyunOts.TableStore.PartitionRange.decode!(delimited)]
+                 ], rest}
+
               {5, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
@@ -297,6 +331,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
           {:reserved_throughput, {:scalar, nil},
            {:message, ExAliyunOts.TableStore.ReservedThroughput}},
         3 => {:table_options, {:scalar, nil}, {:message, ExAliyunOts.TableStore.TableOptions}},
+        4 => {:partitions, :unpacked, {:message, ExAliyunOts.TableStore.PartitionRange}},
         5 =>
           {:stream_spec, {:scalar, nil}, {:message, ExAliyunOts.TableStore.StreamSpecification}},
         7 => {:index_metas, :unpacked, {:message, ExAliyunOts.TableStore.IndexMeta}}
@@ -310,6 +345,7 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
     def(defs_by_name()) do
       %{
         index_metas: {7, :unpacked, {:message, ExAliyunOts.TableStore.IndexMeta}},
+        partitions: {4, :unpacked, {:message, ExAliyunOts.TableStore.PartitionRange}},
         reserved_throughput:
           {2, {:scalar, nil}, {:message, ExAliyunOts.TableStore.ReservedThroughput}},
         stream_spec: {5, {:scalar, nil}, {:message, ExAliyunOts.TableStore.StreamSpecification}},
@@ -347,6 +383,15 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
           name: :table_options,
           tag: 3,
           type: {:message, ExAliyunOts.TableStore.TableOptions}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "partitions",
+          kind: :unpacked,
+          label: :repeated,
+          name: :partitions,
+          tag: 4,
+          type: {:message, ExAliyunOts.TableStore.PartitionRange}
         },
         %{
           __struct__: Protox.Field,
@@ -492,6 +537,35 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
         end
       ),
       (
+        def(field_def(:partitions)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "partitions",
+             kind: :unpacked,
+             label: :repeated,
+             name: :partitions,
+             tag: 4,
+             type: {:message, ExAliyunOts.TableStore.PartitionRange}
+           }}
+        end
+
+        def(field_def("partitions")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "partitions",
+             kind: :unpacked,
+             label: :repeated,
+             name: :partitions,
+             tag: 4,
+             type: {:message, ExAliyunOts.TableStore.PartitionRange}
+           }}
+        end
+
+        []
+      ),
+      (
         def(field_def(:stream_spec)) do
           {:ok,
            %{
@@ -597,6 +671,9 @@ defmodule(ExAliyunOts.TableStore.CreateTableRequest) do
       end,
       def(default(:table_options)) do
         {:ok, nil}
+      end,
+      def(default(:partitions)) do
+        {:error, :no_default_value}
       end,
       def(default(:stream_spec)) do
         {:ok, nil}

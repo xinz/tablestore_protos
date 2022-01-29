@@ -11,6 +11,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
       limit: nil,
       inclusive_start_primary_key: nil,
       exclusive_end_primary_key: nil,
+      cache_blocks: nil,
       filter: nil,
       start_column: nil,
       end_column: nil,
@@ -41,6 +42,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           |> encode_limit(msg)
           |> encode_inclusive_start_primary_key(msg)
           |> encode_exclusive_end_primary_key(msg)
+          |> encode_cache_blocks(msg)
           |> encode_filter(msg)
           |> encode_start_column(msg)
           |> encode_end_column(msg)
@@ -189,6 +191,23 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
             ArgumentError ->
               reraise(
                 Protox.EncodingError.new(:exclusive_end_primary_key, "invalid field value"),
+                __STACKTRACE__
+              )
+          end
+        end,
+        defp(encode_cache_blocks(acc, msg)) do
+          try do
+            case(msg.cache_blocks) do
+              nil ->
+                acc
+
+              _ ->
+                [acc, "H", Protox.Encode.encode_bool(msg.cache_blocks)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(
+                Protox.EncodingError.new(:cache_blocks, "invalid field value"),
                 __STACKTRACE__
               )
           end
@@ -372,6 +391,10 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
                 {[:exclusive_end_primary_key | set_fields],
                  [exclusive_end_primary_key: delimited], rest}
 
+              {9, _, bytes} ->
+                {value, rest} = Protox.Decode.parse_bool(bytes)
+                {[:cache_blocks | set_fields], [cache_blocks: value], rest}
+
               {10, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
@@ -463,6 +486,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         6 => {:limit, {:scalar, 0}, :int32},
         7 => {:inclusive_start_primary_key, {:scalar, ""}, :bytes},
         8 => {:exclusive_end_primary_key, {:scalar, ""}, :bytes},
+        9 => {:cache_blocks, {:scalar, true}, :bool},
         10 => {:filter, {:scalar, ""}, :bytes},
         11 => {:start_column, {:scalar, ""}, :string},
         12 => {:end_column, {:scalar, ""}, :string},
@@ -477,6 +501,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           }
     def(defs_by_name()) do
       %{
+        cache_blocks: {9, {:scalar, true}, :bool},
         columns_to_get: {3, :unpacked, :string},
         direction: {2, {:scalar, :FORWARD}, {:enum, ExAliyunOts.TableStore.Direction}},
         end_column: {12, {:scalar, ""}, :string},
@@ -567,6 +592,15 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           name: :exclusive_end_primary_key,
           tag: 8,
           type: :bytes
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "cacheBlocks",
+          kind: {:scalar, true},
+          label: :optional,
+          name: :cache_blocks,
+          tag: 9,
+          type: :bool
         },
         %{
           __struct__: Protox.Field,
@@ -917,6 +951,46 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         end
       ),
       (
+        def(field_def(:cache_blocks)) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "cacheBlocks",
+             kind: {:scalar, true},
+             label: :optional,
+             name: :cache_blocks,
+             tag: 9,
+             type: :bool
+           }}
+        end
+
+        def(field_def("cacheBlocks")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "cacheBlocks",
+             kind: {:scalar, true},
+             label: :optional,
+             name: :cache_blocks,
+             tag: 9,
+             type: :bool
+           }}
+        end
+
+        def(field_def("cache_blocks")) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "cacheBlocks",
+             kind: {:scalar, true},
+             label: :optional,
+             name: :cache_blocks,
+             tag: 9,
+             type: :bool
+           }}
+        end
+      ),
+      (
         def(field_def(:filter)) do
           {:ok,
            %{
@@ -1139,6 +1213,9 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
       end,
       def(default(:exclusive_end_primary_key)) do
         {:ok, ""}
+      end,
+      def(default(:cache_blocks)) do
+        {:ok, true}
       end,
       def(default(:filter)) do
         {:ok, ""}

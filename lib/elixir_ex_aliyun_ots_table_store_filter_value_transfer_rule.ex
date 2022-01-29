@@ -1,8 +1,8 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
+defmodule(ExAliyunOts.TableStoreFilter.ValueTransferRule) do
   @moduledoc false
   (
-    defstruct(shard_iterator: nil, next_token: nil)
+    defstruct(regex: nil, cast_type: nil)
 
     (
       (
@@ -18,45 +18,45 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
 
         @spec encode!(struct) :: iodata | no_return
         def(encode!(msg)) do
-          [] |> encode_shard_iterator(msg) |> encode_next_token(msg)
+          [] |> encode_regex(msg) |> encode_cast_type(msg)
         end
       )
 
       []
 
       [
-        defp(encode_shard_iterator(acc, msg)) do
+        defp(encode_regex(acc, msg)) do
           try do
-            case(msg.shard_iterator) do
+            case(msg.regex) do
               nil ->
-                raise(Protox.RequiredFieldsError.new([:shard_iterator]))
+                raise(Protox.RequiredFieldsError.new([:regex]))
 
               _ ->
-                [acc, "\n", Protox.Encode.encode_string(msg.shard_iterator)]
+                [acc, "\n", Protox.Encode.encode_string(msg.regex)]
             end
           rescue
             ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:shard_iterator, "invalid field value"),
-                __STACKTRACE__
-              )
+              reraise(Protox.EncodingError.new(:regex, "invalid field value"), __STACKTRACE__)
           end
         end,
-        defp(encode_next_token(acc, msg)) do
+        defp(encode_cast_type(acc, msg)) do
           try do
-            case(msg.next_token) do
+            case(msg.cast_type) do
               nil ->
                 acc
 
               _ ->
-                [acc, <<18>>, Protox.Encode.encode_string(msg.next_token)]
+                [
+                  acc,
+                  <<16>>,
+                  msg.cast_type
+                  |> ExAliyunOts.TableStoreFilter.VariantType.encode()
+                  |> Protox.Encode.encode_enum()
+                ]
             end
           rescue
             ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:next_token, "invalid field value"),
-                __STACKTRACE__
-              )
+              reraise(Protox.EncodingError.new(:cast_type, "invalid field value"), __STACKTRACE__)
           end
         end
       ]
@@ -80,9 +80,9 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
           @spec decode!(binary) :: struct | no_return
           def(decode!(bytes)) do
             {msg, set_fields} =
-              parse_key_value([], bytes, struct(ExAliyunOts.TableStore.GetShardIteratorResponse))
+              parse_key_value([], bytes, struct(ExAliyunOts.TableStoreFilter.ValueTransferRule))
 
-            case([:shard_iterator] -- set_fields) do
+            case([:regex] -- set_fields) do
               [] ->
                 msg
 
@@ -108,12 +108,13 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[:shard_iterator | set_fields], [shard_iterator: delimited], rest}
+                {[:regex | set_fields], [regex: delimited], rest}
 
               {2, _, bytes} ->
-                {len, bytes} = Protox.Varint.decode(bytes)
-                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[:next_token | set_fields], [next_token: delimited], rest}
+                {value, rest} =
+                  Protox.Decode.parse_enum(bytes, ExAliyunOts.TableStoreFilter.VariantType)
+
+                {[:cast_type | set_fields], [cast_type: value], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
@@ -145,7 +146,7 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
 
         Protox.JsonDecode.decode!(
           input,
-          ExAliyunOts.TableStore.GetShardIteratorResponse,
+          ExAliyunOts.TableStoreFilter.ValueTransferRule,
           &json_library_wrapper.decode!(json_library, &1)
         )
       end
@@ -173,8 +174,9 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
           }
     def(defs()) do
       %{
-        1 => {:shard_iterator, {:scalar, ""}, :string},
-        2 => {:next_token, {:scalar, ""}, :string}
+        1 => {:regex, {:scalar, ""}, :string},
+        2 =>
+          {:cast_type, {:scalar, :VT_INTEGER}, {:enum, ExAliyunOts.TableStoreFilter.VariantType}}
       }
     end
 
@@ -183,7 +185,10 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
-      %{next_token: {2, {:scalar, ""}, :string}, shard_iterator: {1, {:scalar, ""}, :string}}
+      %{
+        cast_type: {2, {:scalar, :VT_INTEGER}, {:enum, ExAliyunOts.TableStoreFilter.VariantType}},
+        regex: {1, {:scalar, ""}, :string}
+      }
     end
 
     @spec fields_defs() :: list(Protox.Field.t())
@@ -191,21 +196,21 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
       [
         %{
           __struct__: Protox.Field,
-          json_name: "shardIterator",
+          json_name: "regex",
           kind: {:scalar, ""},
           label: :required,
-          name: :shard_iterator,
+          name: :regex,
           tag: 1,
           type: :string
         },
         %{
           __struct__: Protox.Field,
-          json_name: "nextToken",
-          kind: {:scalar, ""},
+          json_name: "castType",
+          kind: {:scalar, :VT_INTEGER},
           label: :optional,
-          name: :next_token,
+          name: :cast_type,
           tag: 2,
-          type: :string
+          type: {:enum, ExAliyunOts.TableStoreFilter.VariantType}
         }
       ]
     end
@@ -213,82 +218,71 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:shard_iterator)) do
+        def(field_def(:regex)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "shardIterator",
+             json_name: "regex",
              kind: {:scalar, ""},
              label: :required,
-             name: :shard_iterator,
+             name: :regex,
              tag: 1,
              type: :string
            }}
         end
 
-        def(field_def("shardIterator")) do
+        def(field_def("regex")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "shardIterator",
+             json_name: "regex",
              kind: {:scalar, ""},
              label: :required,
-             name: :shard_iterator,
+             name: :regex,
              tag: 1,
              type: :string
            }}
         end
 
-        def(field_def("shard_iterator")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "shardIterator",
-             kind: {:scalar, ""},
-             label: :required,
-             name: :shard_iterator,
-             tag: 1,
-             type: :string
-           }}
-        end
+        []
       ),
       (
-        def(field_def(:next_token)) do
+        def(field_def(:cast_type)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "nextToken",
-             kind: {:scalar, ""},
+             json_name: "castType",
+             kind: {:scalar, :VT_INTEGER},
              label: :optional,
-             name: :next_token,
+             name: :cast_type,
              tag: 2,
-             type: :string
+             type: {:enum, ExAliyunOts.TableStoreFilter.VariantType}
            }}
         end
 
-        def(field_def("nextToken")) do
+        def(field_def("castType")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "nextToken",
-             kind: {:scalar, ""},
+             json_name: "castType",
+             kind: {:scalar, :VT_INTEGER},
              label: :optional,
-             name: :next_token,
+             name: :cast_type,
              tag: 2,
-             type: :string
+             type: {:enum, ExAliyunOts.TableStoreFilter.VariantType}
            }}
         end
 
-        def(field_def("next_token")) do
+        def(field_def("cast_type")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "nextToken",
-             kind: {:scalar, ""},
+             json_name: "castType",
+             kind: {:scalar, :VT_INTEGER},
              label: :optional,
-             name: :next_token,
+             name: :cast_type,
              tag: 2,
-             type: :string
+             type: {:enum, ExAliyunOts.TableStoreFilter.VariantType}
            }}
         end
       ),
@@ -298,9 +292,9 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
     ]
 
     []
-    @spec required_fields() :: [:shard_iterator]
+    @spec required_fields() :: [:regex]
     def(required_fields()) do
-      [:shard_iterator]
+      [:regex]
     end
 
     @spec syntax() :: atom
@@ -310,11 +304,11 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
 
     [
       @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-      def(default(:shard_iterator)) do
+      def(default(:regex)) do
         {:ok, ""}
       end,
-      def(default(:next_token)) do
-        {:ok, ""}
+      def(default(:cast_type)) do
+        {:ok, :VT_INTEGER}
       end,
       def(default(_)) do
         {:error, :no_such_field}

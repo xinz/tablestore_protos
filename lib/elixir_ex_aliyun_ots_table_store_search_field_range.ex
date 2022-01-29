@@ -1,8 +1,8 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
+defmodule(ExAliyunOts.TableStoreSearch.FieldRange) do
   @moduledoc false
   (
-    defstruct(shard_iterator: nil, next_token: nil)
+    defstruct(min: nil, max: nil)
 
     (
       (
@@ -18,45 +18,39 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
 
         @spec encode!(struct) :: iodata | no_return
         def(encode!(msg)) do
-          [] |> encode_shard_iterator(msg) |> encode_next_token(msg)
+          [] |> encode_min(msg) |> encode_max(msg)
         end
       )
 
       []
 
       [
-        defp(encode_shard_iterator(acc, msg)) do
+        defp(encode_min(acc, msg)) do
           try do
-            case(msg.shard_iterator) do
-              nil ->
-                raise(Protox.RequiredFieldsError.new([:shard_iterator]))
-
-              _ ->
-                [acc, "\n", Protox.Encode.encode_string(msg.shard_iterator)]
-            end
-          rescue
-            ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:shard_iterator, "invalid field value"),
-                __STACKTRACE__
-              )
-          end
-        end,
-        defp(encode_next_token(acc, msg)) do
-          try do
-            case(msg.next_token) do
+            case(msg.min) do
               nil ->
                 acc
 
               _ ->
-                [acc, <<18>>, Protox.Encode.encode_string(msg.next_token)]
+                [acc, "\n", Protox.Encode.encode_bytes(msg.min)]
             end
           rescue
             ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:next_token, "invalid field value"),
-                __STACKTRACE__
-              )
+              reraise(Protox.EncodingError.new(:min, "invalid field value"), __STACKTRACE__)
+          end
+        end,
+        defp(encode_max(acc, msg)) do
+          try do
+            case(msg.max) do
+              nil ->
+                acc
+
+              _ ->
+                [acc, <<18>>, Protox.Encode.encode_bytes(msg.max)]
+            end
+          rescue
+            ArgumentError ->
+              reraise(Protox.EncodingError.new(:max, "invalid field value"), __STACKTRACE__)
           end
         end
       ]
@@ -79,28 +73,19 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
         (
           @spec decode!(binary) :: struct | no_return
           def(decode!(bytes)) do
-            {msg, set_fields} =
-              parse_key_value([], bytes, struct(ExAliyunOts.TableStore.GetShardIteratorResponse))
-
-            case([:shard_iterator] -- set_fields) do
-              [] ->
-                msg
-
-              missing_fields ->
-                raise(Protox.RequiredFieldsError.new(missing_fields))
-            end
+            parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.FieldRange))
           end
         )
       )
 
       (
-        @spec parse_key_value([atom], binary, struct) :: {struct, [atom]}
-        defp(parse_key_value(set_fields, <<>>, msg)) do
-          {msg, set_fields}
+        @spec parse_key_value(binary, struct) :: struct
+        defp(parse_key_value(<<>>, msg)) do
+          msg
         end
 
-        defp(parse_key_value(set_fields, bytes, msg)) do
-          {new_set_fields, field, rest} =
+        defp(parse_key_value(bytes, msg)) do
+          {field, rest} =
             case(Protox.Decode.parse_key(bytes)) do
               {0, _, _} ->
                 raise(%Protox.IllegalTagError{})
@@ -108,20 +93,20 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
               {1, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[:shard_iterator | set_fields], [shard_iterator: delimited], rest}
+                {[min: delimited], rest}
 
               {2, _, bytes} ->
                 {len, bytes} = Protox.Varint.decode(bytes)
                 {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[:next_token | set_fields], [next_token: delimited], rest}
+                {[max: delimited], rest}
 
               {tag, wire_type, rest} ->
                 {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
-                {set_fields, [], rest}
+                {[], rest}
             end
 
           msg_updated = struct(msg, field)
-          parse_key_value(new_set_fields, rest, msg_updated)
+          parse_key_value(rest, msg_updated)
         end
       )
 
@@ -145,7 +130,7 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
 
         Protox.JsonDecode.decode!(
           input,
-          ExAliyunOts.TableStore.GetShardIteratorResponse,
+          ExAliyunOts.TableStoreSearch.FieldRange,
           &json_library_wrapper.decode!(json_library, &1)
         )
       end
@@ -172,10 +157,7 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs()) do
-      %{
-        1 => {:shard_iterator, {:scalar, ""}, :string},
-        2 => {:next_token, {:scalar, ""}, :string}
-      }
+      %{1 => {:min, {:scalar, ""}, :bytes}, 2 => {:max, {:scalar, ""}, :bytes}}
     end
 
     @deprecated "Use fields_defs()/0 instead"
@@ -183,7 +165,7 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
     def(defs_by_name()) do
-      %{next_token: {2, {:scalar, ""}, :string}, shard_iterator: {1, {:scalar, ""}, :string}}
+      %{max: {2, {:scalar, ""}, :bytes}, min: {1, {:scalar, ""}, :bytes}}
     end
 
     @spec fields_defs() :: list(Protox.Field.t())
@@ -191,21 +173,21 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
       [
         %{
           __struct__: Protox.Field,
-          json_name: "shardIterator",
+          json_name: "min",
           kind: {:scalar, ""},
-          label: :required,
-          name: :shard_iterator,
+          label: :optional,
+          name: :min,
           tag: 1,
-          type: :string
+          type: :bytes
         },
         %{
           __struct__: Protox.Field,
-          json_name: "nextToken",
+          json_name: "max",
           kind: {:scalar, ""},
           label: :optional,
-          name: :next_token,
+          name: :max,
           tag: 2,
-          type: :string
+          type: :bytes
         }
       ]
     end
@@ -213,84 +195,62 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:shard_iterator)) do
+        def(field_def(:min)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "shardIterator",
+             json_name: "min",
              kind: {:scalar, ""},
-             label: :required,
-             name: :shard_iterator,
+             label: :optional,
+             name: :min,
              tag: 1,
-             type: :string
+             type: :bytes
            }}
         end
 
-        def(field_def("shardIterator")) do
+        def(field_def("min")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "shardIterator",
+             json_name: "min",
              kind: {:scalar, ""},
-             label: :required,
-             name: :shard_iterator,
+             label: :optional,
+             name: :min,
              tag: 1,
-             type: :string
+             type: :bytes
            }}
         end
 
-        def(field_def("shard_iterator")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "shardIterator",
-             kind: {:scalar, ""},
-             label: :required,
-             name: :shard_iterator,
-             tag: 1,
-             type: :string
-           }}
-        end
+        []
       ),
       (
-        def(field_def(:next_token)) do
+        def(field_def(:max)) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "nextToken",
+             json_name: "max",
              kind: {:scalar, ""},
              label: :optional,
-             name: :next_token,
+             name: :max,
              tag: 2,
-             type: :string
+             type: :bytes
            }}
         end
 
-        def(field_def("nextToken")) do
+        def(field_def("max")) do
           {:ok,
            %{
              __struct__: Protox.Field,
-             json_name: "nextToken",
+             json_name: "max",
              kind: {:scalar, ""},
              label: :optional,
-             name: :next_token,
+             name: :max,
              tag: 2,
-             type: :string
+             type: :bytes
            }}
         end
 
-        def(field_def("next_token")) do
-          {:ok,
-           %{
-             __struct__: Protox.Field,
-             json_name: "nextToken",
-             kind: {:scalar, ""},
-             label: :optional,
-             name: :next_token,
-             tag: 2,
-             type: :string
-           }}
-        end
+        []
       ),
       def(field_def(_)) do
         {:error, :no_such_field}
@@ -298,9 +258,9 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
     ]
 
     []
-    @spec required_fields() :: [:shard_iterator]
+    @spec required_fields() :: []
     def(required_fields()) do
-      [:shard_iterator]
+      []
     end
 
     @spec syntax() :: atom
@@ -310,10 +270,10 @@ defmodule(ExAliyunOts.TableStore.GetShardIteratorResponse) do
 
     [
       @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-      def(default(:shard_iterator)) do
+      def(default(:min)) do
         {:ok, ""}
       end,
-      def(default(:next_token)) do
+      def(default(:max)) do
         {:ok, ""}
       end,
       def(default(_)) do
