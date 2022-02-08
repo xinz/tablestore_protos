@@ -1,247 +1,235 @@
 # credo:disable-for-this-file
 defmodule(ExAliyunOts.TableStoreSearch.ParallelScanRequest) do
   @moduledoc false
+  defstruct(
+    table_name: nil,
+    index_name: nil,
+    columns_to_get: nil,
+    session_id: nil,
+    scan_query: nil
+  )
+
   (
-    defstruct(
-      table_name: nil,
-      index_name: nil,
-      columns_to_get: nil,
-      session_id: nil,
-      scan_query: nil
-    )
-
     (
-      (
-        @spec encode(struct) :: {:ok, iodata} | {:error, any}
-        def(encode(msg)) do
-          try do
-            {:ok, encode!(msg)}
-          rescue
-            e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
-              {:error, e}
-          end
-        end
-
-        @spec encode!(struct) :: iodata | no_return
-        def(encode!(msg)) do
-          []
-          |> encode_table_name(msg)
-          |> encode_index_name(msg)
-          |> encode_columns_to_get(msg)
-          |> encode_session_id(msg)
-          |> encode_scan_query(msg)
-        end
-      )
-
-      []
-
-      [
-        defp(encode_table_name(acc, msg)) do
-          try do
-            case(msg.table_name) do
-              nil ->
-                acc
-
-              _ ->
-                [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
-            end
-          rescue
-            ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:table_name, "invalid field value"),
-                __STACKTRACE__
-              )
-          end
-        end,
-        defp(encode_index_name(acc, msg)) do
-          try do
-            case(msg.index_name) do
-              nil ->
-                acc
-
-              _ ->
-                [acc, <<18>>, Protox.Encode.encode_string(msg.index_name)]
-            end
-          rescue
-            ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:index_name, "invalid field value"),
-                __STACKTRACE__
-              )
-          end
-        end,
-        defp(encode_columns_to_get(acc, msg)) do
-          try do
-            case(msg.columns_to_get) do
-              nil ->
-                acc
-
-              _ ->
-                [acc, <<26>>, Protox.Encode.encode_message(msg.columns_to_get)]
-            end
-          rescue
-            ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:columns_to_get, "invalid field value"),
-                __STACKTRACE__
-              )
-          end
-        end,
-        defp(encode_session_id(acc, msg)) do
-          try do
-            case(msg.session_id) do
-              nil ->
-                acc
-
-              _ ->
-                [acc, "\"", Protox.Encode.encode_bytes(msg.session_id)]
-            end
-          rescue
-            ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:session_id, "invalid field value"),
-                __STACKTRACE__
-              )
-          end
-        end,
-        defp(encode_scan_query(acc, msg)) do
-          try do
-            case(msg.scan_query) do
-              nil ->
-                acc
-
-              _ ->
-                [acc, "*", Protox.Encode.encode_bytes(msg.scan_query)]
-            end
-          rescue
-            ArgumentError ->
-              reraise(
-                Protox.EncodingError.new(:scan_query, "invalid field value"),
-                __STACKTRACE__
-              )
-          end
-        end
-      ]
-
-      []
-    )
-
-    (
-      (
-        @spec decode(binary) :: {:ok, struct} | {:error, any}
-        def(decode(bytes)) do
-          try do
-            {:ok, decode!(bytes)}
-          rescue
-            e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
-              {:error, e}
-          end
-        end
-
-        (
-          @spec decode!(binary) :: struct | no_return
-          def(decode!(bytes)) do
-            parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.ParallelScanRequest))
-          end
-        )
-      )
-
-      (
-        @spec parse_key_value(binary, struct) :: struct
-        defp(parse_key_value(<<>>, msg)) do
-          msg
-        end
-
-        defp(parse_key_value(bytes, msg)) do
-          {field, rest} =
-            case(Protox.Decode.parse_key(bytes)) do
-              {0, _, _} ->
-                raise(%Protox.IllegalTagError{})
-
-              {1, _, bytes} ->
-                {len, bytes} = Protox.Varint.decode(bytes)
-                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[table_name: delimited], rest}
-
-              {2, _, bytes} ->
-                {len, bytes} = Protox.Varint.decode(bytes)
-                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[index_name: delimited], rest}
-
-              {3, _, bytes} ->
-                {len, bytes} = Protox.Varint.decode(bytes)
-                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-
-                {[
-                   columns_to_get:
-                     Protox.MergeMessage.merge(
-                       msg.columns_to_get,
-                       ExAliyunOts.TableStoreSearch.ColumnsToGet.decode!(delimited)
-                     )
-                 ], rest}
-
-              {4, _, bytes} ->
-                {len, bytes} = Protox.Varint.decode(bytes)
-                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[session_id: delimited], rest}
-
-              {5, _, bytes} ->
-                {len, bytes} = Protox.Varint.decode(bytes)
-                {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
-                {[scan_query: delimited], rest}
-
-              {tag, wire_type, rest} ->
-                {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
-                {[], rest}
-            end
-
-          msg_updated = struct(msg, field)
-          parse_key_value(rest, msg_updated)
-        end
-      )
-
-      []
-    )
-
-    (
-      @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
-      def(json_decode(input, opts \\ [])) do
+      @spec encode(struct) :: {:ok, iodata} | {:error, any}
+      def(encode(msg)) do
         try do
-          {:ok, json_decode!(input, opts)}
+          {:ok, encode!(msg)}
         rescue
-          e in Protox.JsonDecodingError ->
+          e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
             {:error, e}
         end
       end
 
-      @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
-      def(json_decode!(input, opts \\ [])) do
-        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
-
-        Protox.JsonDecode.decode!(
-          input,
-          ExAliyunOts.TableStoreSearch.ParallelScanRequest,
-          &json_library_wrapper.decode!(json_library, &1)
-        )
+      @spec encode!(struct) :: iodata | no_return
+      def(encode!(msg)) do
+        []
+        |> encode_table_name(msg)
+        |> encode_index_name(msg)
+        |> encode_columns_to_get(msg)
+        |> encode_session_id(msg)
+        |> encode_scan_query(msg)
       end
+    )
 
-      @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-      def(json_encode(msg, opts \\ [])) do
+    []
+
+    [
+      defp(encode_table_name(acc, msg)) do
         try do
-          {:ok, json_encode!(msg, opts)}
+          case(msg.table_name) do
+            nil ->
+              acc
+
+            _ ->
+              [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
+          end
         rescue
-          e in Protox.JsonEncodingError ->
+          ArgumentError ->
+            reraise(Protox.EncodingError.new(:table_name, "invalid field value"), __STACKTRACE__)
+        end
+      end,
+      defp(encode_index_name(acc, msg)) do
+        try do
+          case(msg.index_name) do
+            nil ->
+              acc
+
+            _ ->
+              [acc, <<18>>, Protox.Encode.encode_string(msg.index_name)]
+          end
+        rescue
+          ArgumentError ->
+            reraise(Protox.EncodingError.new(:index_name, "invalid field value"), __STACKTRACE__)
+        end
+      end,
+      defp(encode_columns_to_get(acc, msg)) do
+        try do
+          case(msg.columns_to_get) do
+            nil ->
+              acc
+
+            _ ->
+              [acc, <<26>>, Protox.Encode.encode_message(msg.columns_to_get)]
+          end
+        rescue
+          ArgumentError ->
+            reraise(
+              Protox.EncodingError.new(:columns_to_get, "invalid field value"),
+              __STACKTRACE__
+            )
+        end
+      end,
+      defp(encode_session_id(acc, msg)) do
+        try do
+          case(msg.session_id) do
+            nil ->
+              acc
+
+            _ ->
+              [acc, "\"", Protox.Encode.encode_bytes(msg.session_id)]
+          end
+        rescue
+          ArgumentError ->
+            reraise(Protox.EncodingError.new(:session_id, "invalid field value"), __STACKTRACE__)
+        end
+      end,
+      defp(encode_scan_query(acc, msg)) do
+        try do
+          case(msg.scan_query) do
+            nil ->
+              acc
+
+            _ ->
+              [acc, "*", Protox.Encode.encode_bytes(msg.scan_query)]
+          end
+        rescue
+          ArgumentError ->
+            reraise(Protox.EncodingError.new(:scan_query, "invalid field value"), __STACKTRACE__)
+        end
+      end
+    ]
+
+    []
+  )
+
+  (
+    (
+      @spec decode(binary) :: {:ok, struct} | {:error, any}
+      def(decode(bytes)) do
+        try do
+          {:ok, decode!(bytes)}
+        rescue
+          e in [Protox.DecodingError, Protox.IllegalTagError, Protox.RequiredFieldsError] ->
             {:error, e}
         end
       end
 
-      @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
-      def(json_encode!(msg, opts \\ [])) do
-        {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
-        Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+      (
+        @spec decode!(binary) :: struct | no_return
+        def(decode!(bytes)) do
+          parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.ParallelScanRequest))
+        end
+      )
+    )
+
+    (
+      @spec parse_key_value(binary, struct) :: struct
+      defp(parse_key_value(<<>>, msg)) do
+        msg
+      end
+
+      defp(parse_key_value(bytes, msg)) do
+        {field, rest} =
+          case(Protox.Decode.parse_key(bytes)) do
+            {0, _, _} ->
+              raise(%Protox.IllegalTagError{})
+
+            {1, _, bytes} ->
+              {len, bytes} = Protox.Varint.decode(bytes)
+              {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+              {[table_name: delimited], rest}
+
+            {2, _, bytes} ->
+              {len, bytes} = Protox.Varint.decode(bytes)
+              {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+              {[index_name: delimited], rest}
+
+            {3, _, bytes} ->
+              {len, bytes} = Protox.Varint.decode(bytes)
+              {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+
+              {[
+                 columns_to_get:
+                   Protox.MergeMessage.merge(
+                     msg.columns_to_get,
+                     ExAliyunOts.TableStoreSearch.ColumnsToGet.decode!(delimited)
+                   )
+               ], rest}
+
+            {4, _, bytes} ->
+              {len, bytes} = Protox.Varint.decode(bytes)
+              {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+              {[session_id: delimited], rest}
+
+            {5, _, bytes} ->
+              {len, bytes} = Protox.Varint.decode(bytes)
+              {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
+              {[scan_query: delimited], rest}
+
+            {tag, wire_type, rest} ->
+              {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
+              {[], rest}
+          end
+
+        msg_updated = struct(msg, field)
+        parse_key_value(rest, msg_updated)
       end
     )
 
+    []
+  )
+
+  (
+    @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
+    def(json_decode(input, opts \\ [])) do
+      try do
+        {:ok, json_decode!(input, opts)}
+      rescue
+        e in Protox.JsonDecodingError ->
+          {:error, e}
+      end
+    end
+
+    @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
+    def(json_decode!(input, opts \\ [])) do
+      {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
+
+      Protox.JsonDecode.decode!(
+        input,
+        ExAliyunOts.TableStoreSearch.ParallelScanRequest,
+        &json_library_wrapper.decode!(json_library, &1)
+      )
+    end
+
+    @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
+    def(json_encode(msg, opts \\ [])) do
+      try do
+        {:ok, json_encode!(msg, opts)}
+      rescue
+        e in Protox.JsonEncodingError ->
+          {:error, e}
+      end
+    end
+
+    @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
+    def(json_encode!(msg, opts \\ [])) do
+      {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
+      Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
+    end
+  )
+
+  (
     @deprecated "Use fields_defs()/0 instead"
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
@@ -271,7 +259,9 @@ defmodule(ExAliyunOts.TableStoreSearch.ParallelScanRequest) do
         table_name: {1, {:scalar, ""}, :string}
       }
     end
+  )
 
+  (
     @spec fields_defs() :: list(Protox.Field.t())
     def(fields_defs()) do
       [
@@ -529,38 +519,43 @@ defmodule(ExAliyunOts.TableStoreSearch.ParallelScanRequest) do
         {:error, :no_such_field}
       end
     ]
+  )
 
-    []
+  []
+
+  (
     @spec required_fields() :: []
     def(required_fields()) do
       []
     end
+  )
 
-    @spec syntax() :: atom
+  (
+    @spec syntax() :: atom()
     def(syntax()) do
       :proto2
     end
-
-    [
-      @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-      def(default(:table_name)) do
-        {:ok, ""}
-      end,
-      def(default(:index_name)) do
-        {:ok, ""}
-      end,
-      def(default(:columns_to_get)) do
-        {:ok, nil}
-      end,
-      def(default(:session_id)) do
-        {:ok, ""}
-      end,
-      def(default(:scan_query)) do
-        {:ok, ""}
-      end,
-      def(default(_)) do
-        {:error, :no_such_field}
-      end
-    ]
   )
+
+  [
+    @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
+    def(default(:table_name)) do
+      {:ok, ""}
+    end,
+    def(default(:index_name)) do
+      {:ok, ""}
+    end,
+    def(default(:columns_to_get)) do
+      {:ok, nil}
+    end,
+    def(default(:session_id)) do
+      {:ok, ""}
+    end,
+    def(default(:scan_query)) do
+      {:ok, ""}
+    end,
+    def(default(_)) do
+      {:error, :no_such_field}
+    end
+  ]
 end
