@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package ExAliyunOts.TableStoreTunnel;
+package TableStoreTunnel;
 
 enum TunnelType {
     BaseData = 1;

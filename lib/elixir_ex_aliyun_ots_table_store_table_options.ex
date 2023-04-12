@@ -1,84 +1,71 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.TableOptions) do
+defmodule ExAliyunOts.TableStore.TableOptions do
   @moduledoc false
-  defstruct(
-    time_to_live: nil,
-    max_versions: nil,
-    bloom_filter_type: nil,
-    block_size: nil,
-    deviation_cell_version_in_sec: nil
-  )
+  defstruct time_to_live: nil,
+            max_versions: nil,
+            bloom_filter_type: nil,
+            block_size: nil,
+            deviation_cell_version_in_sec: nil,
+            allow_update: nil
 
   (
     (
       @spec encode(struct) :: {:ok, iodata} | {:error, any}
-      def(encode(msg)) do
+      def encode(msg) do
         try do
           {:ok, encode!(msg)}
         rescue
-          e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
-            {:error, e}
+          e in [Protox.EncodingError, Protox.RequiredFieldsError] -> {:error, e}
         end
       end
 
       @spec encode!(struct) :: iodata | no_return
-      def(encode!(msg)) do
+      def encode!(msg) do
         []
         |> encode_time_to_live(msg)
         |> encode_max_versions(msg)
         |> encode_bloom_filter_type(msg)
         |> encode_block_size(msg)
         |> encode_deviation_cell_version_in_sec(msg)
+        |> encode_allow_update(msg)
       end
     )
 
     []
 
     [
-      defp(encode_time_to_live(acc, msg)) do
+      defp encode_time_to_live(acc, msg) do
         try do
-          case(msg.time_to_live) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\b", Protox.Encode.encode_int32(msg.time_to_live)]
+          case msg.time_to_live do
+            nil -> acc
+            _ -> [acc, "\b", Protox.Encode.encode_int32(msg.time_to_live)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:time_to_live, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:time_to_live, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_max_versions(acc, msg)) do
+      defp encode_max_versions(acc, msg) do
         try do
-          case(msg.max_versions) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<16>>, Protox.Encode.encode_int32(msg.max_versions)]
+          case msg.max_versions do
+            nil -> acc
+            _ -> [acc, "\x10", Protox.Encode.encode_int32(msg.max_versions)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:max_versions, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:max_versions, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_bloom_filter_type(acc, msg)) do
+      defp encode_bloom_filter_type(acc, msg) do
         try do
-          case(msg.bloom_filter_type) do
+          case msg.bloom_filter_type do
             nil ->
               acc
 
             _ ->
               [
                 acc,
-                <<24>>,
+                "\x18",
                 msg.bloom_filter_type
                 |> ExAliyunOts.TableStore.BloomFilterType.encode()
                 |> Protox.Encode.encode_enum()
@@ -86,41 +73,45 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:bloom_filter_type, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:bloom_filter_type, "invalid field value"),
+                    __STACKTRACE__
         end
       end,
-      defp(encode_block_size(acc, msg)) do
+      defp encode_block_size(acc, msg) do
         try do
-          case(msg.block_size) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, " ", Protox.Encode.encode_int32(msg.block_size)]
+          case msg.block_size do
+            nil -> acc
+            _ -> [acc, " ", Protox.Encode.encode_int32(msg.block_size)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:block_size, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:block_size, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_deviation_cell_version_in_sec(acc, msg)) do
+      defp encode_deviation_cell_version_in_sec(acc, msg) do
         try do
-          case(msg.deviation_cell_version_in_sec) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "(", Protox.Encode.encode_int64(msg.deviation_cell_version_in_sec)]
+          case msg.deviation_cell_version_in_sec do
+            nil -> acc
+            _ -> [acc, "(", Protox.Encode.encode_int64(msg.deviation_cell_version_in_sec)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:deviation_cell_version_in_sec, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(
+                      :deviation_cell_version_in_sec,
+                      "invalid field value"
+                    ),
+                    __STACKTRACE__
+        end
+      end,
+      defp encode_allow_update(acc, msg) do
+        try do
+          case msg.allow_update do
+            nil -> acc
+            _ -> [acc, "0", Protox.Encode.encode_bool(msg.allow_update)]
+          end
+        rescue
+          ArgumentError ->
+            reraise Protox.EncodingError.new(:allow_update, "invalid field value"), __STACKTRACE__
         end
       end
     ]
@@ -131,7 +122,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
   (
     (
       @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
+      def decode(bytes) do
         try do
           {:ok, decode!(bytes)}
         rescue
@@ -142,7 +133,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
 
       (
         @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
+        def decode!(bytes) do
           parse_key_value(bytes, struct(ExAliyunOts.TableStore.TableOptions))
         end
       )
@@ -150,15 +141,15 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
 
     (
       @spec parse_key_value(binary, struct) :: struct
-      defp(parse_key_value(<<>>, msg)) do
+      defp parse_key_value(<<>>, msg) do
         msg
       end
 
-      defp(parse_key_value(bytes, msg)) do
+      defp parse_key_value(bytes, msg) do
         {field, rest} =
-          case(Protox.Decode.parse_key(bytes)) do
+          case Protox.Decode.parse_key(bytes) do
             {0, _, _} ->
-              raise(%Protox.IllegalTagError{})
+              raise %Protox.IllegalTagError{}
 
             {1, _, bytes} ->
               {value, rest} = Protox.Decode.parse_int32(bytes)
@@ -182,6 +173,10 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
               {value, rest} = Protox.Decode.parse_int64(bytes)
               {[deviation_cell_version_in_sec: value], rest}
 
+            {6, _, bytes} ->
+              {value, rest} = Protox.Decode.parse_bool(bytes)
+              {[allow_update: value], rest}
+
             {tag, wire_type, rest} ->
               {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
               {[], rest}
@@ -197,17 +192,16 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
 
   (
     @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
-    def(json_decode(input, opts \\ [])) do
+    def json_decode(input, opts \\ []) do
       try do
         {:ok, json_decode!(input, opts)}
       rescue
-        e in Protox.JsonDecodingError ->
-          {:error, e}
+        e in Protox.JsonDecodingError -> {:error, e}
       end
     end
 
     @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
-    def(json_decode!(input, opts \\ [])) do
+    def json_decode!(input, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
       Protox.JsonDecode.decode!(
@@ -218,17 +212,16 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
     end
 
     @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-    def(json_encode(msg, opts \\ [])) do
+    def json_encode(msg, opts \\ []) do
       try do
         {:ok, json_encode!(msg, opts)}
       rescue
-        e in Protox.JsonEncodingError ->
-          {:error, e}
+        e in Protox.JsonEncodingError -> {:error, e}
       end
     end
 
     @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
-    def(json_encode!(msg, opts \\ [])) do
+    def json_encode!(msg, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
       Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
     end
@@ -239,14 +232,15 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs()) do
+    def defs() do
       %{
         1 => {:time_to_live, {:scalar, 0}, :int32},
         2 => {:max_versions, {:scalar, 0}, :int32},
         3 =>
           {:bloom_filter_type, {:scalar, :NONE}, {:enum, ExAliyunOts.TableStore.BloomFilterType}},
         4 => {:block_size, {:scalar, 0}, :int32},
-        5 => {:deviation_cell_version_in_sec, {:scalar, 0}, :int64}
+        5 => {:deviation_cell_version_in_sec, {:scalar, 0}, :int64},
+        6 => {:allow_update, {:scalar, false}, :bool}
       }
     end
 
@@ -254,8 +248,9 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs_by_name()) do
+    def defs_by_name() do
       %{
+        allow_update: {6, {:scalar, false}, :bool},
         block_size: {4, {:scalar, 0}, :int32},
         bloom_filter_type: {3, {:scalar, :NONE}, {:enum, ExAliyunOts.TableStore.BloomFilterType}},
         deviation_cell_version_in_sec: {5, {:scalar, 0}, :int64},
@@ -267,7 +262,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
 
   (
     @spec fields_defs() :: list(Protox.Field.t())
-    def(fields_defs()) do
+    def fields_defs() do
       [
         %{
           __struct__: Protox.Field,
@@ -313,6 +308,15 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
           name: :deviation_cell_version_in_sec,
           tag: 5,
           type: :int64
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "allowUpdate",
+          kind: {:scalar, false},
+          label: :optional,
+          name: :allow_update,
+          tag: 6,
+          type: :bool
         }
       ]
     end
@@ -320,7 +324,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:time_to_live)) do
+        def field_def(:time_to_live) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -333,7 +337,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
            }}
         end
 
-        def(field_def("timeToLive")) do
+        def field_def("timeToLive") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -346,7 +350,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
            }}
         end
 
-        def(field_def("time_to_live")) do
+        def field_def("time_to_live") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -360,7 +364,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
         end
       ),
       (
-        def(field_def(:max_versions)) do
+        def field_def(:max_versions) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -373,7 +377,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
            }}
         end
 
-        def(field_def("maxVersions")) do
+        def field_def("maxVersions") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -386,7 +390,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
            }}
         end
 
-        def(field_def("max_versions")) do
+        def field_def("max_versions") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -400,7 +404,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
         end
       ),
       (
-        def(field_def(:bloom_filter_type)) do
+        def field_def(:bloom_filter_type) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -413,7 +417,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
            }}
         end
 
-        def(field_def("bloomFilterType")) do
+        def field_def("bloomFilterType") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -426,7 +430,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
            }}
         end
 
-        def(field_def("bloom_filter_type")) do
+        def field_def("bloom_filter_type") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -440,7 +444,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
         end
       ),
       (
-        def(field_def(:block_size)) do
+        def field_def(:block_size) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -453,7 +457,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
            }}
         end
 
-        def(field_def("blockSize")) do
+        def field_def("blockSize") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -466,7 +470,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
            }}
         end
 
-        def(field_def("block_size")) do
+        def field_def("block_size") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -480,7 +484,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
         end
       ),
       (
-        def(field_def(:deviation_cell_version_in_sec)) do
+        def field_def(:deviation_cell_version_in_sec) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -493,7 +497,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
            }}
         end
 
-        def(field_def("deviationCellVersionInSec")) do
+        def field_def("deviationCellVersionInSec") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -506,7 +510,7 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
            }}
         end
 
-        def(field_def("deviation_cell_version_in_sec")) do
+        def field_def("deviation_cell_version_in_sec") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -519,7 +523,47 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
            }}
         end
       ),
-      def(field_def(_)) do
+      (
+        def field_def(:allow_update) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "allowUpdate",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :allow_update,
+             tag: 6,
+             type: :bool
+           }}
+        end
+
+        def field_def("allowUpdate") do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "allowUpdate",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :allow_update,
+             tag: 6,
+             type: :bool
+           }}
+        end
+
+        def field_def("allow_update") do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "allowUpdate",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :allow_update,
+             tag: 6,
+             type: :bool
+           }}
+        end
+      ),
+      def field_def(_) do
         {:error, :no_such_field}
       end
     ]
@@ -529,37 +573,47 @@ defmodule(ExAliyunOts.TableStore.TableOptions) do
 
   (
     @spec required_fields() :: []
-    def(required_fields()) do
+    def required_fields() do
       []
     end
   )
 
   (
     @spec syntax() :: atom()
-    def(syntax()) do
+    def syntax() do
       :proto2
     end
   )
 
   [
     @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-    def(default(:time_to_live)) do
+    def default(:time_to_live) do
       {:ok, 0}
     end,
-    def(default(:max_versions)) do
+    def default(:max_versions) do
       {:ok, 0}
     end,
-    def(default(:bloom_filter_type)) do
+    def default(:bloom_filter_type) do
       {:ok, :NONE}
     end,
-    def(default(:block_size)) do
+    def default(:block_size) do
       {:ok, 0}
     end,
-    def(default(:deviation_cell_version_in_sec)) do
+    def default(:deviation_cell_version_in_sec) do
       {:ok, 0}
     end,
-    def(default(_)) do
+    def default(:allow_update) do
+      {:ok, false}
+    end,
+    def default(_) do
       {:error, :no_such_field}
     end
   ]
+
+  (
+    @spec file_options() :: nil
+    def file_options() do
+      nil
+    end
+  )
 end

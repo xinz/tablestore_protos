@@ -1,22 +1,21 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
+defmodule ExAliyunOts.TableStoreSearch.IndexSchema do
   @moduledoc false
-  defstruct(field_schemas: [], index_setting: nil, index_sort: nil)
+  defstruct field_schemas: [], index_setting: nil, index_sort: nil
 
   (
     (
       @spec encode(struct) :: {:ok, iodata} | {:error, any}
-      def(encode(msg)) do
+      def encode(msg) do
         try do
           {:ok, encode!(msg)}
         rescue
-          e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
-            {:error, e}
+          e in [Protox.EncodingError, Protox.RequiredFieldsError] -> {:error, e}
         end
       end
 
       @spec encode!(struct) :: iodata | no_return
-      def(encode!(msg)) do
+      def encode!(msg) do
         [] |> encode_field_schemas(msg) |> encode_index_setting(msg) |> encode_index_sort(msg)
       end
     )
@@ -24,9 +23,9 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
     []
 
     [
-      defp(encode_field_schemas(acc, msg)) do
+      defp encode_field_schemas(acc, msg) do
         try do
-          case(msg.field_schemas) do
+          case msg.field_schemas do
             [] ->
               acc
 
@@ -40,41 +39,31 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:field_schemas, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:field_schemas, "invalid field value"),
+                    __STACKTRACE__
         end
       end,
-      defp(encode_index_setting(acc, msg)) do
+      defp encode_index_setting(acc, msg) do
         try do
-          case(msg.index_setting) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<18>>, Protox.Encode.encode_message(msg.index_setting)]
+          case msg.index_setting do
+            nil -> acc
+            _ -> [acc, "\x12", Protox.Encode.encode_message(msg.index_setting)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:index_setting, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:index_setting, "invalid field value"),
+                    __STACKTRACE__
         end
       end,
-      defp(encode_index_sort(acc, msg)) do
+      defp encode_index_sort(acc, msg) do
         try do
-          case(msg.index_sort) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<26>>, Protox.Encode.encode_message(msg.index_sort)]
+          case msg.index_sort do
+            nil -> acc
+            _ -> [acc, "\x1A", Protox.Encode.encode_message(msg.index_sort)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:index_sort, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:index_sort, "invalid field value"), __STACKTRACE__
         end
       end
     ]
@@ -85,7 +74,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
   (
     (
       @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
+      def decode(bytes) do
         try do
           {:ok, decode!(bytes)}
         rescue
@@ -96,7 +85,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
 
       (
         @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
+        def decode!(bytes) do
           parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.IndexSchema))
         end
       )
@@ -104,15 +93,15 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
 
     (
       @spec parse_key_value(binary, struct) :: struct
-      defp(parse_key_value(<<>>, msg)) do
+      defp parse_key_value(<<>>, msg) do
         msg
       end
 
-      defp(parse_key_value(bytes, msg)) do
+      defp parse_key_value(bytes, msg) do
         {field, rest} =
-          case(Protox.Decode.parse_key(bytes)) do
+          case Protox.Decode.parse_key(bytes) do
             {0, _, _} ->
-              raise(%Protox.IllegalTagError{})
+              raise %Protox.IllegalTagError{}
 
             {1, _, bytes} ->
               {len, bytes} = Protox.Varint.decode(bytes)
@@ -163,17 +152,16 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
 
   (
     @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
-    def(json_decode(input, opts \\ [])) do
+    def json_decode(input, opts \\ []) do
       try do
         {:ok, json_decode!(input, opts)}
       rescue
-        e in Protox.JsonDecodingError ->
-          {:error, e}
+        e in Protox.JsonDecodingError -> {:error, e}
       end
     end
 
     @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
-    def(json_decode!(input, opts \\ [])) do
+    def json_decode!(input, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
       Protox.JsonDecode.decode!(
@@ -184,17 +172,16 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
     end
 
     @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-    def(json_encode(msg, opts \\ [])) do
+    def json_encode(msg, opts \\ []) do
       try do
         {:ok, json_encode!(msg, opts)}
       rescue
-        e in Protox.JsonEncodingError ->
-          {:error, e}
+        e in Protox.JsonEncodingError -> {:error, e}
       end
     end
 
     @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
-    def(json_encode!(msg, opts \\ [])) do
+    def json_encode!(msg, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
       Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
     end
@@ -205,7 +192,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs()) do
+    def defs() do
       %{
         1 => {:field_schemas, :unpacked, {:message, ExAliyunOts.TableStoreSearch.FieldSchema}},
         2 =>
@@ -218,7 +205,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs_by_name()) do
+    def defs_by_name() do
       %{
         field_schemas: {1, :unpacked, {:message, ExAliyunOts.TableStoreSearch.FieldSchema}},
         index_setting: {2, {:scalar, nil}, {:message, ExAliyunOts.TableStoreSearch.IndexSetting}},
@@ -229,7 +216,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
 
   (
     @spec fields_defs() :: list(Protox.Field.t())
-    def(fields_defs()) do
+    def fields_defs() do
       [
         %{
           __struct__: Protox.Field,
@@ -264,7 +251,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:field_schemas)) do
+        def field_def(:field_schemas) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -277,7 +264,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
            }}
         end
 
-        def(field_def("fieldSchemas")) do
+        def field_def("fieldSchemas") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -290,7 +277,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
            }}
         end
 
-        def(field_def("field_schemas")) do
+        def field_def("field_schemas") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -304,7 +291,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
         end
       ),
       (
-        def(field_def(:index_setting)) do
+        def field_def(:index_setting) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -317,7 +304,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
            }}
         end
 
-        def(field_def("indexSetting")) do
+        def field_def("indexSetting") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -330,7 +317,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
            }}
         end
 
-        def(field_def("index_setting")) do
+        def field_def("index_setting") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -344,7 +331,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
         end
       ),
       (
-        def(field_def(:index_sort)) do
+        def field_def(:index_sort) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -357,7 +344,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
            }}
         end
 
-        def(field_def("indexSort")) do
+        def field_def("indexSort") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -370,7 +357,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
            }}
         end
 
-        def(field_def("index_sort")) do
+        def field_def("index_sort") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -383,7 +370,7 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
            }}
         end
       ),
-      def(field_def(_)) do
+      def field_def(_) do
         {:error, :no_such_field}
       end
     ]
@@ -393,31 +380,38 @@ defmodule(ExAliyunOts.TableStoreSearch.IndexSchema) do
 
   (
     @spec required_fields() :: []
-    def(required_fields()) do
+    def required_fields() do
       []
     end
   )
 
   (
     @spec syntax() :: atom()
-    def(syntax()) do
+    def syntax() do
       :proto2
     end
   )
 
   [
     @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-    def(default(:field_schemas)) do
+    def default(:field_schemas) do
       {:error, :no_default_value}
     end,
-    def(default(:index_setting)) do
+    def default(:index_setting) do
       {:ok, nil}
     end,
-    def(default(:index_sort)) do
+    def default(:index_sort) do
       {:ok, nil}
     end,
-    def(default(_)) do
+    def default(_) do
       {:error, :no_such_field}
     end
   ]
+
+  (
+    @spec file_options() :: nil
+    def file_options() do
+      nil
+    end
+  )
 end

@@ -1,32 +1,29 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
+defmodule ExAliyunOts.TableStoreTunnel.TunnelInfo do
   @moduledoc false
-  defstruct(
-    tunnel_id: nil,
-    tunnel_type: nil,
-    table_name: nil,
-    instance_name: nil,
-    stream_id: nil,
-    stage: nil,
-    expired: nil,
-    tunnel_name: nil,
-    public: nil
-  )
+  defstruct tunnel_id: nil,
+            tunnel_type: nil,
+            table_name: nil,
+            instance_name: nil,
+            stream_id: nil,
+            stage: nil,
+            expired: nil,
+            tunnel_name: nil,
+            public: nil
 
   (
     (
       @spec encode(struct) :: {:ok, iodata} | {:error, any}
-      def(encode(msg)) do
+      def encode(msg) do
         try do
           {:ok, encode!(msg)}
         rescue
-          e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
-            {:error, e}
+          e in [Protox.EncodingError, Protox.RequiredFieldsError] -> {:error, e}
         end
       end
 
       @spec encode!(struct) :: iodata | no_return
-      def(encode!(msg)) do
+      def encode!(msg) do
         []
         |> encode_tunnel_id(msg)
         |> encode_tunnel_type(msg)
@@ -43,133 +40,104 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
     []
 
     [
-      defp(encode_tunnel_id(acc, msg)) do
+      defp encode_tunnel_id(acc, msg) do
         try do
-          case(msg.tunnel_id) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:tunnel_id]))
-
-            _ ->
-              [acc, "\n", Protox.Encode.encode_string(msg.tunnel_id)]
+          case msg.tunnel_id do
+            nil -> raise Protox.RequiredFieldsError.new([:tunnel_id])
+            _ -> [acc, "\n", Protox.Encode.encode_string(msg.tunnel_id)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:tunnel_id, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:tunnel_id, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_tunnel_type(acc, msg)) do
+      defp encode_tunnel_type(acc, msg) do
         try do
-          case(msg.tunnel_type) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:tunnel_type]))
-
-            _ ->
-              [acc, <<18>>, Protox.Encode.encode_string(msg.tunnel_type)]
+          case msg.tunnel_type do
+            nil -> raise Protox.RequiredFieldsError.new([:tunnel_type])
+            _ -> [acc, "\x12", Protox.Encode.encode_string(msg.tunnel_type)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:tunnel_type, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:tunnel_type, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_table_name(acc, msg)) do
+      defp encode_table_name(acc, msg) do
         try do
-          case(msg.table_name) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:table_name]))
-
-            _ ->
-              [acc, <<26>>, Protox.Encode.encode_string(msg.table_name)]
+          case msg.table_name do
+            nil -> raise Protox.RequiredFieldsError.new([:table_name])
+            _ -> [acc, "\x1A", Protox.Encode.encode_string(msg.table_name)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:table_name, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:table_name, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_instance_name(acc, msg)) do
+      defp encode_instance_name(acc, msg) do
         try do
-          case(msg.instance_name) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:instance_name]))
-
-            _ ->
-              [acc, "\"", Protox.Encode.encode_string(msg.instance_name)]
+          case msg.instance_name do
+            nil -> raise Protox.RequiredFieldsError.new([:instance_name])
+            _ -> [acc, "\"", Protox.Encode.encode_string(msg.instance_name)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:instance_name, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:instance_name, "invalid field value"),
+                    __STACKTRACE__
         end
       end,
-      defp(encode_stream_id(acc, msg)) do
+      defp encode_stream_id(acc, msg) do
         try do
-          case(msg.stream_id) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:stream_id]))
-
-            _ ->
-              [acc, "*", Protox.Encode.encode_string(msg.stream_id)]
+          case msg.stream_id do
+            nil -> raise Protox.RequiredFieldsError.new([:stream_id])
+            _ -> [acc, "*", Protox.Encode.encode_string(msg.stream_id)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:stream_id, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:stream_id, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_stage(acc, msg)) do
+      defp encode_stage(acc, msg) do
         try do
-          case(msg.stage) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:stage]))
-
-            _ ->
-              [acc, "2", Protox.Encode.encode_string(msg.stage)]
+          case msg.stage do
+            nil -> raise Protox.RequiredFieldsError.new([:stage])
+            _ -> [acc, "2", Protox.Encode.encode_string(msg.stage)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:stage, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:stage, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_expired(acc, msg)) do
+      defp encode_expired(acc, msg) do
         try do
-          case(msg.expired) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "8", Protox.Encode.encode_bool(msg.expired)]
+          case msg.expired do
+            nil -> acc
+            _ -> [acc, "8", Protox.Encode.encode_bool(msg.expired)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:expired, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:expired, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_tunnel_name(acc, msg)) do
+      defp encode_tunnel_name(acc, msg) do
         try do
-          case(msg.tunnel_name) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "B", Protox.Encode.encode_string(msg.tunnel_name)]
+          case msg.tunnel_name do
+            nil -> acc
+            _ -> [acc, "B", Protox.Encode.encode_string(msg.tunnel_name)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:tunnel_name, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:tunnel_name, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_public(acc, msg)) do
+      defp encode_public(acc, msg) do
         try do
-          case(msg.public) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "H", Protox.Encode.encode_bool(msg.public)]
+          case msg.public do
+            nil -> acc
+            _ -> [acc, "H", Protox.Encode.encode_bool(msg.public)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:public, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:public, "invalid field value"), __STACKTRACE__
         end
       end
     ]
@@ -180,7 +148,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
   (
     (
       @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
+      def decode(bytes) do
         try do
           {:ok, decode!(bytes)}
         rescue
@@ -191,19 +159,14 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
 
       (
         @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
+        def decode!(bytes) do
           {msg, set_fields} =
             parse_key_value([], bytes, struct(ExAliyunOts.TableStoreTunnel.TunnelInfo))
 
-          case(
-            [:tunnel_id, :tunnel_type, :table_name, :instance_name, :stream_id, :stage] --
-              set_fields
-          ) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+          case [:tunnel_id, :tunnel_type, :table_name, :instance_name, :stream_id, :stage] --
+                 set_fields do
+            [] -> msg
+            missing_fields -> raise Protox.RequiredFieldsError.new(missing_fields)
           end
         end
       )
@@ -211,15 +174,15 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
 
     (
       @spec parse_key_value([atom], binary, struct) :: {struct, [atom]}
-      defp(parse_key_value(set_fields, <<>>, msg)) do
+      defp parse_key_value(set_fields, <<>>, msg) do
         {msg, set_fields}
       end
 
-      defp(parse_key_value(set_fields, bytes, msg)) do
+      defp parse_key_value(set_fields, bytes, msg) do
         {new_set_fields, field, rest} =
-          case(Protox.Decode.parse_key(bytes)) do
+          case Protox.Decode.parse_key(bytes) do
             {0, _, _} ->
-              raise(%Protox.IllegalTagError{})
+              raise %Protox.IllegalTagError{}
 
             {1, _, bytes} ->
               {len, bytes} = Protox.Varint.decode(bytes)
@@ -279,17 +242,16 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
 
   (
     @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
-    def(json_decode(input, opts \\ [])) do
+    def json_decode(input, opts \\ []) do
       try do
         {:ok, json_decode!(input, opts)}
       rescue
-        e in Protox.JsonDecodingError ->
-          {:error, e}
+        e in Protox.JsonDecodingError -> {:error, e}
       end
     end
 
     @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
-    def(json_decode!(input, opts \\ [])) do
+    def json_decode!(input, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
       Protox.JsonDecode.decode!(
@@ -300,17 +262,16 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
     end
 
     @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-    def(json_encode(msg, opts \\ [])) do
+    def json_encode(msg, opts \\ []) do
       try do
         {:ok, json_encode!(msg, opts)}
       rescue
-        e in Protox.JsonEncodingError ->
-          {:error, e}
+        e in Protox.JsonEncodingError -> {:error, e}
       end
     end
 
     @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
-    def(json_encode!(msg, opts \\ [])) do
+    def json_encode!(msg, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
       Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
     end
@@ -321,7 +282,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs()) do
+    def defs() do
       %{
         1 => {:tunnel_id, {:scalar, ""}, :string},
         2 => {:tunnel_type, {:scalar, ""}, :string},
@@ -339,7 +300,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs_by_name()) do
+    def defs_by_name() do
       %{
         expired: {7, {:scalar, false}, :bool},
         instance_name: {4, {:scalar, ""}, :string},
@@ -356,7 +317,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
 
   (
     @spec fields_defs() :: list(Protox.Field.t())
-    def(fields_defs()) do
+    def fields_defs() do
       [
         %{
           __struct__: Protox.Field,
@@ -445,7 +406,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:tunnel_id)) do
+        def field_def(:tunnel_id) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -458,7 +419,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("tunnelId")) do
+        def field_def("tunnelId") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -471,7 +432,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("tunnel_id")) do
+        def field_def("tunnel_id") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -485,7 +446,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
         end
       ),
       (
-        def(field_def(:tunnel_type)) do
+        def field_def(:tunnel_type) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -498,7 +459,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("tunnelType")) do
+        def field_def("tunnelType") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -511,7 +472,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("tunnel_type")) do
+        def field_def("tunnel_type") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -525,7 +486,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
         end
       ),
       (
-        def(field_def(:table_name)) do
+        def field_def(:table_name) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -538,7 +499,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("tableName")) do
+        def field_def("tableName") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -551,7 +512,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("table_name")) do
+        def field_def("table_name") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -565,7 +526,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
         end
       ),
       (
-        def(field_def(:instance_name)) do
+        def field_def(:instance_name) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -578,7 +539,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("instanceName")) do
+        def field_def("instanceName") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -591,7 +552,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("instance_name")) do
+        def field_def("instance_name") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -605,7 +566,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
         end
       ),
       (
-        def(field_def(:stream_id)) do
+        def field_def(:stream_id) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -618,7 +579,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("streamId")) do
+        def field_def("streamId") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -631,7 +592,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("stream_id")) do
+        def field_def("stream_id") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -645,7 +606,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
         end
       ),
       (
-        def(field_def(:stage)) do
+        def field_def(:stage) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -658,7 +619,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("stage")) do
+        def field_def("stage") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -674,7 +635,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
         []
       ),
       (
-        def(field_def(:expired)) do
+        def field_def(:expired) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -687,7 +648,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("expired")) do
+        def field_def("expired") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -703,7 +664,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
         []
       ),
       (
-        def(field_def(:tunnel_name)) do
+        def field_def(:tunnel_name) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -716,7 +677,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("tunnelName")) do
+        def field_def("tunnelName") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -729,7 +690,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("tunnel_name")) do
+        def field_def("tunnel_name") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -743,7 +704,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
         end
       ),
       (
-        def(field_def(:public)) do
+        def field_def(:public) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -756,7 +717,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
            }}
         end
 
-        def(field_def("public")) do
+        def field_def("public") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -771,7 +732,7 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
 
         []
       ),
-      def(field_def(_)) do
+      def field_def(_) do
         {:error, :no_such_field}
       end
     ]
@@ -783,49 +744,56 @@ defmodule(ExAliyunOts.TableStoreTunnel.TunnelInfo) do
     @spec required_fields() :: [
             ((((:tunnel_id | :tunnel_type) | :table_name) | :instance_name) | :stream_id) | :stage
           ]
-    def(required_fields()) do
+    def required_fields() do
       [:tunnel_id, :tunnel_type, :table_name, :instance_name, :stream_id, :stage]
     end
   )
 
   (
     @spec syntax() :: atom()
-    def(syntax()) do
+    def syntax() do
       :proto2
     end
   )
 
   [
     @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-    def(default(:tunnel_id)) do
+    def default(:tunnel_id) do
       {:ok, ""}
     end,
-    def(default(:tunnel_type)) do
+    def default(:tunnel_type) do
       {:ok, ""}
     end,
-    def(default(:table_name)) do
+    def default(:table_name) do
       {:ok, ""}
     end,
-    def(default(:instance_name)) do
+    def default(:instance_name) do
       {:ok, ""}
     end,
-    def(default(:stream_id)) do
+    def default(:stream_id) do
       {:ok, ""}
     end,
-    def(default(:stage)) do
+    def default(:stage) do
       {:ok, ""}
     end,
-    def(default(:expired)) do
+    def default(:expired) do
       {:ok, false}
     end,
-    def(default(:tunnel_name)) do
+    def default(:tunnel_name) do
       {:ok, ""}
     end,
-    def(default(:public)) do
+    def default(:public) do
       {:ok, false}
     end,
-    def(default(_)) do
+    def default(_) do
       {:error, :no_such_field}
     end
   ]
+
+  (
+    @spec file_options() :: nil
+    def file_options() do
+      nil
+    end
+  )
 end

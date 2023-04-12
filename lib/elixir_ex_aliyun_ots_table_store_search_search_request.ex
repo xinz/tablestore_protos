@@ -1,105 +1,87 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
+defmodule ExAliyunOts.TableStoreSearch.SearchRequest do
   @moduledoc false
-  defstruct(
-    table_name: nil,
-    index_name: nil,
-    columns_to_get: nil,
-    search_query: nil,
-    routing_values: []
-  )
+  defstruct table_name: nil,
+            index_name: nil,
+            columns_to_get: nil,
+            search_query: nil,
+            routing_values: [],
+            timeoutMs: nil
 
   (
     (
       @spec encode(struct) :: {:ok, iodata} | {:error, any}
-      def(encode(msg)) do
+      def encode(msg) do
         try do
           {:ok, encode!(msg)}
         rescue
-          e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
-            {:error, e}
+          e in [Protox.EncodingError, Protox.RequiredFieldsError] -> {:error, e}
         end
       end
 
       @spec encode!(struct) :: iodata | no_return
-      def(encode!(msg)) do
+      def encode!(msg) do
         []
         |> encode_table_name(msg)
         |> encode_index_name(msg)
         |> encode_columns_to_get(msg)
         |> encode_search_query(msg)
         |> encode_routing_values(msg)
+        |> encode_timeoutMs(msg)
       end
     )
 
     []
 
     [
-      defp(encode_table_name(acc, msg)) do
+      defp encode_table_name(acc, msg) do
         try do
-          case(msg.table_name) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
+          case msg.table_name do
+            nil -> acc
+            _ -> [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:table_name, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:table_name, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_index_name(acc, msg)) do
+      defp encode_index_name(acc, msg) do
         try do
-          case(msg.index_name) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<18>>, Protox.Encode.encode_string(msg.index_name)]
+          case msg.index_name do
+            nil -> acc
+            _ -> [acc, "\x12", Protox.Encode.encode_string(msg.index_name)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:index_name, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:index_name, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_columns_to_get(acc, msg)) do
+      defp encode_columns_to_get(acc, msg) do
         try do
-          case(msg.columns_to_get) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<26>>, Protox.Encode.encode_message(msg.columns_to_get)]
+          case msg.columns_to_get do
+            nil -> acc
+            _ -> [acc, "\x1A", Protox.Encode.encode_message(msg.columns_to_get)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:columns_to_get, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:columns_to_get, "invalid field value"),
+                    __STACKTRACE__
         end
       end,
-      defp(encode_search_query(acc, msg)) do
+      defp encode_search_query(acc, msg) do
         try do
-          case(msg.search_query) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\"", Protox.Encode.encode_bytes(msg.search_query)]
+          case msg.search_query do
+            nil -> acc
+            _ -> [acc, "\"", Protox.Encode.encode_bytes(msg.search_query)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:search_query, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:search_query, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_routing_values(acc, msg)) do
+      defp encode_routing_values(acc, msg) do
         try do
-          case(msg.routing_values) do
+          case msg.routing_values do
             [] ->
               acc
 
@@ -113,10 +95,19 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:routing_values, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:routing_values, "invalid field value"),
+                    __STACKTRACE__
+        end
+      end,
+      defp encode_timeoutMs(acc, msg) do
+        try do
+          case msg.timeoutMs do
+            nil -> acc
+            _ -> [acc, "0", Protox.Encode.encode_int32(msg.timeoutMs)]
+          end
+        rescue
+          ArgumentError ->
+            reraise Protox.EncodingError.new(:timeoutMs, "invalid field value"), __STACKTRACE__
         end
       end
     ]
@@ -127,7 +118,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
   (
     (
       @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
+      def decode(bytes) do
         try do
           {:ok, decode!(bytes)}
         rescue
@@ -138,7 +129,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
 
       (
         @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
+        def decode!(bytes) do
           parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.SearchRequest))
         end
       )
@@ -146,15 +137,15 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
 
     (
       @spec parse_key_value(binary, struct) :: struct
-      defp(parse_key_value(<<>>, msg)) do
+      defp parse_key_value(<<>>, msg) do
         msg
       end
 
-      defp(parse_key_value(bytes, msg)) do
+      defp parse_key_value(bytes, msg) do
         {field, rest} =
-          case(Protox.Decode.parse_key(bytes)) do
+          case Protox.Decode.parse_key(bytes) do
             {0, _, _} ->
-              raise(%Protox.IllegalTagError{})
+              raise %Protox.IllegalTagError{}
 
             {1, _, bytes} ->
               {len, bytes} = Protox.Varint.decode(bytes)
@@ -188,6 +179,10 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
               {delimited, rest} = Protox.Decode.parse_delimited(bytes, len)
               {[routing_values: msg.routing_values ++ [delimited]], rest}
 
+            {6, _, bytes} ->
+              {value, rest} = Protox.Decode.parse_int32(bytes)
+              {[timeoutMs: value], rest}
+
             {tag, wire_type, rest} ->
               {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
               {[], rest}
@@ -203,17 +198,16 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
 
   (
     @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
-    def(json_decode(input, opts \\ [])) do
+    def json_decode(input, opts \\ []) do
       try do
         {:ok, json_decode!(input, opts)}
       rescue
-        e in Protox.JsonDecodingError ->
-          {:error, e}
+        e in Protox.JsonDecodingError -> {:error, e}
       end
     end
 
     @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
-    def(json_decode!(input, opts \\ [])) do
+    def json_decode!(input, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
       Protox.JsonDecode.decode!(
@@ -224,17 +218,16 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
     end
 
     @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-    def(json_encode(msg, opts \\ [])) do
+    def json_encode(msg, opts \\ []) do
       try do
         {:ok, json_encode!(msg, opts)}
       rescue
-        e in Protox.JsonEncodingError ->
-          {:error, e}
+        e in Protox.JsonEncodingError -> {:error, e}
       end
     end
 
     @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
-    def(json_encode!(msg, opts \\ [])) do
+    def json_encode!(msg, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
       Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
     end
@@ -245,14 +238,15 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs()) do
+    def defs() do
       %{
         1 => {:table_name, {:scalar, ""}, :string},
         2 => {:index_name, {:scalar, ""}, :string},
         3 =>
           {:columns_to_get, {:scalar, nil}, {:message, ExAliyunOts.TableStoreSearch.ColumnsToGet}},
         4 => {:search_query, {:scalar, ""}, :bytes},
-        5 => {:routing_values, :unpacked, :bytes}
+        5 => {:routing_values, :unpacked, :bytes},
+        6 => {:timeoutMs, {:scalar, 0}, :int32}
       }
     end
 
@@ -260,21 +254,22 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs_by_name()) do
+    def defs_by_name() do
       %{
         columns_to_get:
           {3, {:scalar, nil}, {:message, ExAliyunOts.TableStoreSearch.ColumnsToGet}},
         index_name: {2, {:scalar, ""}, :string},
         routing_values: {5, :unpacked, :bytes},
         search_query: {4, {:scalar, ""}, :bytes},
-        table_name: {1, {:scalar, ""}, :string}
+        table_name: {1, {:scalar, ""}, :string},
+        timeoutMs: {6, {:scalar, 0}, :int32}
       }
     end
   )
 
   (
     @spec fields_defs() :: list(Protox.Field.t())
-    def(fields_defs()) do
+    def fields_defs() do
       [
         %{
           __struct__: Protox.Field,
@@ -320,6 +315,15 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
           name: :routing_values,
           tag: 5,
           type: :bytes
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "timeoutMs",
+          kind: {:scalar, 0},
+          label: :optional,
+          name: :timeoutMs,
+          tag: 6,
+          type: :int32
         }
       ]
     end
@@ -327,7 +331,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:table_name)) do
+        def field_def(:table_name) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -340,7 +344,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
            }}
         end
 
-        def(field_def("tableName")) do
+        def field_def("tableName") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -353,7 +357,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
            }}
         end
 
-        def(field_def("table_name")) do
+        def field_def("table_name") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -367,7 +371,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
         end
       ),
       (
-        def(field_def(:index_name)) do
+        def field_def(:index_name) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -380,7 +384,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
            }}
         end
 
-        def(field_def("indexName")) do
+        def field_def("indexName") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -393,7 +397,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
            }}
         end
 
-        def(field_def("index_name")) do
+        def field_def("index_name") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -407,7 +411,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
         end
       ),
       (
-        def(field_def(:columns_to_get)) do
+        def field_def(:columns_to_get) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -420,7 +424,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
            }}
         end
 
-        def(field_def("columnsToGet")) do
+        def field_def("columnsToGet") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -433,7 +437,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
            }}
         end
 
-        def(field_def("columns_to_get")) do
+        def field_def("columns_to_get") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -447,7 +451,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
         end
       ),
       (
-        def(field_def(:search_query)) do
+        def field_def(:search_query) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -460,7 +464,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
            }}
         end
 
-        def(field_def("searchQuery")) do
+        def field_def("searchQuery") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -473,7 +477,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
            }}
         end
 
-        def(field_def("search_query")) do
+        def field_def("search_query") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -487,7 +491,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
         end
       ),
       (
-        def(field_def(:routing_values)) do
+        def field_def(:routing_values) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -500,7 +504,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
            }}
         end
 
-        def(field_def("routingValues")) do
+        def field_def("routingValues") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -513,7 +517,7 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
            }}
         end
 
-        def(field_def("routing_values")) do
+        def field_def("routing_values") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -526,7 +530,36 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
            }}
         end
       ),
-      def(field_def(_)) do
+      (
+        def field_def(:timeoutMs) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "timeoutMs",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :timeoutMs,
+             tag: 6,
+             type: :int32
+           }}
+        end
+
+        def field_def("timeoutMs") do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "timeoutMs",
+             kind: {:scalar, 0},
+             label: :optional,
+             name: :timeoutMs,
+             tag: 6,
+             type: :int32
+           }}
+        end
+
+        []
+      ),
+      def field_def(_) do
         {:error, :no_such_field}
       end
     ]
@@ -536,37 +569,47 @@ defmodule(ExAliyunOts.TableStoreSearch.SearchRequest) do
 
   (
     @spec required_fields() :: []
-    def(required_fields()) do
+    def required_fields() do
       []
     end
   )
 
   (
     @spec syntax() :: atom()
-    def(syntax()) do
+    def syntax() do
       :proto2
     end
   )
 
   [
     @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-    def(default(:table_name)) do
+    def default(:table_name) do
       {:ok, ""}
     end,
-    def(default(:index_name)) do
+    def default(:index_name) do
       {:ok, ""}
     end,
-    def(default(:columns_to_get)) do
+    def default(:columns_to_get) do
       {:ok, nil}
     end,
-    def(default(:search_query)) do
+    def default(:search_query) do
       {:ok, ""}
     end,
-    def(default(:routing_values)) do
+    def default(:routing_values) do
       {:error, :no_default_value}
     end,
-    def(default(_)) do
+    def default(:timeoutMs) do
+      {:ok, 0}
+    end,
+    def default(_) do
       {:error, :no_such_field}
     end
   ]
+
+  (
+    @spec file_options() :: nil
+    def file_options() do
+      nil
+    end
+  )
 end

@@ -1,22 +1,21 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
+defmodule ExAliyunOts.TableStore.TableInBatchWriteRowResponse do
   @moduledoc false
-  defstruct(table_name: nil, rows: [])
+  defstruct table_name: nil, rows: []
 
   (
     (
       @spec encode(struct) :: {:ok, iodata} | {:error, any}
-      def(encode(msg)) do
+      def encode(msg) do
         try do
           {:ok, encode!(msg)}
         rescue
-          e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
-            {:error, e}
+          e in [Protox.EncodingError, Protox.RequiredFieldsError] -> {:error, e}
         end
       end
 
       @spec encode!(struct) :: iodata | no_return
-      def(encode!(msg)) do
+      def encode!(msg) do
         [] |> encode_table_name(msg) |> encode_rows(msg)
       end
     )
@@ -24,23 +23,20 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
     []
 
     [
-      defp(encode_table_name(acc, msg)) do
+      defp encode_table_name(acc, msg) do
         try do
-          case(msg.table_name) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:table_name]))
-
-            _ ->
-              [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
+          case msg.table_name do
+            nil -> raise Protox.RequiredFieldsError.new([:table_name])
+            _ -> [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:table_name, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:table_name, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_rows(acc, msg)) do
+      defp encode_rows(acc, msg) do
         try do
-          case(msg.rows) do
+          case msg.rows do
             [] ->
               acc
 
@@ -48,13 +44,13 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
               [
                 acc,
                 Enum.reduce(values, [], fn value, acc ->
-                  [acc, <<18>>, Protox.Encode.encode_message(value)]
+                  [acc, "\x12", Protox.Encode.encode_message(value)]
                 end)
               ]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:rows, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:rows, "invalid field value"), __STACKTRACE__
         end
       end
     ]
@@ -65,7 +61,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
   (
     (
       @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
+      def decode(bytes) do
         try do
           {:ok, decode!(bytes)}
         rescue
@@ -76,7 +72,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
 
       (
         @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
+        def decode!(bytes) do
           {msg, set_fields} =
             parse_key_value(
               [],
@@ -84,12 +80,9 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
               struct(ExAliyunOts.TableStore.TableInBatchWriteRowResponse)
             )
 
-          case([:table_name] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+          case [:table_name] -- set_fields do
+            [] -> msg
+            missing_fields -> raise Protox.RequiredFieldsError.new(missing_fields)
           end
         end
       )
@@ -97,15 +90,15 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
 
     (
       @spec parse_key_value([atom], binary, struct) :: {struct, [atom]}
-      defp(parse_key_value(set_fields, <<>>, msg)) do
+      defp parse_key_value(set_fields, <<>>, msg) do
         {msg, set_fields}
       end
 
-      defp(parse_key_value(set_fields, bytes, msg)) do
+      defp parse_key_value(set_fields, bytes, msg) do
         {new_set_fields, field, rest} =
-          case(Protox.Decode.parse_key(bytes)) do
+          case Protox.Decode.parse_key(bytes) do
             {0, _, _} ->
-              raise(%Protox.IllegalTagError{})
+              raise %Protox.IllegalTagError{}
 
             {1, _, bytes} ->
               {len, bytes} = Protox.Varint.decode(bytes)
@@ -138,17 +131,16 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
 
   (
     @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
-    def(json_decode(input, opts \\ [])) do
+    def json_decode(input, opts \\ []) do
       try do
         {:ok, json_decode!(input, opts)}
       rescue
-        e in Protox.JsonDecodingError ->
-          {:error, e}
+        e in Protox.JsonDecodingError -> {:error, e}
       end
     end
 
     @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
-    def(json_decode!(input, opts \\ [])) do
+    def json_decode!(input, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
       Protox.JsonDecode.decode!(
@@ -159,17 +151,16 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
     end
 
     @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-    def(json_encode(msg, opts \\ [])) do
+    def json_encode(msg, opts \\ []) do
       try do
         {:ok, json_encode!(msg, opts)}
       rescue
-        e in Protox.JsonEncodingError ->
-          {:error, e}
+        e in Protox.JsonEncodingError -> {:error, e}
       end
     end
 
     @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
-    def(json_encode!(msg, opts \\ [])) do
+    def json_encode!(msg, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
       Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
     end
@@ -180,7 +171,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs()) do
+    def defs() do
       %{
         1 => {:table_name, {:scalar, ""}, :string},
         2 => {:rows, :unpacked, {:message, ExAliyunOts.TableStore.RowInBatchWriteRowResponse}}
@@ -191,7 +182,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs_by_name()) do
+    def defs_by_name() do
       %{
         rows: {2, :unpacked, {:message, ExAliyunOts.TableStore.RowInBatchWriteRowResponse}},
         table_name: {1, {:scalar, ""}, :string}
@@ -201,7 +192,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
 
   (
     @spec fields_defs() :: list(Protox.Field.t())
-    def(fields_defs()) do
+    def fields_defs() do
       [
         %{
           __struct__: Protox.Field,
@@ -227,7 +218,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:table_name)) do
+        def field_def(:table_name) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -240,7 +231,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
            }}
         end
 
-        def(field_def("tableName")) do
+        def field_def("tableName") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -253,7 +244,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
            }}
         end
 
-        def(field_def("table_name")) do
+        def field_def("table_name") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -267,7 +258,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
         end
       ),
       (
-        def(field_def(:rows)) do
+        def field_def(:rows) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -280,7 +271,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
            }}
         end
 
-        def(field_def("rows")) do
+        def field_def("rows") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -295,7 +286,7 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
 
         []
       ),
-      def(field_def(_)) do
+      def field_def(_) do
         {:error, :no_such_field}
       end
     ]
@@ -305,28 +296,35 @@ defmodule(ExAliyunOts.TableStore.TableInBatchWriteRowResponse) do
 
   (
     @spec required_fields() :: [:table_name]
-    def(required_fields()) do
+    def required_fields() do
       [:table_name]
     end
   )
 
   (
     @spec syntax() :: atom()
-    def(syntax()) do
+    def syntax() do
       :proto2
     end
   )
 
   [
     @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-    def(default(:table_name)) do
+    def default(:table_name) do
       {:ok, ""}
     end,
-    def(default(:rows)) do
+    def default(:rows) do
       {:error, :no_default_value}
     end,
-    def(default(_)) do
+    def default(_) do
       {:error, :no_such_field}
     end
   ]
+
+  (
+    @spec file_options() :: nil
+    def file_options() do
+      nil
+    end
+  )
 end

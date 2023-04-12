@@ -1,6 +1,7 @@
 syntax = "proto2";
+package TableStoreSearch;
 
-package ExAliyunOts.TableStoreSearch;
+import "table_store.proto";
 
 /* query */
 enum QueryType {
@@ -160,6 +161,8 @@ message FieldSort {
     optional SortOrder order = 2;
     optional SortMode mode = 3;
     optional NestedFilter nested_filter = 4;
+    optional bytes missing_value = 5;
+    optional string missing_field = 6;
 }
 
 enum GeoDistanceType {
@@ -221,6 +224,7 @@ message SearchRequest {
     optional ColumnsToGet columns_to_get = 3;
     optional bytes search_query = 4;
     repeated bytes routing_values = 5;
+    optional int32 timeoutMs = 6;
 }
 
 /**
@@ -234,6 +238,8 @@ message SearchResponse {
     optional bytes next_token = 6;
     optional bytes aggs = 7;
     optional bytes group_bys = 8;
+    optional TableStore.ConsumedCapacity consumed = 9;
+    optional TableStore.ConsumedCapacity reserved_consumed = 10;
 }
 
 /* Create Search Index */
@@ -253,6 +259,7 @@ enum FieldType {
     TEXT = 5;
     NESTED = 6;
     GEO_POINT = 7;
+    DATE = 8;
 }
 
 message SingleWordAnalyzerParameter {
@@ -282,6 +289,7 @@ message FieldSchema {
     optional bytes analyzer_parameter = 10;
     optional bool is_virtual_field = 11;
     repeated string source_field_names = 12;
+    repeated string date_formats = 13;
 }
 
 message IndexSchema {
@@ -300,9 +308,28 @@ message CreateSearchIndexRequest {
     required string table_name = 1;
     required string index_name = 2;
     optional IndexSchema schema = 3;
+    optional string source_index_name = 4; // It is not recommended to use the SDK directly
+    optional int32 time_to_live = 5; // unit is seconds
 }
 
 message CreateSearchIndexResponse {
+}
+
+/* Update Search Index */
+message QueryFlowWeight {
+    optional string index_name = 1;
+    optional int32 weight = 2;
+}
+
+message UpdateSearchIndexRequest {
+    optional string table_name = 1;
+    optional string index_name = 2;
+    optional string switch_index_name = 3;
+    repeated QueryFlowWeight query_flow_weight = 4;
+    optional int32 time_to_live = 5;  // unit is seconds
+}
+
+message UpdateSearchIndexResponse {
 }
 
 /* List Search Index */
@@ -341,6 +368,13 @@ message SyncStat {
     optional int64 current_sync_timestamp = 2; // 同步进度，参考TunnelService。
 }
 
+message MeteringInfo {
+    optional int64 storage_size = 1;
+    optional int64 row_count = 2;
+    optional int64 reserved_read_cu = 3;
+    optional int64 timestamp = 4;
+}
+
 message DescribeSearchIndexRequest {
     optional string table_name = 1;
     optional string index_name = 2;
@@ -349,6 +383,12 @@ message DescribeSearchIndexRequest {
 message DescribeSearchIndexResponse {
     optional IndexSchema schema = 1;
     optional SyncStat sync_stat = 2;
+    optional MeteringInfo metering_info = 3;
+
+    optional string brother_index_name = 4;
+    repeated QueryFlowWeight query_flow_weight = 5;
+    optional int64 create_time = 6;
+    optional int32 time_to_live = 7;  // unit is seconds
 }
 
 
@@ -636,6 +676,7 @@ message ParallelScanRequest {
     optional ColumnsToGet columns_to_get = 3;
     optional bytes session_id = 4;
     optional bytes scan_query = 5;
+    optional int32 timeoutMs = 6;
 }
 
 message ParallelScanResponse {

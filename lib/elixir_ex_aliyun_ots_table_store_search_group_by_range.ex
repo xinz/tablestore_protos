@@ -1,22 +1,21 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
+defmodule ExAliyunOts.TableStoreSearch.GroupByRange do
   @moduledoc false
-  defstruct(field_name: nil, ranges: [], sub_aggs: nil, sub_group_bys: nil)
+  defstruct field_name: nil, ranges: [], sub_aggs: nil, sub_group_bys: nil
 
   (
     (
       @spec encode(struct) :: {:ok, iodata} | {:error, any}
-      def(encode(msg)) do
+      def encode(msg) do
         try do
           {:ok, encode!(msg)}
         rescue
-          e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
-            {:error, e}
+          e in [Protox.EncodingError, Protox.RequiredFieldsError] -> {:error, e}
         end
       end
 
       @spec encode!(struct) :: iodata | no_return
-      def(encode!(msg)) do
+      def encode!(msg) do
         []
         |> encode_field_name(msg)
         |> encode_ranges(msg)
@@ -28,23 +27,20 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
     []
 
     [
-      defp(encode_field_name(acc, msg)) do
+      defp encode_field_name(acc, msg) do
         try do
-          case(msg.field_name) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\n", Protox.Encode.encode_string(msg.field_name)]
+          case msg.field_name do
+            nil -> acc
+            _ -> [acc, "\n", Protox.Encode.encode_string(msg.field_name)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:field_name, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:field_name, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_ranges(acc, msg)) do
+      defp encode_ranges(acc, msg) do
         try do
-          case(msg.ranges) do
+          case msg.ranges do
             [] ->
               acc
 
@@ -52,44 +48,36 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
               [
                 acc,
                 Enum.reduce(values, [], fn value, acc ->
-                  [acc, <<18>>, Protox.Encode.encode_message(value)]
+                  [acc, "\x12", Protox.Encode.encode_message(value)]
                 end)
               ]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:ranges, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:ranges, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_sub_aggs(acc, msg)) do
+      defp encode_sub_aggs(acc, msg) do
         try do
-          case(msg.sub_aggs) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<26>>, Protox.Encode.encode_message(msg.sub_aggs)]
+          case msg.sub_aggs do
+            nil -> acc
+            _ -> [acc, "\x1A", Protox.Encode.encode_message(msg.sub_aggs)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:sub_aggs, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:sub_aggs, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_sub_group_bys(acc, msg)) do
+      defp encode_sub_group_bys(acc, msg) do
         try do
-          case(msg.sub_group_bys) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\"", Protox.Encode.encode_message(msg.sub_group_bys)]
+          case msg.sub_group_bys do
+            nil -> acc
+            _ -> [acc, "\"", Protox.Encode.encode_message(msg.sub_group_bys)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:sub_group_bys, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:sub_group_bys, "invalid field value"),
+                    __STACKTRACE__
         end
       end
     ]
@@ -100,7 +88,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
   (
     (
       @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
+      def decode(bytes) do
         try do
           {:ok, decode!(bytes)}
         rescue
@@ -111,7 +99,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
 
       (
         @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
+        def decode!(bytes) do
           parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.GroupByRange))
         end
       )
@@ -119,15 +107,15 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
 
     (
       @spec parse_key_value(binary, struct) :: struct
-      defp(parse_key_value(<<>>, msg)) do
+      defp parse_key_value(<<>>, msg) do
         msg
       end
 
-      defp(parse_key_value(bytes, msg)) do
+      defp parse_key_value(bytes, msg) do
         {field, rest} =
-          case(Protox.Decode.parse_key(bytes)) do
+          case Protox.Decode.parse_key(bytes) do
             {0, _, _} ->
-              raise(%Protox.IllegalTagError{})
+              raise %Protox.IllegalTagError{}
 
             {1, _, bytes} ->
               {len, bytes} = Protox.Varint.decode(bytes)
@@ -180,17 +168,16 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
 
   (
     @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
-    def(json_decode(input, opts \\ [])) do
+    def json_decode(input, opts \\ []) do
       try do
         {:ok, json_decode!(input, opts)}
       rescue
-        e in Protox.JsonDecodingError ->
-          {:error, e}
+        e in Protox.JsonDecodingError -> {:error, e}
       end
     end
 
     @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
-    def(json_decode!(input, opts \\ [])) do
+    def json_decode!(input, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
       Protox.JsonDecode.decode!(
@@ -201,17 +188,16 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
     end
 
     @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-    def(json_encode(msg, opts \\ [])) do
+    def json_encode(msg, opts \\ []) do
       try do
         {:ok, json_encode!(msg, opts)}
       rescue
-        e in Protox.JsonEncodingError ->
-          {:error, e}
+        e in Protox.JsonEncodingError -> {:error, e}
       end
     end
 
     @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
-    def(json_encode!(msg, opts \\ [])) do
+    def json_encode!(msg, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
       Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
     end
@@ -222,7 +208,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs()) do
+    def defs() do
       %{
         1 => {:field_name, {:scalar, ""}, :string},
         2 => {:ranges, :unpacked, {:message, ExAliyunOts.TableStoreSearch.Range}},
@@ -235,7 +221,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs_by_name()) do
+    def defs_by_name() do
       %{
         field_name: {1, {:scalar, ""}, :string},
         ranges: {2, :unpacked, {:message, ExAliyunOts.TableStoreSearch.Range}},
@@ -247,7 +233,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
 
   (
     @spec fields_defs() :: list(Protox.Field.t())
-    def(fields_defs()) do
+    def fields_defs() do
       [
         %{
           __struct__: Protox.Field,
@@ -291,7 +277,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:field_name)) do
+        def field_def(:field_name) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -304,7 +290,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
            }}
         end
 
-        def(field_def("fieldName")) do
+        def field_def("fieldName") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -317,7 +303,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
            }}
         end
 
-        def(field_def("field_name")) do
+        def field_def("field_name") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -331,7 +317,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
         end
       ),
       (
-        def(field_def(:ranges)) do
+        def field_def(:ranges) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -344,7 +330,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
            }}
         end
 
-        def(field_def("ranges")) do
+        def field_def("ranges") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -360,7 +346,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
         []
       ),
       (
-        def(field_def(:sub_aggs)) do
+        def field_def(:sub_aggs) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -373,7 +359,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
            }}
         end
 
-        def(field_def("subAggs")) do
+        def field_def("subAggs") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -386,7 +372,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
            }}
         end
 
-        def(field_def("sub_aggs")) do
+        def field_def("sub_aggs") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -400,7 +386,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
         end
       ),
       (
-        def(field_def(:sub_group_bys)) do
+        def field_def(:sub_group_bys) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -413,7 +399,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
            }}
         end
 
-        def(field_def("subGroupBys")) do
+        def field_def("subGroupBys") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -426,7 +412,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
            }}
         end
 
-        def(field_def("sub_group_bys")) do
+        def field_def("sub_group_bys") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -439,7 +425,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
            }}
         end
       ),
-      def(field_def(_)) do
+      def field_def(_) do
         {:error, :no_such_field}
       end
     ]
@@ -449,34 +435,41 @@ defmodule(ExAliyunOts.TableStoreSearch.GroupByRange) do
 
   (
     @spec required_fields() :: []
-    def(required_fields()) do
+    def required_fields() do
       []
     end
   )
 
   (
     @spec syntax() :: atom()
-    def(syntax()) do
+    def syntax() do
       :proto2
     end
   )
 
   [
     @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-    def(default(:field_name)) do
+    def default(:field_name) do
       {:ok, ""}
     end,
-    def(default(:ranges)) do
+    def default(:ranges) do
       {:error, :no_default_value}
     end,
-    def(default(:sub_aggs)) do
+    def default(:sub_aggs) do
       {:ok, nil}
     end,
-    def(default(:sub_group_bys)) do
+    def default(:sub_group_bys) do
       {:ok, nil}
     end,
-    def(default(_)) do
+    def default(_) do
       {:error, :no_such_field}
     end
   ]
+
+  (
+    @spec file_options() :: nil
+    def file_options() do
+      nil
+    end
+  )
 end
