@@ -1,37 +1,34 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
+defmodule ExAliyunOts.TableStore.GetRangeRequest do
   @moduledoc false
-  defstruct(
-    table_name: nil,
-    direction: nil,
-    columns_to_get: [],
-    time_range: nil,
-    max_versions: nil,
-    limit: nil,
-    inclusive_start_primary_key: nil,
-    exclusive_end_primary_key: nil,
-    cache_blocks: nil,
-    filter: nil,
-    start_column: nil,
-    end_column: nil,
-    token: nil,
-    transaction_id: nil
-  )
+  defstruct table_name: nil,
+            direction: nil,
+            columns_to_get: [],
+            time_range: nil,
+            max_versions: nil,
+            limit: nil,
+            inclusive_start_primary_key: nil,
+            exclusive_end_primary_key: nil,
+            cache_blocks: nil,
+            filter: nil,
+            start_column: nil,
+            end_column: nil,
+            token: nil,
+            transaction_id: nil
 
   (
     (
       @spec encode(struct) :: {:ok, iodata} | {:error, any}
-      def(encode(msg)) do
+      def encode(msg) do
         try do
           {:ok, encode!(msg)}
         rescue
-          e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
-            {:error, e}
+          e in [Protox.EncodingError, Protox.RequiredFieldsError] -> {:error, e}
         end
       end
 
       @spec encode!(struct) :: iodata | no_return
-      def(encode!(msg)) do
+      def encode!(msg) do
         []
         |> encode_table_name(msg)
         |> encode_direction(msg)
@@ -53,30 +50,27 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
     []
 
     [
-      defp(encode_table_name(acc, msg)) do
+      defp encode_table_name(acc, msg) do
         try do
-          case(msg.table_name) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:table_name]))
-
-            _ ->
-              [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
+          case msg.table_name do
+            nil -> raise Protox.RequiredFieldsError.new([:table_name])
+            _ -> [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:table_name, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:table_name, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_direction(acc, msg)) do
+      defp encode_direction(acc, msg) do
         try do
-          case(msg.direction) do
+          case msg.direction do
             nil ->
-              raise(Protox.RequiredFieldsError.new([:direction]))
+              raise Protox.RequiredFieldsError.new([:direction])
 
             _ ->
               [
                 acc,
-                <<16>>,
+                "\x10",
                 msg.direction
                 |> ExAliyunOts.TableStore.Direction.encode()
                 |> Protox.Encode.encode_enum()
@@ -84,12 +78,12 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:direction, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:direction, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_columns_to_get(acc, msg)) do
+      defp encode_columns_to_get(acc, msg) do
         try do
-          case(msg.columns_to_get) do
+          case msg.columns_to_get do
             [] ->
               acc
 
@@ -97,188 +91,138 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
               [
                 acc,
                 Enum.reduce(values, [], fn value, acc ->
-                  [acc, <<26>>, Protox.Encode.encode_string(value)]
+                  [acc, "\x1A", Protox.Encode.encode_string(value)]
                 end)
               ]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:columns_to_get, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:columns_to_get, "invalid field value"),
+                    __STACKTRACE__
         end
       end,
-      defp(encode_time_range(acc, msg)) do
+      defp encode_time_range(acc, msg) do
         try do
-          case(msg.time_range) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\"", Protox.Encode.encode_message(msg.time_range)]
+          case msg.time_range do
+            nil -> acc
+            _ -> [acc, "\"", Protox.Encode.encode_message(msg.time_range)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:time_range, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:time_range, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_max_versions(acc, msg)) do
+      defp encode_max_versions(acc, msg) do
         try do
-          case(msg.max_versions) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "(", Protox.Encode.encode_int32(msg.max_versions)]
+          case msg.max_versions do
+            nil -> acc
+            _ -> [acc, "(", Protox.Encode.encode_int32(msg.max_versions)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:max_versions, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:max_versions, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_limit(acc, msg)) do
+      defp encode_limit(acc, msg) do
         try do
-          case(msg.limit) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "0", Protox.Encode.encode_int32(msg.limit)]
+          case msg.limit do
+            nil -> acc
+            _ -> [acc, "0", Protox.Encode.encode_int32(msg.limit)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:limit, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:limit, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_inclusive_start_primary_key(acc, msg)) do
+      defp encode_inclusive_start_primary_key(acc, msg) do
         try do
-          case(msg.inclusive_start_primary_key) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:inclusive_start_primary_key]))
-
-            _ ->
-              [acc, ":", Protox.Encode.encode_bytes(msg.inclusive_start_primary_key)]
+          case msg.inclusive_start_primary_key do
+            nil -> raise Protox.RequiredFieldsError.new([:inclusive_start_primary_key])
+            _ -> [acc, ":", Protox.Encode.encode_bytes(msg.inclusive_start_primary_key)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:inclusive_start_primary_key, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:inclusive_start_primary_key, "invalid field value"),
+                    __STACKTRACE__
         end
       end,
-      defp(encode_exclusive_end_primary_key(acc, msg)) do
+      defp encode_exclusive_end_primary_key(acc, msg) do
         try do
-          case(msg.exclusive_end_primary_key) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:exclusive_end_primary_key]))
-
-            _ ->
-              [acc, "B", Protox.Encode.encode_bytes(msg.exclusive_end_primary_key)]
+          case msg.exclusive_end_primary_key do
+            nil -> raise Protox.RequiredFieldsError.new([:exclusive_end_primary_key])
+            _ -> [acc, "B", Protox.Encode.encode_bytes(msg.exclusive_end_primary_key)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:exclusive_end_primary_key, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:exclusive_end_primary_key, "invalid field value"),
+                    __STACKTRACE__
         end
       end,
-      defp(encode_cache_blocks(acc, msg)) do
+      defp encode_cache_blocks(acc, msg) do
         try do
-          case(msg.cache_blocks) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "H", Protox.Encode.encode_bool(msg.cache_blocks)]
+          case msg.cache_blocks do
+            nil -> acc
+            _ -> [acc, "H", Protox.Encode.encode_bool(msg.cache_blocks)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:cache_blocks, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:cache_blocks, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_filter(acc, msg)) do
+      defp encode_filter(acc, msg) do
         try do
-          case(msg.filter) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "R", Protox.Encode.encode_bytes(msg.filter)]
+          case msg.filter do
+            nil -> acc
+            _ -> [acc, "R", Protox.Encode.encode_bytes(msg.filter)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:filter, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:filter, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_start_column(acc, msg)) do
+      defp encode_start_column(acc, msg) do
         try do
-          case(msg.start_column) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "Z", Protox.Encode.encode_string(msg.start_column)]
+          case msg.start_column do
+            nil -> acc
+            _ -> [acc, "Z", Protox.Encode.encode_string(msg.start_column)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:start_column, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:start_column, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_end_column(acc, msg)) do
+      defp encode_end_column(acc, msg) do
         try do
-          case(msg.end_column) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "b", Protox.Encode.encode_string(msg.end_column)]
+          case msg.end_column do
+            nil -> acc
+            _ -> [acc, "b", Protox.Encode.encode_string(msg.end_column)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:end_column, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:end_column, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_token(acc, msg)) do
+      defp encode_token(acc, msg) do
         try do
-          case(msg.token) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "j", Protox.Encode.encode_bytes(msg.token)]
+          case msg.token do
+            nil -> acc
+            _ -> [acc, "j", Protox.Encode.encode_bytes(msg.token)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:token, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:token, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_transaction_id(acc, msg)) do
+      defp encode_transaction_id(acc, msg) do
         try do
-          case(msg.transaction_id) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "r", Protox.Encode.encode_string(msg.transaction_id)]
+          case msg.transaction_id do
+            nil -> acc
+            _ -> [acc, "r", Protox.Encode.encode_string(msg.transaction_id)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:transaction_id, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:transaction_id, "invalid field value"),
+                    __STACKTRACE__
         end
       end
     ]
@@ -289,7 +233,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
   (
     (
       @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
+      def decode(bytes) do
         try do
           {:ok, decode!(bytes)}
         rescue
@@ -300,19 +244,14 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
 
       (
         @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
+        def decode!(bytes) do
           {msg, set_fields} =
             parse_key_value([], bytes, struct(ExAliyunOts.TableStore.GetRangeRequest))
 
-          case(
-            [:table_name, :direction, :inclusive_start_primary_key, :exclusive_end_primary_key] --
-              set_fields
-          ) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+          case [:table_name, :direction, :inclusive_start_primary_key, :exclusive_end_primary_key] --
+                 set_fields do
+            [] -> msg
+            missing_fields -> raise Protox.RequiredFieldsError.new(missing_fields)
           end
         end
       )
@@ -320,15 +259,15 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
 
     (
       @spec parse_key_value([atom], binary, struct) :: {struct, [atom]}
-      defp(parse_key_value(set_fields, <<>>, msg)) do
+      defp parse_key_value(set_fields, <<>>, msg) do
         {msg, set_fields}
       end
 
-      defp(parse_key_value(set_fields, bytes, msg)) do
+      defp parse_key_value(set_fields, bytes, msg) do
         {new_set_fields, field, rest} =
-          case(Protox.Decode.parse_key(bytes)) do
+          case Protox.Decode.parse_key(bytes) do
             {0, _, _} ->
-              raise(%Protox.IllegalTagError{})
+              raise %Protox.IllegalTagError{}
 
             {1, _, bytes} ->
               {len, bytes} = Protox.Varint.decode(bytes)
@@ -425,17 +364,16 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
 
   (
     @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
-    def(json_decode(input, opts \\ [])) do
+    def json_decode(input, opts \\ []) do
       try do
         {:ok, json_decode!(input, opts)}
       rescue
-        e in Protox.JsonDecodingError ->
-          {:error, e}
+        e in Protox.JsonDecodingError -> {:error, e}
       end
     end
 
     @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
-    def(json_decode!(input, opts \\ [])) do
+    def json_decode!(input, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
       Protox.JsonDecode.decode!(
@@ -446,17 +384,16 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
     end
 
     @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-    def(json_encode(msg, opts \\ [])) do
+    def json_encode(msg, opts \\ []) do
       try do
         {:ok, json_encode!(msg, opts)}
       rescue
-        e in Protox.JsonEncodingError ->
-          {:error, e}
+        e in Protox.JsonEncodingError -> {:error, e}
       end
     end
 
     @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
-    def(json_encode!(msg, opts \\ [])) do
+    def json_encode!(msg, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
       Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
     end
@@ -467,7 +404,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs()) do
+    def defs() do
       %{
         1 => {:table_name, {:scalar, ""}, :string},
         2 => {:direction, {:scalar, :FORWARD}, {:enum, ExAliyunOts.TableStore.Direction}},
@@ -490,7 +427,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs_by_name()) do
+    def defs_by_name() do
       %{
         cache_blocks: {9, {:scalar, true}, :bool},
         columns_to_get: {3, :unpacked, :string},
@@ -512,7 +449,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
 
   (
     @spec fields_defs() :: list(Protox.Field.t())
-    def(fields_defs()) do
+    def fields_defs() do
       [
         %{
           __struct__: Protox.Field,
@@ -646,7 +583,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:table_name)) do
+        def field_def(:table_name) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -659,7 +596,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("tableName")) do
+        def field_def("tableName") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -672,7 +609,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("table_name")) do
+        def field_def("table_name") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -686,7 +623,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         end
       ),
       (
-        def(field_def(:direction)) do
+        def field_def(:direction) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -699,7 +636,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("direction")) do
+        def field_def("direction") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -715,7 +652,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         []
       ),
       (
-        def(field_def(:columns_to_get)) do
+        def field_def(:columns_to_get) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -728,7 +665,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("columnsToGet")) do
+        def field_def("columnsToGet") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -741,7 +678,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("columns_to_get")) do
+        def field_def("columns_to_get") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -755,7 +692,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         end
       ),
       (
-        def(field_def(:time_range)) do
+        def field_def(:time_range) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -768,7 +705,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("timeRange")) do
+        def field_def("timeRange") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -781,7 +718,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("time_range")) do
+        def field_def("time_range") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -795,7 +732,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         end
       ),
       (
-        def(field_def(:max_versions)) do
+        def field_def(:max_versions) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -808,7 +745,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("maxVersions")) do
+        def field_def("maxVersions") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -821,7 +758,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("max_versions")) do
+        def field_def("max_versions") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -835,7 +772,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         end
       ),
       (
-        def(field_def(:limit)) do
+        def field_def(:limit) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -848,7 +785,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("limit")) do
+        def field_def("limit") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -864,7 +801,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         []
       ),
       (
-        def(field_def(:inclusive_start_primary_key)) do
+        def field_def(:inclusive_start_primary_key) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -877,7 +814,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("inclusiveStartPrimaryKey")) do
+        def field_def("inclusiveStartPrimaryKey") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -890,7 +827,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("inclusive_start_primary_key")) do
+        def field_def("inclusive_start_primary_key") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -904,7 +841,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         end
       ),
       (
-        def(field_def(:exclusive_end_primary_key)) do
+        def field_def(:exclusive_end_primary_key) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -917,7 +854,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("exclusiveEndPrimaryKey")) do
+        def field_def("exclusiveEndPrimaryKey") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -930,7 +867,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("exclusive_end_primary_key")) do
+        def field_def("exclusive_end_primary_key") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -944,7 +881,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         end
       ),
       (
-        def(field_def(:cache_blocks)) do
+        def field_def(:cache_blocks) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -957,7 +894,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("cacheBlocks")) do
+        def field_def("cacheBlocks") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -970,7 +907,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("cache_blocks")) do
+        def field_def("cache_blocks") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -984,7 +921,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         end
       ),
       (
-        def(field_def(:filter)) do
+        def field_def(:filter) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -997,7 +934,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("filter")) do
+        def field_def("filter") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -1013,7 +950,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         []
       ),
       (
-        def(field_def(:start_column)) do
+        def field_def(:start_column) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -1026,7 +963,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("startColumn")) do
+        def field_def("startColumn") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -1039,7 +976,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("start_column")) do
+        def field_def("start_column") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -1053,7 +990,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         end
       ),
       (
-        def(field_def(:end_column)) do
+        def field_def(:end_column) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -1066,7 +1003,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("endColumn")) do
+        def field_def("endColumn") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -1079,7 +1016,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("end_column")) do
+        def field_def("end_column") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -1093,7 +1030,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         end
       ),
       (
-        def(field_def(:token)) do
+        def field_def(:token) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -1106,7 +1043,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("token")) do
+        def field_def("token") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -1122,7 +1059,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
         []
       ),
       (
-        def(field_def(:transaction_id)) do
+        def field_def(:transaction_id) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -1135,7 +1072,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("transactionId")) do
+        def field_def("transactionId") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -1148,7 +1085,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
 
-        def(field_def("transaction_id")) do
+        def field_def("transaction_id") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -1161,7 +1098,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
            }}
         end
       ),
-      def(field_def(_)) do
+      def field_def(_) do
         {:error, :no_such_field}
       end
     ]
@@ -1174,64 +1111,71 @@ defmodule(ExAliyunOts.TableStore.GetRangeRequest) do
             ((:table_name | :direction) | :inclusive_start_primary_key)
             | :exclusive_end_primary_key
           ]
-    def(required_fields()) do
+    def required_fields() do
       [:table_name, :direction, :inclusive_start_primary_key, :exclusive_end_primary_key]
     end
   )
 
   (
     @spec syntax() :: atom()
-    def(syntax()) do
+    def syntax() do
       :proto2
     end
   )
 
   [
     @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-    def(default(:table_name)) do
+    def default(:table_name) do
       {:ok, ""}
     end,
-    def(default(:direction)) do
+    def default(:direction) do
       {:ok, :FORWARD}
     end,
-    def(default(:columns_to_get)) do
+    def default(:columns_to_get) do
       {:error, :no_default_value}
     end,
-    def(default(:time_range)) do
+    def default(:time_range) do
       {:ok, nil}
     end,
-    def(default(:max_versions)) do
+    def default(:max_versions) do
       {:ok, 0}
     end,
-    def(default(:limit)) do
+    def default(:limit) do
       {:ok, 0}
     end,
-    def(default(:inclusive_start_primary_key)) do
+    def default(:inclusive_start_primary_key) do
       {:ok, ""}
     end,
-    def(default(:exclusive_end_primary_key)) do
+    def default(:exclusive_end_primary_key) do
       {:ok, ""}
     end,
-    def(default(:cache_blocks)) do
+    def default(:cache_blocks) do
       {:ok, true}
     end,
-    def(default(:filter)) do
+    def default(:filter) do
       {:ok, ""}
     end,
-    def(default(:start_column)) do
+    def default(:start_column) do
       {:ok, ""}
     end,
-    def(default(:end_column)) do
+    def default(:end_column) do
       {:ok, ""}
     end,
-    def(default(:token)) do
+    def default(:token) do
       {:ok, ""}
     end,
-    def(default(:transaction_id)) do
+    def default(:transaction_id) do
       {:ok, ""}
     end,
-    def(default(_)) do
+    def default(_) do
       {:error, :no_such_field}
     end
   ]
+
+  (
+    @spec file_options() :: nil
+    def file_options() do
+      nil
+    end
+  )
 end

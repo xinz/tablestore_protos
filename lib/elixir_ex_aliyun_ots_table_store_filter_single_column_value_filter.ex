@@ -1,29 +1,26 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
+defmodule ExAliyunOts.TableStoreFilter.SingleColumnValueFilter do
   @moduledoc false
-  defstruct(
-    comparator: nil,
-    column_name: nil,
-    column_value: nil,
-    filter_if_missing: nil,
-    latest_version_only: nil,
-    value_trans_rule: nil
-  )
+  defstruct comparator: nil,
+            column_name: nil,
+            column_value: nil,
+            filter_if_missing: nil,
+            latest_version_only: nil,
+            value_trans_rule: nil
 
   (
     (
       @spec encode(struct) :: {:ok, iodata} | {:error, any}
-      def(encode(msg)) do
+      def encode(msg) do
         try do
           {:ok, encode!(msg)}
         rescue
-          e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
-            {:error, e}
+          e in [Protox.EncodingError, Protox.RequiredFieldsError] -> {:error, e}
         end
       end
 
       @spec encode!(struct) :: iodata | no_return
-      def(encode!(msg)) do
+      def encode!(msg) do
         []
         |> encode_comparator(msg)
         |> encode_column_name(msg)
@@ -37,11 +34,11 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
     []
 
     [
-      defp(encode_comparator(acc, msg)) do
+      defp encode_comparator(acc, msg) do
         try do
-          case(msg.comparator) do
+          case msg.comparator do
             nil ->
-              raise(Protox.RequiredFieldsError.new([:comparator]))
+              raise Protox.RequiredFieldsError.new([:comparator])
 
             _ ->
               [
@@ -54,89 +51,65 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:comparator, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:comparator, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_column_name(acc, msg)) do
+      defp encode_column_name(acc, msg) do
         try do
-          case(msg.column_name) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:column_name]))
-
-            _ ->
-              [acc, <<18>>, Protox.Encode.encode_string(msg.column_name)]
+          case msg.column_name do
+            nil -> raise Protox.RequiredFieldsError.new([:column_name])
+            _ -> [acc, "\x12", Protox.Encode.encode_string(msg.column_name)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:column_name, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:column_name, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_column_value(acc, msg)) do
+      defp encode_column_value(acc, msg) do
         try do
-          case(msg.column_value) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:column_value]))
-
-            _ ->
-              [acc, <<26>>, Protox.Encode.encode_bytes(msg.column_value)]
+          case msg.column_value do
+            nil -> raise Protox.RequiredFieldsError.new([:column_value])
+            _ -> [acc, "\x1A", Protox.Encode.encode_bytes(msg.column_value)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:column_value, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:column_value, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_filter_if_missing(acc, msg)) do
+      defp encode_filter_if_missing(acc, msg) do
         try do
-          case(msg.filter_if_missing) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:filter_if_missing]))
-
-            _ ->
-              [acc, " ", Protox.Encode.encode_bool(msg.filter_if_missing)]
+          case msg.filter_if_missing do
+            nil -> raise Protox.RequiredFieldsError.new([:filter_if_missing])
+            _ -> [acc, " ", Protox.Encode.encode_bool(msg.filter_if_missing)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:filter_if_missing, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:filter_if_missing, "invalid field value"),
+                    __STACKTRACE__
         end
       end,
-      defp(encode_latest_version_only(acc, msg)) do
+      defp encode_latest_version_only(acc, msg) do
         try do
-          case(msg.latest_version_only) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:latest_version_only]))
-
-            _ ->
-              [acc, "(", Protox.Encode.encode_bool(msg.latest_version_only)]
+          case msg.latest_version_only do
+            nil -> raise Protox.RequiredFieldsError.new([:latest_version_only])
+            _ -> [acc, "(", Protox.Encode.encode_bool(msg.latest_version_only)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:latest_version_only, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:latest_version_only, "invalid field value"),
+                    __STACKTRACE__
         end
       end,
-      defp(encode_value_trans_rule(acc, msg)) do
+      defp encode_value_trans_rule(acc, msg) do
         try do
-          case(msg.value_trans_rule) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "2", Protox.Encode.encode_message(msg.value_trans_rule)]
+          case msg.value_trans_rule do
+            nil -> acc
+            _ -> [acc, "2", Protox.Encode.encode_message(msg.value_trans_rule)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:value_trans_rule, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:value_trans_rule, "invalid field value"),
+                    __STACKTRACE__
         end
       end
     ]
@@ -147,7 +120,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
   (
     (
       @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
+      def decode(bytes) do
         try do
           {:ok, decode!(bytes)}
         rescue
@@ -158,7 +131,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
 
       (
         @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
+        def decode!(bytes) do
           {msg, set_fields} =
             parse_key_value(
               [],
@@ -166,15 +139,15 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
               struct(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter)
             )
 
-          case(
-            [:comparator, :column_name, :column_value, :filter_if_missing, :latest_version_only] --
-              set_fields
-          ) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+          case [
+                 :comparator,
+                 :column_name,
+                 :column_value,
+                 :filter_if_missing,
+                 :latest_version_only
+               ] -- set_fields do
+            [] -> msg
+            missing_fields -> raise Protox.RequiredFieldsError.new(missing_fields)
           end
         end
       )
@@ -182,15 +155,15 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
 
     (
       @spec parse_key_value([atom], binary, struct) :: {struct, [atom]}
-      defp(parse_key_value(set_fields, <<>>, msg)) do
+      defp parse_key_value(set_fields, <<>>, msg) do
         {msg, set_fields}
       end
 
-      defp(parse_key_value(set_fields, bytes, msg)) do
+      defp parse_key_value(set_fields, bytes, msg) do
         {new_set_fields, field, rest} =
-          case(Protox.Decode.parse_key(bytes)) do
+          case Protox.Decode.parse_key(bytes) do
             {0, _, _} ->
-              raise(%Protox.IllegalTagError{})
+              raise %Protox.IllegalTagError{}
 
             {1, _, bytes} ->
               {value, rest} =
@@ -244,17 +217,16 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
 
   (
     @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
-    def(json_decode(input, opts \\ [])) do
+    def json_decode(input, opts \\ []) do
       try do
         {:ok, json_decode!(input, opts)}
       rescue
-        e in Protox.JsonDecodingError ->
-          {:error, e}
+        e in Protox.JsonDecodingError -> {:error, e}
       end
     end
 
     @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
-    def(json_decode!(input, opts \\ [])) do
+    def json_decode!(input, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
       Protox.JsonDecode.decode!(
@@ -265,17 +237,16 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
     end
 
     @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-    def(json_encode(msg, opts \\ [])) do
+    def json_encode(msg, opts \\ []) do
       try do
         {:ok, json_encode!(msg, opts)}
       rescue
-        e in Protox.JsonEncodingError ->
-          {:error, e}
+        e in Protox.JsonEncodingError -> {:error, e}
       end
     end
 
     @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
-    def(json_encode!(msg, opts \\ [])) do
+    def json_encode!(msg, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
       Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
     end
@@ -286,7 +257,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs()) do
+    def defs() do
       %{
         1 =>
           {:comparator, {:scalar, :CT_EQUAL},
@@ -305,7 +276,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs_by_name()) do
+    def defs_by_name() do
       %{
         column_name: {2, {:scalar, ""}, :string},
         column_value: {3, {:scalar, ""}, :bytes},
@@ -321,7 +292,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
 
   (
     @spec fields_defs() :: list(Protox.Field.t())
-    def(fields_defs()) do
+    def fields_defs() do
       [
         %{
           __struct__: Protox.Field,
@@ -383,7 +354,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:comparator)) do
+        def field_def(:comparator) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -396,7 +367,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
            }}
         end
 
-        def(field_def("comparator")) do
+        def field_def("comparator") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -412,7 +383,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
         []
       ),
       (
-        def(field_def(:column_name)) do
+        def field_def(:column_name) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -425,7 +396,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
            }}
         end
 
-        def(field_def("columnName")) do
+        def field_def("columnName") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -438,7 +409,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
            }}
         end
 
-        def(field_def("column_name")) do
+        def field_def("column_name") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -452,7 +423,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
         end
       ),
       (
-        def(field_def(:column_value)) do
+        def field_def(:column_value) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -465,7 +436,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
            }}
         end
 
-        def(field_def("columnValue")) do
+        def field_def("columnValue") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -478,7 +449,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
            }}
         end
 
-        def(field_def("column_value")) do
+        def field_def("column_value") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -492,7 +463,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
         end
       ),
       (
-        def(field_def(:filter_if_missing)) do
+        def field_def(:filter_if_missing) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -505,7 +476,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
            }}
         end
 
-        def(field_def("filterIfMissing")) do
+        def field_def("filterIfMissing") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -518,7 +489,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
            }}
         end
 
-        def(field_def("filter_if_missing")) do
+        def field_def("filter_if_missing") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -532,7 +503,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
         end
       ),
       (
-        def(field_def(:latest_version_only)) do
+        def field_def(:latest_version_only) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -545,7 +516,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
            }}
         end
 
-        def(field_def("latestVersionOnly")) do
+        def field_def("latestVersionOnly") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -558,7 +529,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
            }}
         end
 
-        def(field_def("latest_version_only")) do
+        def field_def("latest_version_only") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -572,7 +543,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
         end
       ),
       (
-        def(field_def(:value_trans_rule)) do
+        def field_def(:value_trans_rule) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -585,7 +556,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
            }}
         end
 
-        def(field_def("valueTransRule")) do
+        def field_def("valueTransRule") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -598,7 +569,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
            }}
         end
 
-        def(field_def("value_trans_rule")) do
+        def field_def("value_trans_rule") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -611,7 +582,7 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
            }}
         end
       ),
-      def(field_def(_)) do
+      def field_def(_) do
         {:error, :no_such_field}
       end
     ]
@@ -624,40 +595,47 @@ defmodule(ExAliyunOts.TableStoreFilter.SingleColumnValueFilter) do
             (((:comparator | :column_name) | :column_value) | :filter_if_missing)
             | :latest_version_only
           ]
-    def(required_fields()) do
+    def required_fields() do
       [:comparator, :column_name, :column_value, :filter_if_missing, :latest_version_only]
     end
   )
 
   (
     @spec syntax() :: atom()
-    def(syntax()) do
+    def syntax() do
       :proto2
     end
   )
 
   [
     @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-    def(default(:comparator)) do
+    def default(:comparator) do
       {:ok, :CT_EQUAL}
     end,
-    def(default(:column_name)) do
+    def default(:column_name) do
       {:ok, ""}
     end,
-    def(default(:column_value)) do
+    def default(:column_value) do
       {:ok, ""}
     end,
-    def(default(:filter_if_missing)) do
+    def default(:filter_if_missing) do
       {:ok, false}
     end,
-    def(default(:latest_version_only)) do
+    def default(:latest_version_only) do
       {:ok, false}
     end,
-    def(default(:value_trans_rule)) do
+    def default(:value_trans_rule) do
       {:ok, nil}
     end,
-    def(default(_)) do
+    def default(_) do
       {:error, :no_such_field}
     end
   ]
+
+  (
+    @spec file_options() :: nil
+    def file_options() do
+      nil
+    end
+  )
 end

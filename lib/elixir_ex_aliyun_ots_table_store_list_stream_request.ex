@@ -1,22 +1,21 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
+defmodule ExAliyunOts.TableStore.ListStreamRequest do
   @moduledoc false
-  defstruct(table_name: nil)
+  defstruct table_name: nil
 
   (
     (
       @spec encode(struct) :: {:ok, iodata} | {:error, any}
-      def(encode(msg)) do
+      def encode(msg) do
         try do
           {:ok, encode!(msg)}
         rescue
-          e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
-            {:error, e}
+          e in [Protox.EncodingError, Protox.RequiredFieldsError] -> {:error, e}
         end
       end
 
       @spec encode!(struct) :: iodata | no_return
-      def(encode!(msg)) do
+      def encode!(msg) do
         [] |> encode_table_name(msg)
       end
     )
@@ -24,18 +23,15 @@ defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
     []
 
     [
-      defp(encode_table_name(acc, msg)) do
+      defp encode_table_name(acc, msg) do
         try do
-          case(msg.table_name) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
+          case msg.table_name do
+            nil -> acc
+            _ -> [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:table_name, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:table_name, "invalid field value"), __STACKTRACE__
         end
       end
     ]
@@ -46,7 +42,7 @@ defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
   (
     (
       @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
+      def decode(bytes) do
         try do
           {:ok, decode!(bytes)}
         rescue
@@ -57,7 +53,7 @@ defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
 
       (
         @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
+        def decode!(bytes) do
           parse_key_value(bytes, struct(ExAliyunOts.TableStore.ListStreamRequest))
         end
       )
@@ -65,15 +61,15 @@ defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
 
     (
       @spec parse_key_value(binary, struct) :: struct
-      defp(parse_key_value(<<>>, msg)) do
+      defp parse_key_value(<<>>, msg) do
         msg
       end
 
-      defp(parse_key_value(bytes, msg)) do
+      defp parse_key_value(bytes, msg) do
         {field, rest} =
-          case(Protox.Decode.parse_key(bytes)) do
+          case Protox.Decode.parse_key(bytes) do
             {0, _, _} ->
-              raise(%Protox.IllegalTagError{})
+              raise %Protox.IllegalTagError{}
 
             {1, _, bytes} ->
               {len, bytes} = Protox.Varint.decode(bytes)
@@ -95,17 +91,16 @@ defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
 
   (
     @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
-    def(json_decode(input, opts \\ [])) do
+    def json_decode(input, opts \\ []) do
       try do
         {:ok, json_decode!(input, opts)}
       rescue
-        e in Protox.JsonDecodingError ->
-          {:error, e}
+        e in Protox.JsonDecodingError -> {:error, e}
       end
     end
 
     @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
-    def(json_decode!(input, opts \\ [])) do
+    def json_decode!(input, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
       Protox.JsonDecode.decode!(
@@ -116,17 +111,16 @@ defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
     end
 
     @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-    def(json_encode(msg, opts \\ [])) do
+    def json_encode(msg, opts \\ []) do
       try do
         {:ok, json_encode!(msg, opts)}
       rescue
-        e in Protox.JsonEncodingError ->
-          {:error, e}
+        e in Protox.JsonEncodingError -> {:error, e}
       end
     end
 
     @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
-    def(json_encode!(msg, opts \\ [])) do
+    def json_encode!(msg, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
       Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
     end
@@ -137,7 +131,7 @@ defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs()) do
+    def defs() do
       %{1 => {:table_name, {:scalar, ""}, :string}}
     end
 
@@ -145,14 +139,14 @@ defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs_by_name()) do
+    def defs_by_name() do
       %{table_name: {1, {:scalar, ""}, :string}}
     end
   )
 
   (
     @spec fields_defs() :: list(Protox.Field.t())
-    def(fields_defs()) do
+    def fields_defs() do
       [
         %{
           __struct__: Protox.Field,
@@ -169,7 +163,7 @@ defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:table_name)) do
+        def field_def(:table_name) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -182,7 +176,7 @@ defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
            }}
         end
 
-        def(field_def("tableName")) do
+        def field_def("tableName") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -195,7 +189,7 @@ defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
            }}
         end
 
-        def(field_def("table_name")) do
+        def field_def("table_name") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -208,7 +202,7 @@ defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
            }}
         end
       ),
-      def(field_def(_)) do
+      def field_def(_) do
         {:error, :no_such_field}
       end
     ]
@@ -218,25 +212,32 @@ defmodule(ExAliyunOts.TableStore.ListStreamRequest) do
 
   (
     @spec required_fields() :: []
-    def(required_fields()) do
+    def required_fields() do
       []
     end
   )
 
   (
     @spec syntax() :: atom()
-    def(syntax()) do
+    def syntax() do
       :proto2
     end
   )
 
   [
     @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-    def(default(:table_name)) do
+    def default(:table_name) do
       {:ok, ""}
     end,
-    def(default(_)) do
+    def default(_) do
       {:error, :no_such_field}
     end
   ]
+
+  (
+    @spec file_options() :: nil
+    def file_options() do
+      nil
+    end
+  )
 end

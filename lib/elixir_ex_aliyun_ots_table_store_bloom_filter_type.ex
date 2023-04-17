@@ -1,88 +1,88 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.BloomFilterType) do
+defmodule ExAliyunOts.TableStore.BloomFilterType do
   @moduledoc false
   (
-    defstruct([])
+    defstruct []
 
     (
       @spec default() :: :NONE
-      def(default()) do
+      def default() do
         :NONE
       end
     )
 
-    @spec encode(atom()) :: integer() | atom()
+    @spec encode(atom() | String.t()) :: integer() | atom()
     [
       (
-        def(encode(:NONE)) do
+        def encode(:NONE) do
           1
         end
 
-        def(encode("NONE")) do
+        def encode("NONE") do
           1
         end
       ),
       (
-        def(encode(:CELL)) do
+        def encode(:CELL) do
           2
         end
 
-        def(encode("CELL")) do
+        def encode("CELL") do
           2
         end
       ),
       (
-        def(encode(:ROW)) do
+        def encode(:ROW) do
           3
         end
 
-        def(encode("ROW")) do
+        def encode("ROW") do
           3
         end
       )
     ]
 
-    def(encode(x)) do
+    def encode(x) do
       x
     end
 
     @spec decode(integer()) :: atom() | integer()
     [
-      def(decode(1)) do
+      def decode(1) do
         :NONE
       end,
-      def(decode(2)) do
+      def decode(2) do
         :CELL
       end,
-      def(decode(3)) do
+      def decode(3) do
         :ROW
       end
     ]
 
-    def(decode(x)) do
+    def decode(x) do
       x
     end
 
     @spec constants() :: [{integer(), atom()}]
-    def(constants()) do
+    def constants() do
       [{1, :NONE}, {2, :CELL}, {3, :ROW}]
     end
 
     @spec has_constant?(any()) :: boolean()
     (
       [
-        def(has_constant?(:NONE)) do
+        def has_constant?(:NONE) do
           true
         end,
-        def(has_constant?(:CELL)) do
+        def has_constant?(:CELL) do
           true
         end,
-        def(has_constant?(:ROW)) do
+        def has_constant?(:ROW) do
           true
         end
       ]
 
-      def(has_constant?(_)) do
+      def has_constant?(_) do
         false
       end
     )

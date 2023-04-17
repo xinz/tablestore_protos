@@ -1,72 +1,76 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
+defmodule ExAliyunOts.TableStore.TableConsumedCapacity do
   @moduledoc false
-  defstruct(table_name: nil, consumed: nil, reserved_throughput: nil)
+  defstruct table_name: nil, consumed: nil, reserved_throughput: nil, is_timeseries_meta: nil
 
   (
     (
       @spec encode(struct) :: {:ok, iodata} | {:error, any}
-      def(encode(msg)) do
+      def encode(msg) do
         try do
           {:ok, encode!(msg)}
         rescue
-          e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
-            {:error, e}
+          e in [Protox.EncodingError, Protox.RequiredFieldsError] -> {:error, e}
         end
       end
 
       @spec encode!(struct) :: iodata | no_return
-      def(encode!(msg)) do
-        [] |> encode_table_name(msg) |> encode_consumed(msg) |> encode_reserved_throughput(msg)
+      def encode!(msg) do
+        []
+        |> encode_table_name(msg)
+        |> encode_consumed(msg)
+        |> encode_reserved_throughput(msg)
+        |> encode_is_timeseries_meta(msg)
       end
     )
 
     []
 
     [
-      defp(encode_table_name(acc, msg)) do
+      defp encode_table_name(acc, msg) do
         try do
-          case(msg.table_name) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
+          case msg.table_name do
+            nil -> acc
+            _ -> [acc, "\n", Protox.Encode.encode_string(msg.table_name)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:table_name, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:table_name, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_consumed(acc, msg)) do
+      defp encode_consumed(acc, msg) do
         try do
-          case(msg.consumed) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<18>>, Protox.Encode.encode_message(msg.consumed)]
+          case msg.consumed do
+            nil -> acc
+            _ -> [acc, "\x12", Protox.Encode.encode_message(msg.consumed)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:consumed, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:consumed, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_reserved_throughput(acc, msg)) do
+      defp encode_reserved_throughput(acc, msg) do
         try do
-          case(msg.reserved_throughput) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<26>>, Protox.Encode.encode_message(msg.reserved_throughput)]
+          case msg.reserved_throughput do
+            nil -> acc
+            _ -> [acc, "\x1A", Protox.Encode.encode_message(msg.reserved_throughput)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:reserved_throughput, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:reserved_throughput, "invalid field value"),
+                    __STACKTRACE__
+        end
+      end,
+      defp encode_is_timeseries_meta(acc, msg) do
+        try do
+          case msg.is_timeseries_meta do
+            nil -> acc
+            _ -> [acc, " ", Protox.Encode.encode_bool(msg.is_timeseries_meta)]
+          end
+        rescue
+          ArgumentError ->
+            reraise Protox.EncodingError.new(:is_timeseries_meta, "invalid field value"),
+                    __STACKTRACE__
         end
       end
     ]
@@ -77,7 +81,7 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
   (
     (
       @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
+      def decode(bytes) do
         try do
           {:ok, decode!(bytes)}
         rescue
@@ -88,7 +92,7 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
 
       (
         @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
+        def decode!(bytes) do
           parse_key_value(bytes, struct(ExAliyunOts.TableStore.TableConsumedCapacity))
         end
       )
@@ -96,15 +100,15 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
 
     (
       @spec parse_key_value(binary, struct) :: struct
-      defp(parse_key_value(<<>>, msg)) do
+      defp parse_key_value(<<>>, msg) do
         msg
       end
 
-      defp(parse_key_value(bytes, msg)) do
+      defp parse_key_value(bytes, msg) do
         {field, rest} =
-          case(Protox.Decode.parse_key(bytes)) do
+          case Protox.Decode.parse_key(bytes) do
             {0, _, _} ->
-              raise(%Protox.IllegalTagError{})
+              raise %Protox.IllegalTagError{}
 
             {1, _, bytes} ->
               {len, bytes} = Protox.Varint.decode(bytes)
@@ -135,6 +139,10 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
                    )
                ], rest}
 
+            {4, _, bytes} ->
+              {value, rest} = Protox.Decode.parse_bool(bytes)
+              {[is_timeseries_meta: value], rest}
+
             {tag, wire_type, rest} ->
               {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
               {[], rest}
@@ -150,17 +158,16 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
 
   (
     @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
-    def(json_decode(input, opts \\ [])) do
+    def json_decode(input, opts \\ []) do
       try do
         {:ok, json_decode!(input, opts)}
       rescue
-        e in Protox.JsonDecodingError ->
-          {:error, e}
+        e in Protox.JsonDecodingError -> {:error, e}
       end
     end
 
     @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
-    def(json_decode!(input, opts \\ [])) do
+    def json_decode!(input, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
       Protox.JsonDecode.decode!(
@@ -171,17 +178,16 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
     end
 
     @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-    def(json_encode(msg, opts \\ [])) do
+    def json_encode(msg, opts \\ []) do
       try do
         {:ok, json_encode!(msg, opts)}
       rescue
-        e in Protox.JsonEncodingError ->
-          {:error, e}
+        e in Protox.JsonEncodingError -> {:error, e}
       end
     end
 
     @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
-    def(json_encode!(msg, opts \\ [])) do
+    def json_encode!(msg, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
       Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
     end
@@ -192,13 +198,14 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs()) do
+    def defs() do
       %{
         1 => {:table_name, {:scalar, ""}, :string},
         2 => {:consumed, {:scalar, nil}, {:message, ExAliyunOts.TableStore.ConsumedCapacity}},
         3 =>
           {:reserved_throughput, {:scalar, nil},
-           {:message, ExAliyunOts.TableStore.ReservedThroughput}}
+           {:message, ExAliyunOts.TableStore.ReservedThroughput}},
+        4 => {:is_timeseries_meta, {:scalar, false}, :bool}
       }
     end
 
@@ -206,9 +213,10 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs_by_name()) do
+    def defs_by_name() do
       %{
         consumed: {2, {:scalar, nil}, {:message, ExAliyunOts.TableStore.ConsumedCapacity}},
+        is_timeseries_meta: {4, {:scalar, false}, :bool},
         reserved_throughput:
           {3, {:scalar, nil}, {:message, ExAliyunOts.TableStore.ReservedThroughput}},
         table_name: {1, {:scalar, ""}, :string}
@@ -218,7 +226,7 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
 
   (
     @spec fields_defs() :: list(Protox.Field.t())
-    def(fields_defs()) do
+    def fields_defs() do
       [
         %{
           __struct__: Protox.Field,
@@ -246,6 +254,15 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
           name: :reserved_throughput,
           tag: 3,
           type: {:message, ExAliyunOts.TableStore.ReservedThroughput}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "isTimeseriesMeta",
+          kind: {:scalar, false},
+          label: :optional,
+          name: :is_timeseries_meta,
+          tag: 4,
+          type: :bool
         }
       ]
     end
@@ -253,7 +270,7 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:table_name)) do
+        def field_def(:table_name) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -266,7 +283,7 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
            }}
         end
 
-        def(field_def("tableName")) do
+        def field_def("tableName") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -279,7 +296,7 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
            }}
         end
 
-        def(field_def("table_name")) do
+        def field_def("table_name") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -293,7 +310,7 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
         end
       ),
       (
-        def(field_def(:consumed)) do
+        def field_def(:consumed) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -306,7 +323,7 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
            }}
         end
 
-        def(field_def("consumed")) do
+        def field_def("consumed") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -322,7 +339,7 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
         []
       ),
       (
-        def(field_def(:reserved_throughput)) do
+        def field_def(:reserved_throughput) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -335,7 +352,7 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
            }}
         end
 
-        def(field_def("reservedThroughput")) do
+        def field_def("reservedThroughput") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -348,7 +365,7 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
            }}
         end
 
-        def(field_def("reserved_throughput")) do
+        def field_def("reserved_throughput") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -361,7 +378,47 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
            }}
         end
       ),
-      def(field_def(_)) do
+      (
+        def field_def(:is_timeseries_meta) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "isTimeseriesMeta",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :is_timeseries_meta,
+             tag: 4,
+             type: :bool
+           }}
+        end
+
+        def field_def("isTimeseriesMeta") do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "isTimeseriesMeta",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :is_timeseries_meta,
+             tag: 4,
+             type: :bool
+           }}
+        end
+
+        def field_def("is_timeseries_meta") do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "isTimeseriesMeta",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :is_timeseries_meta,
+             tag: 4,
+             type: :bool
+           }}
+        end
+      ),
+      def field_def(_) do
         {:error, :no_such_field}
       end
     ]
@@ -371,31 +428,41 @@ defmodule(ExAliyunOts.TableStore.TableConsumedCapacity) do
 
   (
     @spec required_fields() :: []
-    def(required_fields()) do
+    def required_fields() do
       []
     end
   )
 
   (
     @spec syntax() :: atom()
-    def(syntax()) do
+    def syntax() do
       :proto2
     end
   )
 
   [
     @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-    def(default(:table_name)) do
+    def default(:table_name) do
       {:ok, ""}
     end,
-    def(default(:consumed)) do
+    def default(:consumed) do
       {:ok, nil}
     end,
-    def(default(:reserved_throughput)) do
+    def default(:reserved_throughput) do
       {:ok, nil}
     end,
-    def(default(_)) do
+    def default(:is_timeseries_meta) do
+      {:ok, false}
+    end,
+    def default(_) do
       {:error, :no_such_field}
     end
   ]
+
+  (
+    @spec file_options() :: nil
+    def file_options() do
+      nil
+    end
+  )
 end

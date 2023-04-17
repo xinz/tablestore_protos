@@ -1,22 +1,21 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
+defmodule ExAliyunOts.TableStore.GetRangeResponse do
   @moduledoc false
-  defstruct(consumed: nil, rows: nil, next_start_primary_key: nil, next_token: nil)
+  defstruct consumed: nil, rows: nil, next_start_primary_key: nil, next_token: nil
 
   (
     (
       @spec encode(struct) :: {:ok, iodata} | {:error, any}
-      def(encode(msg)) do
+      def encode(msg) do
         try do
           {:ok, encode!(msg)}
         rescue
-          e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
-            {:error, e}
+          e in [Protox.EncodingError, Protox.RequiredFieldsError] -> {:error, e}
         end
       end
 
       @spec encode!(struct) :: iodata | no_return
-      def(encode!(msg)) do
+      def encode!(msg) do
         []
         |> encode_consumed(msg)
         |> encode_rows(msg)
@@ -28,63 +27,49 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
     []
 
     [
-      defp(encode_consumed(acc, msg)) do
+      defp encode_consumed(acc, msg) do
         try do
-          case(msg.consumed) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:consumed]))
-
-            _ ->
-              [acc, "\n", Protox.Encode.encode_message(msg.consumed)]
+          case msg.consumed do
+            nil -> raise Protox.RequiredFieldsError.new([:consumed])
+            _ -> [acc, "\n", Protox.Encode.encode_message(msg.consumed)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:consumed, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:consumed, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_rows(acc, msg)) do
+      defp encode_rows(acc, msg) do
         try do
-          case(msg.rows) do
-            nil ->
-              raise(Protox.RequiredFieldsError.new([:rows]))
-
-            _ ->
-              [acc, <<18>>, Protox.Encode.encode_bytes(msg.rows)]
+          case msg.rows do
+            nil -> raise Protox.RequiredFieldsError.new([:rows])
+            _ -> [acc, "\x12", Protox.Encode.encode_bytes(msg.rows)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:rows, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:rows, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_next_start_primary_key(acc, msg)) do
+      defp encode_next_start_primary_key(acc, msg) do
         try do
-          case(msg.next_start_primary_key) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<26>>, Protox.Encode.encode_bytes(msg.next_start_primary_key)]
+          case msg.next_start_primary_key do
+            nil -> acc
+            _ -> [acc, "\x1A", Protox.Encode.encode_bytes(msg.next_start_primary_key)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:next_start_primary_key, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:next_start_primary_key, "invalid field value"),
+                    __STACKTRACE__
         end
       end,
-      defp(encode_next_token(acc, msg)) do
+      defp encode_next_token(acc, msg) do
         try do
-          case(msg.next_token) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\"", Protox.Encode.encode_bytes(msg.next_token)]
+          case msg.next_token do
+            nil -> acc
+            _ -> [acc, "\"", Protox.Encode.encode_bytes(msg.next_token)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:next_token, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:next_token, "invalid field value"), __STACKTRACE__
         end
       end
     ]
@@ -95,7 +80,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
   (
     (
       @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
+      def decode(bytes) do
         try do
           {:ok, decode!(bytes)}
         rescue
@@ -106,16 +91,13 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
 
       (
         @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
+        def decode!(bytes) do
           {msg, set_fields} =
             parse_key_value([], bytes, struct(ExAliyunOts.TableStore.GetRangeResponse))
 
-          case([:consumed, :rows] -- set_fields) do
-            [] ->
-              msg
-
-            missing_fields ->
-              raise(Protox.RequiredFieldsError.new(missing_fields))
+          case [:consumed, :rows] -- set_fields do
+            [] -> msg
+            missing_fields -> raise Protox.RequiredFieldsError.new(missing_fields)
           end
         end
       )
@@ -123,15 +105,15 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
 
     (
       @spec parse_key_value([atom], binary, struct) :: {struct, [atom]}
-      defp(parse_key_value(set_fields, <<>>, msg)) do
+      defp parse_key_value(set_fields, <<>>, msg) do
         {msg, set_fields}
       end
 
-      defp(parse_key_value(set_fields, bytes, msg)) do
+      defp parse_key_value(set_fields, bytes, msg) do
         {new_set_fields, field, rest} =
-          case(Protox.Decode.parse_key(bytes)) do
+          case Protox.Decode.parse_key(bytes) do
             {0, _, _} ->
-              raise(%Protox.IllegalTagError{})
+              raise %Protox.IllegalTagError{}
 
             {1, _, bytes} ->
               {len, bytes} = Protox.Varint.decode(bytes)
@@ -176,17 +158,16 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
 
   (
     @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
-    def(json_decode(input, opts \\ [])) do
+    def json_decode(input, opts \\ []) do
       try do
         {:ok, json_decode!(input, opts)}
       rescue
-        e in Protox.JsonDecodingError ->
-          {:error, e}
+        e in Protox.JsonDecodingError -> {:error, e}
       end
     end
 
     @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
-    def(json_decode!(input, opts \\ [])) do
+    def json_decode!(input, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
       Protox.JsonDecode.decode!(
@@ -197,17 +178,16 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
     end
 
     @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-    def(json_encode(msg, opts \\ [])) do
+    def json_encode(msg, opts \\ []) do
       try do
         {:ok, json_encode!(msg, opts)}
       rescue
-        e in Protox.JsonEncodingError ->
-          {:error, e}
+        e in Protox.JsonEncodingError -> {:error, e}
       end
     end
 
     @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
-    def(json_encode!(msg, opts \\ [])) do
+    def json_encode!(msg, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
       Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
     end
@@ -218,7 +198,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs()) do
+    def defs() do
       %{
         1 => {:consumed, {:scalar, nil}, {:message, ExAliyunOts.TableStore.ConsumedCapacity}},
         2 => {:rows, {:scalar, ""}, :bytes},
@@ -231,7 +211,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs_by_name()) do
+    def defs_by_name() do
       %{
         consumed: {1, {:scalar, nil}, {:message, ExAliyunOts.TableStore.ConsumedCapacity}},
         next_start_primary_key: {3, {:scalar, ""}, :bytes},
@@ -243,7 +223,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
 
   (
     @spec fields_defs() :: list(Protox.Field.t())
-    def(fields_defs()) do
+    def fields_defs() do
       [
         %{
           __struct__: Protox.Field,
@@ -287,7 +267,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:consumed)) do
+        def field_def(:consumed) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -300,7 +280,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
            }}
         end
 
-        def(field_def("consumed")) do
+        def field_def("consumed") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -316,7 +296,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
         []
       ),
       (
-        def(field_def(:rows)) do
+        def field_def(:rows) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -329,7 +309,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
            }}
         end
 
-        def(field_def("rows")) do
+        def field_def("rows") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -345,7 +325,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
         []
       ),
       (
-        def(field_def(:next_start_primary_key)) do
+        def field_def(:next_start_primary_key) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -358,7 +338,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
            }}
         end
 
-        def(field_def("nextStartPrimaryKey")) do
+        def field_def("nextStartPrimaryKey") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -371,7 +351,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
            }}
         end
 
-        def(field_def("next_start_primary_key")) do
+        def field_def("next_start_primary_key") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -385,7 +365,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
         end
       ),
       (
-        def(field_def(:next_token)) do
+        def field_def(:next_token) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -398,7 +378,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
            }}
         end
 
-        def(field_def("nextToken")) do
+        def field_def("nextToken") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -411,7 +391,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
            }}
         end
 
-        def(field_def("next_token")) do
+        def field_def("next_token") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -424,7 +404,7 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
            }}
         end
       ),
-      def(field_def(_)) do
+      def field_def(_) do
         {:error, :no_such_field}
       end
     ]
@@ -434,34 +414,41 @@ defmodule(ExAliyunOts.TableStore.GetRangeResponse) do
 
   (
     @spec required_fields() :: [:consumed | :rows]
-    def(required_fields()) do
+    def required_fields() do
       [:consumed, :rows]
     end
   )
 
   (
     @spec syntax() :: atom()
-    def(syntax()) do
+    def syntax() do
       :proto2
     end
   )
 
   [
     @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-    def(default(:consumed)) do
+    def default(:consumed) do
       {:ok, nil}
     end,
-    def(default(:rows)) do
+    def default(:rows) do
       {:ok, ""}
     end,
-    def(default(:next_start_primary_key)) do
+    def default(:next_start_primary_key) do
       {:ok, ""}
     end,
-    def(default(:next_token)) do
+    def default(:next_token) do
       {:ok, ""}
     end,
-    def(default(_)) do
+    def default(_) do
       {:error, :no_such_field}
     end
   ]
+
+  (
+    @spec file_options() :: nil
+    def file_options() do
+      nil
+    end
+  )
 end

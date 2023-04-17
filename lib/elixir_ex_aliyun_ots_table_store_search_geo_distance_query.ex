@@ -1,22 +1,21 @@
 # credo:disable-for-this-file
-defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
+defmodule ExAliyunOts.TableStoreSearch.GeoDistanceQuery do
   @moduledoc false
-  defstruct(field_name: nil, center_point: nil, distance: nil)
+  defstruct field_name: nil, center_point: nil, distance: nil
 
   (
     (
       @spec encode(struct) :: {:ok, iodata} | {:error, any}
-      def(encode(msg)) do
+      def encode(msg) do
         try do
           {:ok, encode!(msg)}
         rescue
-          e in [Protox.EncodingError, Protox.RequiredFieldsError] ->
-            {:error, e}
+          e in [Protox.EncodingError, Protox.RequiredFieldsError] -> {:error, e}
         end
       end
 
       @spec encode!(struct) :: iodata | no_return
-      def(encode!(msg)) do
+      def encode!(msg) do
         [] |> encode_field_name(msg) |> encode_center_point(msg) |> encode_distance(msg)
       end
     )
@@ -24,49 +23,37 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
     []
 
     [
-      defp(encode_field_name(acc, msg)) do
+      defp encode_field_name(acc, msg) do
         try do
-          case(msg.field_name) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, "\n", Protox.Encode.encode_string(msg.field_name)]
+          case msg.field_name do
+            nil -> acc
+            _ -> [acc, "\n", Protox.Encode.encode_string(msg.field_name)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:field_name, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:field_name, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_center_point(acc, msg)) do
+      defp encode_center_point(acc, msg) do
         try do
-          case(msg.center_point) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<18>>, Protox.Encode.encode_string(msg.center_point)]
+          case msg.center_point do
+            nil -> acc
+            _ -> [acc, "\x12", Protox.Encode.encode_string(msg.center_point)]
           end
         rescue
           ArgumentError ->
-            reraise(
-              Protox.EncodingError.new(:center_point, "invalid field value"),
-              __STACKTRACE__
-            )
+            reraise Protox.EncodingError.new(:center_point, "invalid field value"), __STACKTRACE__
         end
       end,
-      defp(encode_distance(acc, msg)) do
+      defp encode_distance(acc, msg) do
         try do
-          case(msg.distance) do
-            nil ->
-              acc
-
-            _ ->
-              [acc, <<25>>, Protox.Encode.encode_double(msg.distance)]
+          case msg.distance do
+            nil -> acc
+            _ -> [acc, "\x19", Protox.Encode.encode_double(msg.distance)]
           end
         rescue
           ArgumentError ->
-            reraise(Protox.EncodingError.new(:distance, "invalid field value"), __STACKTRACE__)
+            reraise Protox.EncodingError.new(:distance, "invalid field value"), __STACKTRACE__
         end
       end
     ]
@@ -77,7 +64,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
   (
     (
       @spec decode(binary) :: {:ok, struct} | {:error, any}
-      def(decode(bytes)) do
+      def decode(bytes) do
         try do
           {:ok, decode!(bytes)}
         rescue
@@ -88,7 +75,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
 
       (
         @spec decode!(binary) :: struct | no_return
-        def(decode!(bytes)) do
+        def decode!(bytes) do
           parse_key_value(bytes, struct(ExAliyunOts.TableStoreSearch.GeoDistanceQuery))
         end
       )
@@ -96,15 +83,15 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
 
     (
       @spec parse_key_value(binary, struct) :: struct
-      defp(parse_key_value(<<>>, msg)) do
+      defp parse_key_value(<<>>, msg) do
         msg
       end
 
-      defp(parse_key_value(bytes, msg)) do
+      defp parse_key_value(bytes, msg) do
         {field, rest} =
-          case(Protox.Decode.parse_key(bytes)) do
+          case Protox.Decode.parse_key(bytes) do
             {0, _, _} ->
-              raise(%Protox.IllegalTagError{})
+              raise %Protox.IllegalTagError{}
 
             {1, _, bytes} ->
               {len, bytes} = Protox.Varint.decode(bytes)
@@ -135,17 +122,16 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
 
   (
     @spec json_decode(iodata(), keyword()) :: {:ok, struct()} | {:error, any()}
-    def(json_decode(input, opts \\ [])) do
+    def json_decode(input, opts \\ []) do
       try do
         {:ok, json_decode!(input, opts)}
       rescue
-        e in Protox.JsonDecodingError ->
-          {:error, e}
+        e in Protox.JsonDecodingError -> {:error, e}
       end
     end
 
     @spec json_decode!(iodata(), keyword()) :: struct() | no_return()
-    def(json_decode!(input, opts \\ [])) do
+    def json_decode!(input, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :decode)
 
       Protox.JsonDecode.decode!(
@@ -156,17 +142,16 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
     end
 
     @spec json_encode(struct(), keyword()) :: {:ok, iodata()} | {:error, any()}
-    def(json_encode(msg, opts \\ [])) do
+    def json_encode(msg, opts \\ []) do
       try do
         {:ok, json_encode!(msg, opts)}
       rescue
-        e in Protox.JsonEncodingError ->
-          {:error, e}
+        e in Protox.JsonEncodingError -> {:error, e}
       end
     end
 
     @spec json_encode!(struct(), keyword()) :: iodata() | no_return()
-    def(json_encode!(msg, opts \\ [])) do
+    def json_encode!(msg, opts \\ []) do
       {json_library_wrapper, json_library} = Protox.JsonLibrary.get_library(opts, :encode)
       Protox.JsonEncode.encode!(msg, &json_library_wrapper.encode!(json_library, &1))
     end
@@ -177,7 +162,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
     @spec defs() :: %{
             required(non_neg_integer) => {atom, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs()) do
+    def defs() do
       %{
         1 => {:field_name, {:scalar, ""}, :string},
         2 => {:center_point, {:scalar, ""}, :string},
@@ -189,7 +174,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
     @spec defs_by_name() :: %{
             required(atom) => {non_neg_integer, Protox.Types.kind(), Protox.Types.type()}
           }
-    def(defs_by_name()) do
+    def defs_by_name() do
       %{
         center_point: {2, {:scalar, ""}, :string},
         distance: {3, {:scalar, 0.0}, :double},
@@ -200,7 +185,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
 
   (
     @spec fields_defs() :: list(Protox.Field.t())
-    def(fields_defs()) do
+    def fields_defs() do
       [
         %{
           __struct__: Protox.Field,
@@ -235,7 +220,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
     [
       @spec(field_def(atom) :: {:ok, Protox.Field.t()} | {:error, :no_such_field}),
       (
-        def(field_def(:field_name)) do
+        def field_def(:field_name) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -248,7 +233,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
            }}
         end
 
-        def(field_def("fieldName")) do
+        def field_def("fieldName") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -261,7 +246,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
            }}
         end
 
-        def(field_def("field_name")) do
+        def field_def("field_name") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -275,7 +260,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
         end
       ),
       (
-        def(field_def(:center_point)) do
+        def field_def(:center_point) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -288,7 +273,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
            }}
         end
 
-        def(field_def("centerPoint")) do
+        def field_def("centerPoint") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -301,7 +286,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
            }}
         end
 
-        def(field_def("center_point")) do
+        def field_def("center_point") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -315,7 +300,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
         end
       ),
       (
-        def(field_def(:distance)) do
+        def field_def(:distance) do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -328,7 +313,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
            }}
         end
 
-        def(field_def("distance")) do
+        def field_def("distance") do
           {:ok,
            %{
              __struct__: Protox.Field,
@@ -343,7 +328,7 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
 
         []
       ),
-      def(field_def(_)) do
+      def field_def(_) do
         {:error, :no_such_field}
       end
     ]
@@ -353,31 +338,38 @@ defmodule(ExAliyunOts.TableStoreSearch.GeoDistanceQuery) do
 
   (
     @spec required_fields() :: []
-    def(required_fields()) do
+    def required_fields() do
       []
     end
   )
 
   (
     @spec syntax() :: atom()
-    def(syntax()) do
+    def syntax() do
       :proto2
     end
   )
 
   [
     @spec(default(atom) :: {:ok, boolean | integer | String.t() | float} | {:error, atom}),
-    def(default(:field_name)) do
+    def default(:field_name) do
       {:ok, ""}
     end,
-    def(default(:center_point)) do
+    def default(:center_point) do
       {:ok, ""}
     end,
-    def(default(:distance)) do
+    def default(:distance) do
       {:ok, 0.0}
     end,
-    def(default(_)) do
+    def default(_) do
       {:error, :no_such_field}
     end
   ]
+
+  (
+    @spec file_options() :: nil
+    def file_options() do
+      nil
+    end
+  )
 end
