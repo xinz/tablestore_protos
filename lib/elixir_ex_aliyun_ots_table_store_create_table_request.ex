@@ -7,7 +7,8 @@ defmodule ExAliyunOts.TableStore.CreateTableRequest do
             partitions: [],
             stream_spec: nil,
             sse_spec: nil,
-            index_metas: []
+            index_metas: [],
+            enable_local_txn: nil
 
   (
     (
@@ -30,6 +31,7 @@ defmodule ExAliyunOts.TableStore.CreateTableRequest do
         |> encode_stream_spec(msg)
         |> encode_sse_spec(msg)
         |> encode_index_metas(msg)
+        |> encode_enable_local_txn(msg)
       end
     )
 
@@ -129,6 +131,18 @@ defmodule ExAliyunOts.TableStore.CreateTableRequest do
         rescue
           ArgumentError ->
             reraise Protox.EncodingError.new(:index_metas, "invalid field value"), __STACKTRACE__
+        end
+      end,
+      defp encode_enable_local_txn(acc, msg) do
+        try do
+          case msg.enable_local_txn do
+            nil -> acc
+            _ -> [acc, "@", Protox.Encode.encode_bool(msg.enable_local_txn)]
+          end
+        rescue
+          ArgumentError ->
+            reraise Protox.EncodingError.new(:enable_local_txn, "invalid field value"),
+                    __STACKTRACE__
         end
       end
     ]
@@ -259,6 +273,10 @@ defmodule ExAliyunOts.TableStore.CreateTableRequest do
                    msg.index_metas ++ [ExAliyunOts.TableStore.IndexMeta.decode!(delimited)]
                ], rest}
 
+            {8, _, bytes} ->
+              {value, rest} = Protox.Decode.parse_bool(bytes)
+              {[:enable_local_txn | set_fields], [enable_local_txn: value], rest}
+
             {tag, wire_type, rest} ->
               {_, rest} = Protox.Decode.parse_unknown(tag, wire_type, rest)
               {set_fields, [], rest}
@@ -325,7 +343,8 @@ defmodule ExAliyunOts.TableStore.CreateTableRequest do
         5 =>
           {:stream_spec, {:scalar, nil}, {:message, ExAliyunOts.TableStore.StreamSpecification}},
         6 => {:sse_spec, {:scalar, nil}, {:message, ExAliyunOts.TableStore.SSESpecification}},
-        7 => {:index_metas, :unpacked, {:message, ExAliyunOts.TableStore.IndexMeta}}
+        7 => {:index_metas, :unpacked, {:message, ExAliyunOts.TableStore.IndexMeta}},
+        8 => {:enable_local_txn, {:scalar, false}, :bool}
       }
     end
 
@@ -335,6 +354,7 @@ defmodule ExAliyunOts.TableStore.CreateTableRequest do
           }
     def defs_by_name() do
       %{
+        enable_local_txn: {8, {:scalar, false}, :bool},
         index_metas: {7, :unpacked, {:message, ExAliyunOts.TableStore.IndexMeta}},
         partitions: {4, :unpacked, {:message, ExAliyunOts.TableStore.PartitionRange}},
         reserved_throughput:
@@ -413,6 +433,15 @@ defmodule ExAliyunOts.TableStore.CreateTableRequest do
           name: :index_metas,
           tag: 7,
           type: {:message, ExAliyunOts.TableStore.IndexMeta}
+        },
+        %{
+          __struct__: Protox.Field,
+          json_name: "enableLocalTxn",
+          kind: {:scalar, false},
+          label: :optional,
+          name: :enable_local_txn,
+          tag: 8,
+          type: :bool
         }
       ]
     end
@@ -688,6 +717,46 @@ defmodule ExAliyunOts.TableStore.CreateTableRequest do
            }}
         end
       ),
+      (
+        def field_def(:enable_local_txn) do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "enableLocalTxn",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :enable_local_txn,
+             tag: 8,
+             type: :bool
+           }}
+        end
+
+        def field_def("enableLocalTxn") do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "enableLocalTxn",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :enable_local_txn,
+             tag: 8,
+             type: :bool
+           }}
+        end
+
+        def field_def("enable_local_txn") do
+          {:ok,
+           %{
+             __struct__: Protox.Field,
+             json_name: "enableLocalTxn",
+             kind: {:scalar, false},
+             label: :optional,
+             name: :enable_local_txn,
+             tag: 8,
+             type: :bool
+           }}
+        end
+      ),
       def field_def(_) do
         {:error, :no_such_field}
       end
@@ -732,6 +801,9 @@ defmodule ExAliyunOts.TableStore.CreateTableRequest do
     end,
     def default(:index_metas) do
       {:error, :no_default_value}
+    end,
+    def default(:enable_local_txn) do
+      {:ok, false}
     end,
     def default(_) do
       {:error, :no_such_field}
